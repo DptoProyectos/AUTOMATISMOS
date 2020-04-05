@@ -2,7 +2,7 @@
 '''
 Created on 22 mar. 2020
 
-@author: root
+@author: Yosniel Cabrera
 
 Version 2.0.6 06-04-2020 10:41
 '''
@@ -239,4 +239,4 @@ if bool(LIST_CONFIG):
 #   
 # CALCULO TIEMPO DE DEMORA
 #print(f'serv_APP_selection TERMINADO A {time()-sel_start_time} s')
-#
+
