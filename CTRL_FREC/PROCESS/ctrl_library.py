@@ -38,9 +38,13 @@ class ctrl_process_frec(object):
         self.print_log = self.config.lst_get('print_log')
         self.DLGID_CTRL = self.config.lst_get('DLGID_CTRL')
         self.TYPE = self.config.lst_get('TYPE')
+        self.ENABLE_OUTPUTS = self.config.lst_get('ENABLE_OUTPUTS')
+        self.TYPE_IN_FREC = self.config.lst_get('TYPE_IN_FREC')
         self.DLGID_REF = self.config.lst_get('DLGID_REF')
         self.CHANNEL_REF = self.config.lst_get('CHANNEL_REF')
         self.TYPE_IN_FREC = self.config.lst_get('TYPE_IN_FREC')
+        self.DLGID_REF_1 = self.config.lst_get('DLGID_REF_1')
+        self.CHANNEL_REF_1 = self.config.lst_get('CHANNEL_REF_1')
         
         ## INSTANCIAS
         self.logs = ctrl_logs('CTRL_FREC',self.DLGID_CTRL,self.print_log)
@@ -115,13 +119,13 @@ class ctrl_process_frec(object):
             elif self.TYPE_IN_FREC == 'PNP': douts(self.DLGID_CTRL,7)
             #
             # MANDO A PRENDER LA BOMBA
-            pump1(self.DLGID_CTRL, True)
+            if self.ENABLE_OUTPUTS: pump1(self.DLGID_CTRL, True)
             #
              
         elif self.redis.hget(self.DLGID_CTRL, 'SW2') == 'OFF':    
             self.logs.print_inf(name_function, 'APAGAR BOMBA')
             # MANDO A APAGAR LA BOMBA
-            pump1(self.DLGID_CTRL, False)
+            if self.ENABLE_OUTPUTS: pump1(self.DLGID_CTRL, False)
             
         else:
             self.logs.print_inf(name_function, f"error in {name_function}, SW2 = {read_param(self.DLGID_CTRL,'SW2')}")
@@ -163,12 +167,18 @@ class ctrl_process_frec(object):
                 FREC += 1
                 self.logs.print_inf(name_function, 'SE AUMENTA LA FRECUENCIA')
                 #
-                # CHEQUE SI LAS SALIDAS TIENEN QUE ACOPLARSE A ENTRADAS NPN P PNP Y MANDO A SETEAR
-                if self.TYPE_IN_FREC == 'NPN': douts(self.DLGID_CTRL,not_dec(FREC,3))
-                elif self.TYPE_IN_FREC == 'PNP': douts(self.DLGID_CTRL,FREC)    
-                 
-                
-            else: self.logs.print_inf(name_function, 'SE ALCANZA FRECUENCIA MAXIMA')
+                # CHEQUE SI LAS SALIDAS TIENEN QUE ACOPLARSE A ENTRADAS NPN P PNP Y MANDO A SETEAR EN CASO DE ENABLE_OUTPUTS
+                if self.ENABLE_OUTPUTS:
+                    if self.TYPE_IN_FREC == 'NPN': 
+                        douts(self.DLGID_CTRL,not_dec(FREC,3))
+                    elif self.TYPE_IN_FREC == 'PNP': 
+                        douts(self.DLGID_CTRL,FREC)
+                    else: 
+                        self.logs.print_inf(name_function, f"error in {name_function}, TYPE_IN_FREC = {self.TYPE_IN_FREC}")    
+                        self.logs.script_performance(f"error in {name_function}, TYPE_IN_FREC = {self.TYPE_IN_FREC}")
+            else: 
+                self.logs.print_inf(name_function, 'SE ALCANZA FRECUENCIA MAXIMA')
+                self.logs.script_performance('SE ALCANZA FRECUENCIA MAXIMA')
             self.redis.hset(self.DLGID_CTRL, 'FREC', FREC)
             
         elif REF > LMAX:
@@ -177,21 +187,25 @@ class ctrl_process_frec(object):
                 FREC -= 1
                 self.logs.print_inf(name_function, 'SE DISMINUYE LA FRECUENCIA')
                 #
-                # CHEQUE SI LAS SALIDAS TIENEN QUE ACOPLARSE A ENTRADAS NPN P PNP Y MANDO A SETEAR
-                if self.TYPE_IN_FREC == 'NPN': douts(self.DLGID_CTRL,not_dec(FREC,3))
-                elif self.TYPE_IN_FREC == 'PNP': douts(self.DLGID_CTRL,FREC)
-                #
-            else: self.logs.print_inf(name_function, 'SE ALCANZA FRECUENCIA MINIMA')
+                # CHEQUE SI LAS SALIDAS TIENEN QUE ACOPLARSE A ENTRADAS NPN P PNP Y MANDO A SETEAR EN CASO DE ENABLE_OUTPUTS
+                if self.ENABLE_OUTPUTS:
+                    if self.TYPE_IN_FREC == 'NPN': 
+                        douts(self.DLGID_CTRL,not_dec(FREC,3))
+                    elif self.TYPE_IN_FREC == 'PNP': 
+                        douts(self.DLGID_CTRL,FREC)
+                    else:
+                        self.logs.print_inf(name_function, f"error in {name_function}, TYPE_IN_FREC = {self.TYPE_IN_FREC}")    
+                        self.logs.script_performance(f"error in {name_function}, TYPE_IN_FREC = {self.TYPE_IN_FREC}")
+            else: 
+                self.logs.print_inf(name_function, 'SE ALCANZA FRECUENCIA MINIMA')
+                self.logs.script_performance('SE ALCANZA FRECUENCIA MINIMA')
             self.redis.hset(self.DLGID_CTRL, 'FREC', FREC)
             
-        else: self.logs.print_inf(name_function, 'PRESION DENTRO DEL RANGO SELECCIONADO')    
+        else: 
+            self.logs.print_inf(name_function, 'PRESION DENTRO DEL RANGO SELECCIONADO')    
         
         douts(self.DLGID_CTRL, FREC)   
         self.logs.print_out(name_function, 'CURR_FREC', FREC)    
-        
-        
-        
-        
         #
 
             

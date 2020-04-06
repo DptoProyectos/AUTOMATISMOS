@@ -6,7 +6,7 @@ Created on 15 mar. 2020
 
 @author: Yosniel Cabrera
 
-Version 2.0.7 06-04-2020 11:02
+Version 2.0.7 06-04-2020 12:57
 ''' 
 
 
@@ -21,7 +21,7 @@ from CTRL_FREC.PROCESS.ctrl_library import ctrl_process_frec
 from drv_redis import Redis
 from drv_logs import ctrl_logs
 from mypython import *
-from drv_dlg import *
+from drv_dlg import emerg_system, read_param
 from time import time   
 ctrl_start_time = time() 
 
@@ -40,6 +40,7 @@ def control_process(LIST_CONFIG):
     print_log = conf.lst_get('print_log')   
     
     #VARIABLES DE CONFIGURACION
+    ENABLE_OUTPUTS = conf.lst_get('ENABLE_OUTPUTS')
     TYPE_IN_FREC = conf.lst_get('TYPE_IN_FREC')
     DLGID_REF = conf.lst_get('DLGID_REF')   
     CHANNEL_REF = conf.lst_get('CHANNEL_REF') 
@@ -72,6 +73,7 @@ def control_process(LIST_CONFIG):
     logs.print_in(name_function, 'print_log', print_log)
     logs.print_in(name_function, 'DLGID_CTRL', DLGID_CTRL)
     logs.print_in(name_function, 'TYPE', TYPE)
+    logs.print_in(name_function, 'ENABLE_OUTPUTS', ENABLE_OUTPUTS)
     logs.print_in(name_function, 'TYPE_IN_FREC', TYPE_IN_FREC)
     logs.print_in(name_function, 'DLGID_REF', DLGID_REF)
     logs.print_in(name_function, 'CHANNEL_REF', CHANNEL_REF)
@@ -112,21 +114,24 @@ def control_process(LIST_CONFIG):
         redis.hset(DLGID_CTRL, 'LOCAL_MODE', 'NO')    #VISUALIZACION
         #
         # SI NO EXISTE LA VARIABLE DE SELECCION SW1 LA CREO CON VALOR AUTO
-        if not(redis.hexist(DLGID_CTRL, 'SW1')): redis.hset(DLGID_CTRL, 'SW1', 'AUTO')
+        if not(redis.hexist(DLGID_CTRL, 'SW1')): 
+            redis.hset(DLGID_CTRL, 'SW1', 'AUTO')
+            logs.print_inf(name_function, 'NO EXISTE LA VARIABLE SW1 EN REDIS')
+            logs.print_inf(name_function, 'SE CREA LA VARIABLE CON VALOR AUTO')
+            logs.script_performance(f"error in {name_function}, SW1 = ")
+            logs.script_performance(f"error in {name_function}, SE CREA SW1 = AUTO")
         #
         # REVISO EL MODO DE TRABAJO WEB
         if redis.hget(DLGID_CTRL, 'SW1') == 'REMOTO':
             logs.print_inf(name_function, 'TRABAJO EN MODO REMOTO')
             p.modo_remoto()
             
-        elif redis.hget(DLGID_CTRL, 'SW1') == 'BOYA':
-            logs.print_inf(name_function, 'TRABAJO EN MODO BOYA')
-            emerg_system(DLGID_CTRL)
+        elif redis.hget(DLGID_CTRL, 'SW1') in ['BOYA', 'TIMER', ]:
+            logs.print_inf(name_function, 'TRABAJO EN MODO SISTEMA DE EMERGENCIA')
+            if ENABLE_OUTPUTS: emerg_system(DLGID_CTRL)
             
             
-        elif redis.hget(DLGID_CTRL, 'SW1') == 'TIMER':
-            logs.print_inf(name_function, 'TRABAJO EN MODO TIMER')
-            emerg_system(DLGID_CTRL)
+        
                
         elif redis.hget(DLGID_CTRL, 'SW1') == 'AUTO':
             logs.print_inf(name_function, 'TRABAJO EN MODO AUTOMATICO')

@@ -8,7 +8,6 @@ Created on 20 mar. 2020
 #CONEXIONES
 from drv_redis import Redis
 
-
 # FUNCIONES
 def douts(dlgid,out_dec):
     '''
@@ -70,6 +69,29 @@ def pump1(dlgid,action):
     #
     # MANDO A SETEAR LAS SALIDAS DEL DATALOGGER
     redis.hset(dlgid,'OUTPUTS',out)
+
+    
+def emerg_system(dlgid):
+    '''
+    DESCRIPTION
+        Se encarga de poner a funcionar el sitema de emergencia
+        
+    LEYENDA:
+        dlgid => datalogger id
+        EJ: pump1('MER006',True)
+    '''
+    ## INSTANCIAS
+    redis = Redis()
+    #
+    #
+    # LEO LA SALIDA ACTUAL SETEADA
+    last_out = redis.hget(dlgid,'OUTPUTS')
+    # APLICO LA MASCARA 1111010
+    last_out = int(last_out) & int('1111010',2)
+    #
+    #
+    # MANDO A SETEAR LAS SALIDAS DEL DATALOGGER
+    redis.hset(dlgid,'OUTPUTS',last_out)
     
 def read_param(dlgid,param):
     '''
@@ -157,27 +179,7 @@ def read_param(dlgid,param):
                 out = '' 
         return out
 
-def emerg_system(dlgid):
-    '''
-    DESCRIPTION
-        Se encarga de poner a funcionar el sitema de emergencia
-        
-    LEYENDA:
-        dlgid => datalogger id
-        EJ: pump1('MER006',True)
-    '''
-    ## INSTANCIAS
-    redis = Redis()
-    #
-    #
-    # LEO LA SALIDA ACTUAL SETEADA
-    last_out = redis.hget(dlgid,'OUTPUTS')
-    # APLICO LA MASCARA 1111010
-    last_out = int(last_out) & int('1111010',2)
-    #
-    #
-    # MANDO A SETEAR LAS SALIDAS DEL DATALOGGER
-    redis.hset(dlgid,'OUTPUTS',last_out)
+
     
 
  

@@ -20,11 +20,12 @@ gen_start_time = time()
 LIST_CONFIG = [
                 #VARIABLES DE EJECUCION
                 'print_log',        True,                           # VER LOS LOGS EN CONSOLA [ True | False ]
-                'DLGID_CTRL',       'MER007',                    # ID DATALOGGER QUE EJECUTA LAS ACCIONES DE CONTROL
+                'DLGID_CTRL',       'MER007',                       # ID DATALOGGER QUE EJECUTA LAS ACCIONES DE CONTROL
                 'TYPE',             'FREC',                         # CUANDO TIENE LE VALOR CHARGE SE CARGA LA CONFIGURACION DE LA db
                 
                 
                 #VARIABLES DE CONFIGURACION
+                'ENABLE_OUTPUTS',   True,                           # ACTIVA Y DESACTIVA LA ACCION DE LAS SALIDAS PARA ESTE DLGID_CTRL [ True | False]
                 'TYPE_IN_FREC',     'PNP',                          # FORMA EN QUE EL VARIADOR DE VELOCIDAD DETECTA LAS ENTRADAS [ NPN (not_in)| PNP] 
                 'DLGID_REF',        'MER005',                       # DATALOGGER QUE SE USA DE REFERENCIA PARA EL AUTOMATIMO
                 'CHANNEL_REF',      'PMP',                          # NOMBRE DEL CANAL CON LA MEDIDA DE REFERENCIA PARA EL AUTOMATISMO
