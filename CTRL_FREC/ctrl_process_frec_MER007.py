@@ -1,4 +1,4 @@
-#!/drbd/www/cgi-bin/spx/AUTOMATISMOS/myenv/bin/python3.6
+#!/drbd/www/cgi-bin/spx/aut_env/bin/python3.6
 
 '''
 Created on 8 mar. 2020

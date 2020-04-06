@@ -1,4 +1,4 @@
-#!/drbd/www/cgi-bin/spx/AUTOMATISMOS/myenv/bin/python3.6
+#!/drbd/www/cgi-bin/spx/aut_env/bin/python3.6
 '''
 SISTEMA DE CONTROL DE FRECUENCIA
 
@@ -6,7 +6,7 @@ Created on 15 mar. 2020
 
 @author: Yosniel Cabrera
 
-Version 2.0.6 06-04-2020 10:41
+Version 2.0.7 06-04-2020 11:02
 ''' 
 
 

@@ -1,4 +1,4 @@
-#!/drbd/www/cgi-bin/spx/AUTOMATISMOS/myenv/bin/python3.6
+#!/drbd/www/cgi-bin/spx/aut_env/bin/python3.6
 
 '''
 Created on 20 mar. 2020
@@ -11,10 +11,11 @@ FICHERO DE TEST DE APLICACIONES
 print(__doc__)
 
 import sys
-sys.path.append('PROCESS/')
+import os
+
+
 from drv_dlg import * 
 from mypython import *
-
 
 
 

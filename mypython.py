@@ -1,4 +1,4 @@
-#!/usr/bin/python3 -u
+#!/drbd/www/cgi-bin/spx/aut_env/bin/python3.6
 
 '''
 Created on 23 mar. 2020
