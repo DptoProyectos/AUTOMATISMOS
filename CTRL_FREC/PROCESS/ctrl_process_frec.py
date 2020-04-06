@@ -135,10 +135,6 @@ def control_process(LIST_CONFIG):
                 logs.print_inf(name_function, f"SALIDAS DESCACTIVADAS [ENABLE_OUTPUTS = {ENABLE_OUTPUTS}]")    
                 logs.script_performance(f"{name_function} ==> SALIDAS DESCACTIVADAS [ENABLE_OUTPUTS = {ENABLE_OUTPUTS}]")
             
-            
-            
-            
-            
         elif redis.hget(DLGID_CTRL, 'SW1') == 'AUTO':
             logs.print_inf(name_function, 'TRABAJO EN MODO AUTOMATICO')
             #
