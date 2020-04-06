@@ -6,7 +6,7 @@ Created on 15 mar. 2020
 
 @author: Yosniel Cabrera
 
-Version 2.0.7 06-04-2020 12:57
+Version 2.0.8 06-04-2020 16:28
 ''' 
 
 
@@ -20,7 +20,7 @@ import configparser
 from CTRL_FREC.PROCESS.ctrl_library import ctrl_process_frec
 from drv_redis import Redis
 from drv_logs import ctrl_logs
-from mypython import *
+from mypython import str2bool, config_var
 from drv_dlg import emerg_system, read_param
 from time import time   
 ctrl_start_time = time() 
@@ -37,10 +37,10 @@ def control_process(LIST_CONFIG):
     #VARIABLES DE EJECUCION
     DLGID_CTRL = conf.lst_get('DLGID_CTRL') 
     TYPE = conf.lst_get('TYPE')                  
-    print_log = conf.lst_get('print_log')   
+    print_log = str2bool(conf.lst_get('print_log'))
     
     #VARIABLES DE CONFIGURACION
-    ENABLE_OUTPUTS = conf.lst_get('ENABLE_OUTPUTS')
+    ENABLE_OUTPUTS = str2bool(conf.lst_get('ENABLE_OUTPUTS'))
     TYPE_IN_FREC = conf.lst_get('TYPE_IN_FREC')
     DLGID_REF = conf.lst_get('DLGID_REF')   
     CHANNEL_REF = conf.lst_get('CHANNEL_REF') 
@@ -82,7 +82,7 @@ def control_process(LIST_CONFIG):
     #
     # CHEQUEO QUE EXISTAN LOS LINES DEL DATALOGGER DE CONTROL Y EL DE REFERENCIA.
     if not(redis.hexist(DLGID_CTRL,'LINE')): 
-        logs.script_performance(f'NO EXISTE LINE {DLGID_CTRL}')
+        logs.script_performance(f'{name_function} ==> NO EXISTE LINE {DLGID_CTRL}')
         logs.print_inf(name_function,f'NO EXISTE LINE {DLGID_CTRL}')
         logs.print_inf(name_function,'EJECUCION INTERRUMPIDA')
         quit()
@@ -109,7 +109,7 @@ def control_process(LIST_CONFIG):
         # REVISO SI ESTA TRABAJANDO EN MODO LOCAL EN EL TABLERO
     if read_param(DLGID_CTRL,'LM') == '1': 
         logs.print_inf(name_function, 'TRABAJO EN MODO LOCAL')
-        redis.hset(DLGID_CTRL, 'LOCAL_MODE', 'SI')    #VISUALIZACION
+        redis.hset(DLGID_CTRL, 'LOCAL_MODE', 'SI')    
     elif read_param(DLGID_CTRL,'LM') == '0':
         redis.hset(DLGID_CTRL, 'LOCAL_MODE', 'NO')    #VISUALIZACION
         #
@@ -128,11 +128,17 @@ def control_process(LIST_CONFIG):
             
         elif redis.hget(DLGID_CTRL, 'SW1') in ['BOYA', 'TIMER', ]:
             logs.print_inf(name_function, 'TRABAJO EN MODO SISTEMA DE EMERGENCIA')
-            if ENABLE_OUTPUTS: emerg_system(DLGID_CTRL)
+            # REVISO EL ESTADO DE ENABLE_OUTPUTS
+            if ENABLE_OUTPUTS:
+                emerg_system(DLGID_CTRL)
+            else:
+                logs.print_inf(name_function, f"SALIDAS DESCACTIVADAS [ENABLE_OUTPUTS = {ENABLE_OUTPUTS}]")    
+                logs.script_performance(f"{name_function} ==> SALIDAS DESCACTIVADAS [ENABLE_OUTPUTS = {ENABLE_OUTPUTS}]")
             
             
-        
-               
+            
+            
+            
         elif redis.hget(DLGID_CTRL, 'SW1') == 'AUTO':
             logs.print_inf(name_function, 'TRABAJO EN MODO AUTOMATICO')
             #
@@ -145,7 +151,6 @@ def control_process(LIST_CONFIG):
                 logs.print_inf(name_function, 'AUTOMATISMO TRABAJADO CON SISTEMA DE EMERGENCIA')
                 emerg_system(DLGID_CTRL)
             elif redis.hget(DLGID_REF, 'TX_ERROR') == 'NO':
-                #
                 # CHEQUEO ERROR EN EL SENSOR
                 if not(p.chequeo_sensor()):
                     logs.print_inf(name_function, 'ERROR DE SENSOR EN SISTEMA DE REFERENCIA')
@@ -191,7 +196,7 @@ if __name__ == '__main__':
     LIST_CONFIG = [
                 #VARIABLES DE EJECUCION
                 'print_log',        True,                          # VER LOS LOGS EN CONSOLA [ True | False ]
-                'DLGID_CTRL',       'MER006',                      # ID DATALOGGER QUE EJECUTA LAS ACCIONES DE CONTROL
+                'DLGID_CTRL',       'MER004',                      # ID DATALOGGER QUE EJECUTA LAS ACCIONES DE CONTROL
                 'TYPE',             'FREC',                        # CUANDO TIENE LE VALOR CHARGE SE CARGA LA CONFIGURACION DE LA db
                 
                 

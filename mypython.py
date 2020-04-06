@@ -6,6 +6,9 @@ Created on 23 mar. 2020
 @author: Yosniel Cabrera
 '''
 
+# LIBRERIAS
+import json
+
 def lst2str(list):
     '''
     Convierto de lista a string
@@ -25,6 +28,15 @@ def lst2str(list):
     return my_str
 
 
+def str2bool(str):
+    '''
+        Funcion que garantiza que en su salida haya una variable tipo bool
+    '''
+    try: out = json.loads(str.lower()) 
+    except: out = str
+    return out
+    
+    
 def not_dec(in_dec,bits):
     '''
     Invierte la representacion binaria del numero decimal entrado. Devuelve en decimal
