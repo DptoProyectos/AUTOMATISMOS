@@ -239,4 +239,4 @@ if bool(LIST_CONFIG):
 #   
 # CALCULO TIEMPO DE DEMORA
 #print(f'serv_APP_selection TERMINADO A {time()-sel_start_time} s')
-
+#
