@@ -151,13 +151,13 @@ class ctrl_process_frec(object):
         name_function = 'CONTROL_SISTEMA'
         
         # SI NO EXISTE LMIN LO CREO CON VALOR 1
-        if not(self.redis.hexist(self.DLGID_CTRL, 'LMIN_TQA')): self.redis.hset(self.DLGID_CTRL, 'LMIN_TQA', 1)
+        if not(self.redis.hexist(self.DLGID_CTRL, 'LMIN_TQ')): self.redis.hset(self.DLGID_CTRL, 'LMIN_TQ', 1)
         # SI NO EXISTE LMAX LO CREO CON VALOR 1.5
-        if not(self.redis.hexist(self.DLGID_CTRL, 'LMAX_TQA')): self.redis.hset(self.DLGID_CTRL, 'LMAX_TQA', 1.5)
+        if not(self.redis.hexist(self.DLGID_CTRL, 'LMAX_TQ')): self.redis.hset(self.DLGID_CTRL, 'LMAX_TQ', 1.5)
         #
         # LEO LAS VARIABLES LMIN Y LMAX
-        LMIN = float(self.redis.hget(self.DLGID_CTRL, 'LMIN_TQA'))
-        LMAX = float(self.redis.hget(self.DLGID_CTRL, 'LMAX_TQA'))
+        LMIN = float(self.redis.hget(self.DLGID_CTRL, 'LMIN_TQ'))
+        LMAX = float(self.redis.hget(self.DLGID_CTRL, 'LMAX_TQ'))
         
         if self.redis.hexist(self.DLGID_REF,'LINE'):
             REF = float(read_param(self.DLGID_REF,self.CHANNEL_REF))
