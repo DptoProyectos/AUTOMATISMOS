@@ -172,6 +172,7 @@ def control_process(LIST_CONFIG):
             
     else:
         logs.print_inf(name_function, f"error in {name_function}, LM = {read_param(DLGID_CTRL,'LM')}")
+        logs.print_inf(name_function,'EJECUCION INTERRUMPIDA')
         # DEJAR REGISTRO DEL ERROR
         logs.script_performance(f"error in {name_function}, LM = {read_param(DLGID_CTRL,'LM')}")
             
