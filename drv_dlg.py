@@ -8,7 +8,7 @@ Created on 20 mar. 2020
 #CONEXIONES
 from drv_redis import Redis
 
-# FUNCIONES
+# FUNCIONES}|
 def douts(dlgid,out_dec):
     '''
     DESCRIPTION
