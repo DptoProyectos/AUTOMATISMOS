@@ -13,7 +13,7 @@ import configparser
 import os
 
 # CONEXIONES
-from mypython import config_var, lst2str
+from mypython import config_var, lst2str, str2lst
 from CTRL_FREC.PROCESS.ctrl_process_frec import control_process
 from drv_redis import Redis
 from drv_logs import ctrl_logs
@@ -21,16 +21,20 @@ from time import time
 from email import quoprimime
 sel_start_time = time() 
 
-
-
-
-
-
+#---------------------------------------------------------------------------------------- 
 # CONFIGURO LAS ENTRADAS DE CONFIGURACION 
 if __name__ == '__main__':
-    # LEO EL STR DE CONFIGURACION       
-    STR_CONFIG = sys.argv[1]
-    LIST_CONFIG = STR_CONFIG.split(',')
+    # LEO EL STR DE CONFIGURACION   
+    try:    
+        STR_CONFIG = sys.argv[1]
+        LIST_CONFIG = STR_CONFIG.split(',')
+    except:
+        print('HELP')
+        print('    ARGUMENT = DLGID_CTRL')
+        print('    EX:')
+        print('    ./serv_APP_selection.py DLGID_CTRL')
+        quit()
+        
     #
     # INSTANCIA DE config_var
     conf = config_var(STR_CONFIG) 
@@ -52,16 +56,12 @@ if __name__ == '__main__':
         else:  TYPE = 'CHARGE'
     ## SE SE LE PASA UN SOLO ARGUMENTO SE LO ASIGNO A DLGID
     else:
-        print_log = True
+        print_log = False
         DLGID_CTRL = sys.argv[1]
         TYPE = 'CHARGE'
         
     
-    
-    
-    
-        
-
+#----------------------------------------------------------------------------------------    
 def read_config_var(DLGID_CTRL):
     ''''''
     
@@ -78,7 +78,7 @@ def read_config_var(DLGID_CTRL):
     else: 
         logs.print_inf(FUNCTION_NAME,'NO EXISTE LA VARIABLE TAG_CONFIG')
         logs.print_inf(FUNCTION_NAME,'NO SE EJECUTA EL SCRIPT')
-        sys.exit()
+        quit()
     #
     # LEO CONFIGUTACION DE LA REDIS
     logs.print_inf(FUNCTION_NAME,'LEO CONFIG EN REDIS')
@@ -171,9 +171,38 @@ def upgrade_config(DLGID_CTRL,LIST_CONFIG):
             logs.print_out(FUNCTION_NAME,check_config[n],check_config[n+1])
             n += 2
 
+def add_2_RUN(dlgid):
+    '''
+        funcion que anade a serv_error_APP_selection / RUN 
+        el DLGID_CTRL y el DLGID_REF
+    '''
     
-
-
+    name_function = 'ADD_VAR_TO_RUN'
+    
+    if redis.hexist('serv_error_APP_selection','RUN'):
+        TAG_CONFIG = redis.hget('serv_error_APP_selection', 'RUN')
+        lst_TAG_CONFIG = str2lst(TAG_CONFIG)
+        try:
+            lst_TAG_CONFIG.index(dlgid)
+            logs.print_out(name_function, 'RUN', TAG_CONFIG)
+        except:
+            lst_TAG_CONFIG.append(dlgid)
+            str_TAG_CONFIG = lst2str(lst_TAG_CONFIG)
+            redis.hset('serv_error_APP_selection', 'RUN', str_TAG_CONFIG)
+            logs.print_out(name_function, 'RUN', str_TAG_CONFIG)
+            
+    else:
+        redis.hset('serv_error_APP_selection', 'RUN', dlgid)
+        logs.print_out(name_function, 'RUN', dlgid)
+    
+def show_var_list(lst):
+    n = 0
+    for param in lst:
+        if n < (len(lst)): 
+            logs.print_out(name_function,lst[n],lst[n+1])
+            n += 2
+    
+#----------------------------------------------------------------------------------------      
 name_function = 'APP_SELECTION'
 
 ## INSTANCIAS
@@ -186,12 +215,9 @@ logs.print_log(f"EXECUTE: {name_function}")
 # VARIABLES DE EJECUCION
 if conf.str_get('print_log'):logs.print_in(name_function,'print_log',print_log)
 logs.print_in(name_function,'DLGID_CTRL',DLGID_CTRL)
-#if conf.str_get('TYPE'): logs.print_in(name_function,'TYPE',TYPE)
-
-   
-        
+#
 ## VARIABLES PARTICULARES QUE LE ENTRAN A APP_SELECTION
-
+#
 if TYPE in config['CTRL_CONFIG']['CTRL_ID']:
     # IMPRIMIR VARIABLES DE CONFIGURACION
     n = 4
@@ -218,18 +244,21 @@ else:
             LIST_CONFIG=[]
 
 
-# MUESTRO LAS VARIABLES QUE SE LE VAN A PASAR AL PROCESS Y LO LLAMO
+
 if bool(LIST_CONFIG):
-    n = 0
-    for param in LIST_CONFIG:
-        if n < (len(LIST_CONFIG)): 
-            logs.print_out(name_function,LIST_CONFIG[n],LIST_CONFIG[n+1])
-            n += 2
-    
     conf = config_var(LIST_CONFIG) 
     if conf.lst_get('TYPE') in config['CTRL_CONFIG']['CTRL_ID']:
+        #
+        # ANADO DLGID_CTRL A 'DLGID_CTRL_TAG_CONFIG' PARA QUE SE EJECUTE EL ctrl_error_frec
+        logs.print_inf(name_function, 'ADD_VAR_TO_RUN')
+        add_2_RUN(conf.lst_get('DLGID_CTRL'))
+        #
+        # MUESTRO LAS VARIABLES QUE SE LE VAN A PASAR AL PROCESS Y LO LLAMO
+        show_var_list(LIST_CONFIG)
+        #
+        # LLAMO AL PROCESS DEL AUTOMATISMO Y LE PASO LIST_CONFIG
         control_process(LIST_CONFIG)
-        #pass
+        #
     else: 
         logs.print_inf(name_function,f"[TYPE = {conf.lst_get('TYPE')}]")
         logs.print_inf(name_function,'VARIABLE TYPE CON VALOR NO RECONOCIDO ')

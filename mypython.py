@@ -27,6 +27,14 @@ def lst2str(list):
     
     return my_str
 
+def str2lst (str):
+    lst = str.split(',')
+    if lst == ['']:
+        return ''
+    else:
+        return lst
+        
+        
 
 def str2bool(str):
     '''
