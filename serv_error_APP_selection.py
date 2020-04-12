@@ -4,7 +4,7 @@ Created on 22 mar. 2020
 
 @author: Yosniel Cabrera
 
-Version 2.0.6 06-04-2020 10:41
+Version 2.0.6 13-04-2020 14:31
 '''
 
 # LIBRERIAS
@@ -267,13 +267,13 @@ while True:
         if bool(lst_RUN):
                 
             ## VARIABLES GLOBALES QUE LE ENTRAN A CORE
+            logs.print_log(' ')
             logs.print_log(f"EXECUTE: {name_function}")
             logs.print_in(name_function,'print_log',print_log)
             logs.print_in(name_function,'DLGID',DLGID)
             
             # LEO LAS VARIABLES DE CONFIGURACION
             logs.print_inf(name_function,'READ_CONFIG_VAR')
-            print(DLGID)
             LIST_CONFIG=read_config_var(DLGID)
             
             # MUESTRO LAS VARIABLES QUE SE LE VAN A PASAR AL PROCESS Y LO LLAMO
