@@ -70,6 +70,13 @@ def error_process(LIST_CONFIG):
     e.event_detection()
     
     
+    if redis.hexist(f'{DLGID}_ERROR', '#_RUN'):
+        no_RUN = redis.hget(f'{DLGID}_ERROR', '#_RUN')
+        no_RUN += 1
+        redis.hset(f'{DLGID}_ERROR', '#_RUN',no_RUN)
+    else:
+        redis.hset(f'{DLGID}_ERROR', '#_RUN',0)
+        
     
     
     
