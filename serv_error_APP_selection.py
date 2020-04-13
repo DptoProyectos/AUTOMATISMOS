@@ -251,6 +251,7 @@ while True:
                     logs.print_inf(name_function, 'NO EXISTE VARIABLE RUN in serv_error_APP_selection')
                     logs.print_inf(name_function, 'NO SE EJECUTA SCRIPT') 
                     lst_RUN = ''
+                    #
                     
                 #
                 n += 1
