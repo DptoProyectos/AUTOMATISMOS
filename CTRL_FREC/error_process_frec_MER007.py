@@ -20,7 +20,7 @@ gen_start_time = time()
 LIST_CONFIG = [
                 #VARIABLES DE EJECUCION
                 'print_log',        True,                           # VER LOS LOGS EN CONSOLA [ True | False ]
-                'DLGID',            'MER007',                        # ID DATALOGGER QUE EJECUTA LAS ACCIONES DE CONTROL
+                'DLGID',            'MER007',                       # ID DATALOGGER QUE EJECUTA LAS ACCIONES DE CONTROL
                 'TYPE',             'FREC',                         # CUANDO TIENE LE VALOR CHARGE SE CARGA LA CONFIGURACION DE LA db
                 
                 

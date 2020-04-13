@@ -15,8 +15,9 @@ import json
 from drv_logs import *
 from drv_redis import Redis
 from drv_dlg import *
+from drv_dlg import read_param, douts
 from mypython import *
-from drv_dlg import douts
+
 
 
 
@@ -213,4 +214,113 @@ class ctrl_process_frec(object):
         
         self.logs.print_out(name_function, 'CURR_FREC', FREC)    
         self.redis.hset(self.DLGID_CTRL,'FREC',FREC)
+
+class error_process_frec(object):  
+    '''
+    FUNCIONES USADAS POR ctrl_error_frec.py
+    '''
+    
+    def __init__(self,LIST_CONFIG):
+        '''
+        Constructor
+        '''
+        #
+        self.config = config_var(LIST_CONFIG)
+        #
+        
+        #VARIABLES DE EJECUCION
+        self.print_log = self.config.lst_get('print_log')
+        self.DLGID = self.config.lst_get('DLGID')
+        self.TYPE = self.config.lst_get('TYPE')
+        #
+        #VARIABLES DE CONFIGURACION
+        self.SWITCH_OUTPUTS = str2bool(self.config.lst_get('SWITCH_OUTPUTS'))
+        self.EVENT_DETECTION = str2bool(self.config.lst_get('EVENT_DETECTION'))
+        
+        ## INSTANCIAS
+        self.logs = ctrl_logs('CTRL_FREC',self.DLGID,self.print_log)
+        self.redis = Redis()   
+        
+    
+    def test_tx(self):
+        '''
+        detecta errores tx y RTC
+        '''
+        
+        name_function = 'TEST_TX_ERRORS'
+        
+        # CHEQUEO DE ERROR TX
+        #
+        # CHEQUEO SI EXISTE EL LINE EN EL DATALOGGER
+        if not(self.redis.hexist(self.DLGID, 'LINE')):
+            self.logs.print_inf(name_function, f'NO EXISTE VARIABLE LINE EN {self.DLGID}')
+            self.logs.print_inf(name_function, f'NO SE EJECUTA {name_function}')
+            self.logs.script_performance(f'NO EXISTE VARIABLE LINE EN {self.DLGID}')
+            return ''
+        
+        # DEVUELVO last_line CON EL LINE ANTERIOR Y current_line CON EL LINE ACTUAL
+        if self.redis.hexist(f'{self.DLGID}_ERROR', 'last_line'):
+            last_line = self.redis.hget(f'{self.DLGID}_ERROR', 'last_line')
+            current_line = self.redis.hget(self.DLGID, 'LINE')
+            self.redis.hset(f'{self.DLGID}_ERROR', 'last_line', current_line)
+        else:
+            last_line = self.redis.hget(self.DLGID, 'LINE')
+            self.redis.hset(f'{self.DLGID}_ERROR', 'last_line', last_line)
+            current_line = last_line
+        
+        # CHEQUEO ERROR TX
+        if last_line == current_line:
+            self.logs.print_inf(name_function, 'TX STOPPED')
+            
+            # ASIGNO EL VALOR DE LA BATERIA PARA MOSTRARLO EN EL LOG
+            if read_param(self.DLGID, 'BAT'):
+                bat = read_param(self.DLGID, 'BAT')
+            else:
+                bat = read_param(self.DLGID, 'bt')
+            
+            # ESCRIBO EN EL LOG
+            self.logs.dlg_performance(f'< ERROR TX > [BAT = {bat}]')
+            
+            return ''
+        else:
+            self.logs.print_inf(name_function, 'TX OK')
+            
+        
+        # CHEQUEO ERROR DE RTC
+        #
+        # DEVUELVO LOS VALORES DE last_fecha_data y last_hora_data asi como fecha_data y hora_data
+        if self.redis.hexist(f'{self.DLGID}_ERROR', 'last_fecha_data') & self.redis.hexist(f'{self.DLGID}_ERROR', 'last_hora_data'):
+            last_fecha_data = self.redis.hget(f'{self.DLGID}_ERROR', 'last_fecha_data')
+            last_hora_data = self.redis.hget(f'{self.DLGID}_ERROR', 'last_hora_data')
+            fecha_data = read_param(self.DLGID, 'DATE')
+            hora_data = read_param(self.DLGID, 'TIME')
+            #
+            # ACTUALIZO last_fecha_data Y last_hora_data CON LOS VALORES ACTUALES
+            self.redis.hset(f'{self.DLGID}_ERROR', 'last_fecha_data', fecha_data)
+            self.redis.hset(f'{self.DLGID}_ERROR', 'last_hora_data', hora_data)
+        else:
+            fecha_data = read_param(self.DLGID, 'DATE')
+            hora_data = read_param(self.DLGID, 'TIME')
+            last_fecha_data = fecha_data
+            last_hora_data = hora_data
+            #
+            # ACTUALIZO last_fecha_data Y last_hora_data CON LOS VALORES ACTUALES
+            self.redis.hset(f'{self.DLGID}_ERROR', 'last_fecha_data', fecha_data)
+            self.redis.hset(f'{self.DLGID}_ERROR', 'last_hora_data', hora_data)
+        #
+        # CHEQUEO QUE NO ESTE CAMBIANDO LA FECHA Y HORA
+        if fecha_data == last_fecha_data and hora_data == last_hora_data:
+            self.logs.print_inf(name_function, 'RTC ERROR')
+            self.logs.dlg_performance(f'< RTC ERORR >')
+        else:
+            self.logs.print_inf(name_function, 'RTC OK')
+            
+    def visual(self):   
+        pass
+    
+    def event_detection(self):
+        pass
+    
+    def switch_outputs(self):
+        pass
             

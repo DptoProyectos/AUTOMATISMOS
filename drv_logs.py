@@ -12,6 +12,7 @@ import json
 #CONEXIONES
 from datetime import date
 from datetime import datetime
+from drv_dlg import read_param
 
 
 
@@ -64,7 +65,39 @@ class ctrl_logs(object):
         
         # CERRAMOS EL LOG
         script_performance.close()
+      
+    def dlg_performance(self,message):
         
-
+        # OBTENFO LA CARPETA EN DONDE SE ENCUENTRA EL ARCHIVO ACTUAL
+        current_path = os.path.dirname(os.path.abspath(__file__))
+        
+        # CREO LA CARPETA DONDE VA A ESTAR EL LOG
+        ## CREO LA CARPETA SOLO SI ESTA NO EXISTE
+        if not(os.path.exists(f"{current_path}/{self.project_folder_name}/DLG_PERFORMANCE/{self.DLGID_CTRL}")): 
+            os.makedirs(f"{current_path}/{self.project_folder_name}/DLG_PERFORMANCE/{self.DLGID_CTRL}",0o777)
+        
+        # OBTENGO LA FECHA FORMATEADA A 'AAAAMMDD'
+        list_fecha = str(date.today()).split('-')
+        fecha = list_fecha[0]+list_fecha[1]+list_fecha[2]
+        
+        # CREO EL ARCHIVO EN DONDE SE VAN A REGISTRAR LOS LOGS
+        from io import open
+        script_performance = open(f"{current_path}/{self.project_folder_name}/DLG_PERFORMANCE/{self.DLGID_CTRL}/{self.DLGID_CTRL}_{fecha}",'a')
+        
+        # OBTENGO LA HORA DEL SERVER FORMATEADA A 'HH:MM:SSD'
+        hora = str(datetime.now()).split(' ')[1].split('.')[0]
+        
+        # OBTENGO LA FECHA DEL DLGID
+        dlgid_date = read_param(self.DLGID_CTRL, 'DATE')
+        
+        # OBTENGO LA HORA DEL DLGID 
+        dlgid_time = read_param(self.DLGID_CTRL, 'TIME')
+       
+        # EXCRIBIMOS EL LOG
+        script_performance.write(f"{hora} [{dlgid_date}-{dlgid_time}] {message}\n") 
+        
+        # CERRAMOS EL LOG
+        script_performance.close()  
+        
      
         
