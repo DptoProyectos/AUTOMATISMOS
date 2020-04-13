@@ -56,9 +56,8 @@ def error_process(LIST_CONFIG):
     logs.print_in(name_function, 'DLGID', DLGID)
     logs.print_in(name_function, 'TYPE', TYPE)
     #
-    logs.print_in(name_function, 'SWITCH_OUTPUTS', SWITCH_OUTPUTS)
-    logs.print_in(name_function, 'EVENT_DETECTION', EVENT_DETECTION)
-    
+    if SWITCH_OUTPUTS: logs.print_in(name_function, 'SWITCH_OUTPUTS', SWITCH_OUTPUTS)
+    if EVENT_DETECTION: logs.print_in(name_function, 'EVENT_DETECTION', EVENT_DETECTION)
     #
     logs.print_inf(name_function, 'TEST_TX_ERRORS')
     e.test_tx()

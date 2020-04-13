@@ -132,8 +132,8 @@ def read_config_var(DLGID):
         TAG_CONFIG = redis.hget('serv_error_APP_selection',f'{DLGID}_TAG_CONFIG')
         TAG_CONFIG = TAG_CONFIG.split(',')
     else: 
-        logs.print_inf(FUNCTION_NAME,f'NO EXISTE {DLGID}_TAG_CONFIG IN serv_error_APP_selection')
-        logs.print_inf(FUNCTION_NAME,'NO SE EJECUTA EL SCRIPT')
+        #logs.print_inf(FUNCTION_NAME,f'NO EXISTE {DLGID}_TAG_CONFIG IN serv_error_APP_selection')
+        #logs.print_inf(FUNCTION_NAME,'NO SE EJECUTA EL SCRIPT')
         return ''
     #
     # LEO CONFIGUTACION DE LA REDIS
@@ -275,7 +275,14 @@ while True:
             
             # LEO LAS VARIABLES DE CONFIGURACION
             logs.print_inf(name_function,'READ_CONFIG_VAR')
-            LIST_CONFIG=read_config_var(DLGID)
+            
+            if read_config_var(DLGID):
+                LIST_CONFIG=read_config_var(DLGID)
+            else:
+                # SOLO EJECUTO CON VARIABLES DE EJECUCION
+                LIST_CONFIG = ['print_log', print_log, 'DLGID', DLGID, 'TYPE', TYPE]
+            
+            
             
             # MUESTRO LAS VARIABLES QUE SE LE VAN A PASAR AL PROCESS Y LO LLAMO
             show_var_list(LIST_CONFIG)

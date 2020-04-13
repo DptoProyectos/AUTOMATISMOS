@@ -253,6 +253,10 @@ if bool(LIST_CONFIG):
         logs.print_inf(name_function, 'ADD_VAR_TO_RUN')
         add_2_RUN(conf.lst_get('DLGID_CTRL'))
         #
+        # ANADO DLGID_REF A 'DLGID_CTRL_TAG_CONFIG' PARA QUE SE EJECUTE EL ctrl_error_frec
+        logs.print_inf(name_function, 'ADD_VAR_TO_RUN')
+        add_2_RUN(conf.lst_get('DLGID_REF'))
+        #
         # MUESTRO LAS VARIABLES QUE SE LE VAN A PASAR AL PROCESS Y LO LLAMO
         show_var_list(LIST_CONFIG)
         #
