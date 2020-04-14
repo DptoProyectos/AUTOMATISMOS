@@ -12,14 +12,12 @@ import redis
 import json
 
 #CONEXIONES
+from CTRL_FREC.PROCESS.drv_visual import dic
 from drv_logs import *
 from drv_redis import Redis
 from drv_dlg import *
 from drv_dlg import read_param, douts
 from mypython import *
-
-
-
 
 
 
@@ -60,12 +58,12 @@ class ctrl_process_frec(object):
         
         # PIERTA DEL GABINETE
         if read_param(self.DLGID_CTRL,'GA') == '1':
-            self.logs.print_inf(name_function, 'GABINETE ABIERTO')
+            self.logs.print_inf(name_function, 'GABINETE_ABIERTO')
             # ESCRIBO LA ALARMA EN REDIS
-            self.redis.hset(self.DLGID_CTRL, 'GABINETE_ABIERTO', 'SI')
+            self.redis.hset(self.DLGID_CTRL, dic.get_dic('GABINETE_ABIERTO', 'name'), dic.get_dic('TX_ERROR', 'True_value'))
         elif read_param(self.DLGID_CTRL,'GA') == '0':
             # ESCRIBO LA ALARMA EN REDIS
-            self.redis.hset(self.DLGID_CTRL, 'GABINETE_ABIERTO', 'NO')
+            self.redis.hset(self.DLGID_CTRL, dic.get_dic('GABINETE_ABIERTO', 'name'), dic.get_dic('TX_ERROR', 'False_value'))
         else:
             self.logs.print_inf(name_function, f"error in {name_function}, GA = {read_param(self.DLGID_CTRL,'GA')}")
             # DEJAR REGISTRO DEL ERROR
@@ -75,10 +73,10 @@ class ctrl_process_frec(object):
         if read_param(self.DLGID_CTRL,'FE') == '1':
             self.logs.print_inf(name_function, 'FALLA ELECTRICA')
             # ESCRIBO LA ALARMA EN REDIS
-            self.redis.hset(self.DLGID_CTRL, 'FALLA_ELECTRICA', 'SI')
+            self.redis.hset(self.DLGID_CTRL, dic.get_dic('FALLA_ELECTRICA', 'name'), dic.get_dic('FALLA_ELECTRICA', 'True_value'))
         elif read_param(self.DLGID_CTRL,'FE') == '0':
             # ESCRIBO LA ALARMA EN REDIS
-            self.redis.hset(self.DLGID_CTRL, 'FALLA_ELECTRICA', 'NO')
+            self.redis.hset(self.DLGID_CTRL, dic.get_dic('FALLA_ELECTRICA', 'name'), dic.get_dic('FALLA_ELECTRICA', 'False_value'))
         else:
             self.logs.print_inf(name_function, f"error in {name_function}, FE = {read_param(self.DLGID_CTRL,'FE')}")
             # DEJAR REGISTRO DEL ERROR
@@ -88,10 +86,10 @@ class ctrl_process_frec(object):
         if read_param(self.DLGID_CTRL,'FT1') == '1':
             self.logs.print_inf(name_function, 'FALLA TERMICA 1')
             # ESCRIBO LA ALARMA EN REDIS
-            self.redis.hset(self.DLGID_CTRL, 'FALLA_TERMICA_1', 'SI')
+            self.redis.hset(self.DLGID_CTRL, dic.get_dic('FALLA_TERMICA_1', 'name'), dic.get_dic('FALLA_ELECTRICA', 'True_value'))
         elif read_param(self.DLGID_CTRL,'FT1') == '0':
             # ESCRIBO LA ALARMA EN REDIS
-            self.redis.hset(self.DLGID_CTRL, 'FALLA_TERMICA_1', 'NO')
+            self.redis.hset(self.DLGID_CTRL, dic.get_dic('FALLA_TERMICA_1', 'name'), dic.get_dic('FALLA_ELECTRICA', 'False_value'))
         else:
             self.logs.print_inf(name_function, f"error in {name_function}, FT1 = {read_param(self.DLGID_CTRL,'FT1')}")
             # DEJAR REGISTRO DEL ERROR
@@ -109,10 +107,13 @@ class ctrl_process_frec(object):
     def modo_remoto(self):
         
         name_function = 'MODO_REMOTO'
+        
         pump_state = False
         #
+        
         # SI NO EXISTE SW2 LO CREO CON VALOR OFF
-        if not(self.redis.hexist(self.DLGID_CTRL, 'SW2')): self.redis.hset(self.DLGID_CTRL, 'SW2', 'OFF')
+        if not(self.redis.hexist(self.DLGID_CTRL, 'SW2')): 
+            self.redis.hset(self.DLGID_CTRL, 'SW2', 'OFF')
         #
         # REVISO LA ACCION TOMADA EN EL SERVER RESPECTO A LA BOMBA
         if self.redis.hget(self.DLGID_CTRL, 'SW2') == 'ON':
@@ -126,7 +127,6 @@ class ctrl_process_frec(object):
             self.logs.print_inf(name_function, f"error in {name_function}, SW2 = {read_param(self.DLGID_CTRL,'SW2')}")
             # DEJAR REGISTRO DEL ERROR
             self.logs.script_performance(f"error in {name_function}, SW2 = {read_param(self.DLGID_CTRL,'SW2')}")
-        
         
         # REVISO ACCION DE LAS SALIDAS    
         if self.ENABLE_OUTPUTS:
@@ -152,26 +152,26 @@ class ctrl_process_frec(object):
         name_function = 'CONTROL_SISTEMA'
         
         # SI NO EXISTE LMIN LO CREO CON VALOR 1
-        if not(self.redis.hexist(self.DLGID_CTRL, 'LMIN_TQ')): self.redis.hset(self.DLGID_CTRL, 'LMIN_TQ', 1)
+        if not(self.redis.hexist(self.DLGID_CTRL, dic.get_dic('LMIN', 'name'))): 
+            self.redis.hset(self.DLGID_CTRL, dic.get_dic('LMIN', 'name'), dic.get_dic('LMIN', 'True_value'))
         # SI NO EXISTE LMAX LO CREO CON VALOR 1.5
-        if not(self.redis.hexist(self.DLGID_CTRL, 'LMAX_TQ')): self.redis.hset(self.DLGID_CTRL, 'LMAX_TQ', 1.5)
+        if not(self.redis.hexist(self.DLGID_CTRL, dic.get_dic('LMAX', 'name'))): 
+            self.redis.hset(self.DLGID_CTRL, dic.get_dic('LMAX', 'name'), dic.get_dic('LMAX', 'True_value'))
         #
         # LEO LAS VARIABLES LMIN Y LMAX
-        LMIN = float(self.redis.hget(self.DLGID_CTRL, 'LMIN_TQ'))
-        LMAX = float(self.redis.hget(self.DLGID_CTRL, 'LMAX_TQ'))
+        LMIN = float(self.redis.hget(self.DLGID_CTRL, dic.get_dic('LMIN', 'name')))
+        LMAX = float(self.redis.hget(self.DLGID_CTRL, dic.get_dic('LMAX', 'name')))
         
         if self.redis.hexist(self.DLGID_REF,'LINE'):
             REF = float(read_param(self.DLGID_REF,self.CHANNEL_REF))
         else:
             self.logs.script_performance(f"error in {name_function}, {self.CHANNEL_REF} = {read_param(self.DLGID_CTRL,self.CHANNEL_REF)}")
         
-            
         self.logs.print_in(name_function, 'ENABLE_OUTPUTS', self.ENABLE_OUTPUTS)
         self.logs.print_in(name_function, 'TYPE_IN_FREC', self.TYPE_IN_FREC)
         self.logs.print_in(name_function, 'LMIN', LMIN)
         self.logs.print_in(name_function, 'LMAX', LMAX)
         self.logs.print_in(name_function, 'REF', REF)
-        
         
         # SI NO FREC LMIN LO CREO CON VALOR 0
         if not(self.redis.hexist(self.DLGID_CTRL, 'FREC')): self.redis.hset(self.DLGID_CTRL, 'FREC', 0)
@@ -189,7 +189,6 @@ class ctrl_process_frec(object):
                 self.logs.print_inf(name_function, 'SE ALCANZA FRECUENCIA MAXIMA')
                 self.logs.script_performance(f'{name_function} ==> SE ALCANZA FRECUENCIA MAXIMA')
                         
-            
         elif REF > LMAX:
             self.logs.print_inf(name_function, 'PRESION ALTA')
             if FREC > 0: 
@@ -198,8 +197,7 @@ class ctrl_process_frec(object):
         else: 
             self.logs.print_inf(name_function, 'PRESION DENTRO DEL RANGO SELECCIONADO')    
         
-        
-        # CHEQUE SI LAS SALIDAS TIENEN QUE ACOPLARSE A ENTRADAS NPN o PNP Y MANDO A SETEAR EN CASO DE ENABLE_OUTPUTS
+        # CHEQUEO SI LAS SALIDAS TIENEN QUE ACOPLARSE A ENTRADAS NPN o PNP Y MANDO A SETEAR EN CASO DE ENABLE_OUTPUTS
         if self.ENABLE_OUTPUTS:
             if self.TYPE_IN_FREC == 'NPN':
                 douts(self.DLGID_CTRL,not_dec(FREC,3))
@@ -278,12 +276,21 @@ class error_process_frec(object):
             else:
                 bat = read_param(self.DLGID, 'bt')
             
+            # ESCRIBO EN REDIS LA ALARMA TX_ERROR
+            self.redis.hset(self.DLGID, dic.get_dic('TX_ERROR', 'name'), dic.get_dic('TX_ERROR', 'True_value'))
+            
             # ESCRIBO EN EL LOG
             self.logs.dlg_performance(f'< ERROR TX > [BAT = {bat}]')
             
             return ''
         else:
             self.logs.print_inf(name_function, 'TX OK')
+            #
+            # ESCRIBO EN REDIS LA ALARMA TX_ERROR
+            self.redis.hset(self.DLGID, dic.get_dic('TX_ERROR', 'name'), dic.get_dic('TX_ERROR', 'False_value'))
+            
+            
+            
             
         
         # CHEQUEO ERROR DE RTC

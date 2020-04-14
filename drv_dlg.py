@@ -83,9 +83,13 @@ def emerg_system(dlgid):
     ## INSTANCIAS
     redis = Redis()
     #
-    #
+    # CHEQUEO SI EXISTE OUTPUTS, SI NO EXSITE LO CREO CON VALOR 0
+    if not(redis.hexist(dlgid,'OUTPUTS')):
+        redis.hset(dlgid, 'OUTPUTS', 0)
+    
     # LEO LA SALIDA ACTUAL SETEADA
     last_out = redis.hget(dlgid,'OUTPUTS')
+    
     # APLICO LA MASCARA 1111010
     last_out = int(last_out) & int('1111010',2)
     #

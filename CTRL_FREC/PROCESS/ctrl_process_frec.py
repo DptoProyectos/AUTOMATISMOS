@@ -17,12 +17,13 @@ import configparser
 
 
 ## CONEXIONES
+from CTRL_FREC.PROCESS.drv_visual import dic
 from CTRL_FREC.PROCESS.ctrl_library import ctrl_process_frec
 from drv_redis import Redis
 from drv_logs import ctrl_logs
 from mypython import str2bool, config_var
 from drv_dlg import emerg_system, read_param
-from time import time   
+from time import time  
 ctrl_start_time = time() 
 
 
@@ -34,7 +35,7 @@ def control_process(LIST_CONFIG):
     
     conf = config_var(LIST_CONFIG)
     
-    #VARIABLES DE EJECUCION
+    # VARIABLES DE EJECUCION
     DLGID_CTRL = conf.lst_get('DLGID_CTRL') 
     TYPE = conf.lst_get('TYPE')                  
     print_log = str2bool(conf.lst_get('print_log'))
@@ -53,12 +54,10 @@ def control_process(LIST_CONFIG):
     config = configparser.ConfigParser()
     redis = Redis()
     
-    
     # OBTENFO LA CARPETA EN DONDE SE ENCUENTRA EL ARCHIVO ACTUAL
     current_path = os.path.dirname(os.path.abspath(__file__))
     # LEO EL ARCHIVO DE CONFIGURACION
     config.read(f"{current_path}/ctrl_config.ini")
-    
     
     #---------------------------------------------------------
     ##PROCESS
@@ -105,8 +104,8 @@ def control_process(LIST_CONFIG):
     # FUNCION MAIN
     
     name_function = 'MAIN'
-        
-        # REVISO SI ESTA TRABAJANDO EN MODO LOCAL EN EL TABLERO
+    
+    # REVISO SI ESTA TRABAJANDO EN MODO LOCAL EN EL TABLERO
     if read_param(DLGID_CTRL,'LM') == '1': 
         logs.print_inf(name_function, 'TRABAJO EN MODO LOCAL')
         redis.hset(DLGID_CTRL, 'LOCAL_MODE', 'SI')    
@@ -114,19 +113,24 @@ def control_process(LIST_CONFIG):
         redis.hset(DLGID_CTRL, 'LOCAL_MODE', 'NO')    #VISUALIZACION
         #
         # SI NO EXISTE LA VARIABLE DE SELECCION SW1 LA CREO CON VALOR AUTO
-        if not(redis.hexist(DLGID_CTRL, 'SW1')): 
-            redis.hset(DLGID_CTRL, 'SW1', 'AUTO')
+        if not(redis.hexist(DLGID_CTRL, dic.get_dic('WEB_MODE', 'name'))): 
+            redis.hset(DLGID_CTRL, dic.get_dic('WEB_MODE', 'name'), dic.get_dic('WEB_MODE', 'True_value'))
+            # MUESTRO LOGS DE ADVERTENCIA
             logs.print_inf(name_function, 'NO EXISTE LA VARIABLE SW1 EN REDIS')
-            logs.print_inf(name_function, 'SE CREA LA VARIABLE CON VALOR AUTO')
-            logs.script_performance(f"error in {name_function}, SW1 = ")
-            logs.script_performance(f"error in {name_function}, SE CREA SW1 = AUTO")
+            logs.print_inf(name_function, 'SE CREA LA VARIABLE CON VALOR [0]'.format(dic.get_dic('WEB_MODE', 'True_value')))
+            logs.script_performance('error in [0] [1] = ,'.format(name_function,dic.get_dic('WEB_MODE', 'name')))
+            logs.script_performance('error in [0], SE CREA [1] = [2]'.format(name_function,dic.get_dic('WEB_MODE', 'name'),dic.get_dic('WEB_MODE', 'True_value')))
         #
+        # LEO VAERIABLE WEB_MODE
+        WEB_MODE = redis.hget(DLGID_CTRL, dic.get_dic('WEB_MODE', 'name'))
+        
+        
         # REVISO EL MODO DE TRABAJO WEB
-        if redis.hget(DLGID_CTRL, 'SW1') == 'REMOTO':
+        if WEB_MODE == 'REMOTO':
             logs.print_inf(name_function, 'TRABAJO EN MODO REMOTO')
             p.modo_remoto()
             
-        elif redis.hget(DLGID_CTRL, 'SW1') in ['BOYA', 'TIMER', ]:
+        elif WEB_MODE in [dic.get_dic('WEB_MODE', 'value_1'), dic.get_dic('WEB_MODE', 'value_1'), ]:
             logs.print_inf(name_function, 'TRABAJO EN MODO SISTEMA DE EMERGENCIA')
             # REVISO EL ESTADO DE ENABLE_OUTPUTS
             if ENABLE_OUTPUTS:
@@ -135,18 +139,24 @@ def control_process(LIST_CONFIG):
                 logs.print_inf(name_function, f"SALIDAS DESCACTIVADAS [ENABLE_OUTPUTS = {ENABLE_OUTPUTS}]")    
                 logs.script_performance(f"{name_function} ==> SALIDAS DESCACTIVADAS [ENABLE_OUTPUTS = {ENABLE_OUTPUTS}]")
             
-        elif redis.hget(DLGID_CTRL, 'SW1') == 'AUTO':
+        elif WEB_MODE == 'AUTO':
             logs.print_inf(name_function, 'TRABAJO EN MODO AUTOMATICO')
             #
+            
             # SI NO EXISTE LA VARIABLE TX_ERROR EN DLGID_REF LA CREO CON VALOR NO
-            if not(redis.hexist(DLGID_REF, 'TX_ERROR')): redis.hset(DLGID_REF, 'TX_ERROR', 'NO')
+            if not(redis.hexist(DLGID_REF, dic.get_dic('TX_ERROR', 'name'))): 
+                redis.hset(DLGID_REF, dic.get_dic('TX_ERROR', 'name'), dic.get_dic('TX_ERROR', 'False_value'))
+            #
+            # LEO TX_ERROR
+            TX_ERROR = redis.hget(DLGID_REF, dic.get_dic('TX_ERROR', 'name'))
+            
             #
             # CHEQUEO ERROR TX EN EL DLG DE REFERENCIA
-            if redis.hget(DLGID_REF, 'TX_ERROR') == 'SI':
+            if TX_ERROR == 'SI':
                 logs.print_inf(name_function, 'ERROR TX EN SISTEMA DE REFERENCIA')
                 logs.print_inf(name_function, 'AUTOMATISMO TRABAJADO CON SISTEMA DE EMERGENCIA')
                 emerg_system(DLGID_CTRL)
-            elif redis.hget(DLGID_REF, 'TX_ERROR') == 'NO':
+            elif TX_ERROR == 'NO':
                 # CHEQUEO ERROR EN EL SENSOR
                 if not(p.chequeo_sensor()):
                     logs.print_inf(name_function, 'ERROR DE SENSOR EN SISTEMA DE REFERENCIA')
@@ -156,19 +166,17 @@ def control_process(LIST_CONFIG):
                     logs.print_inf(name_function, 'CONTROL_SISTEMA')
                     p.control_sistema()
                     
-                    
-                
             else:
-                logs.print_inf(name_function, f"error in {name_function}, TX_ERROR = {read_param(DLGID_REF,'TX_ERROR')}")
+                logs.print_inf(name_function, "error in [0], [1] = [2]".format(name_function,dic.get_dic('TX_ERROR', 'name'),TX_ERROR))
                 # DEJAR REGISTRO DEL ERROR
-                logs.script_performance(f"error in {name_function}, TX_ERROR = {read_param(DLGID_REF,'TX_ERROR')}")
+                logs.script_performance("error in [0], [1] = [2]".format(name_function,dic.get_dic('TX_ERROR', 'name'),TX_ERROR))
             
             
             #
         else:
-            logs.print_inf(name_function, f"error in {name_function}, SW1 = {read_param(DLGID_CTRL,'SW1')}")
+            logs.print_inf(name_function, 'error in [0], [1] = [2]'.format(name_function,dic.get_dic('WEB_MODE', 'name'),WEB_MODE))
             # DEJAR REGISTRO DEL ERROR
-            logs.script_performance(f"error in {name_function}, SW1 = {read_param(DLGID_CTRL,'SW1')}")
+            logs.script_performance('error in [0], [1] = [2]'.format(name_function,dic.get_dic('WEB_MODE', 'name'),WEB_MODE))
             
     else:
         logs.print_inf(name_function, f"error in {name_function}, LM = {read_param(DLGID_CTRL,'LM')}")
