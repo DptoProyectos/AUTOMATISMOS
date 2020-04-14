@@ -18,6 +18,7 @@ from mypython import config_var, str2bool
 from drv_logs import ctrl_logs
 from CTRL_FREC.PROCESS.ctrl_library import error_process_frec
 from drv_redis import Redis
+from drv_dlg import dlg_detection
 
 
 
@@ -59,14 +60,45 @@ def error_process(LIST_CONFIG):
     if SWITCH_OUTPUTS: logs.print_in(name_function, 'SWITCH_OUTPUTS', SWITCH_OUTPUTS)
     if EVENT_DETECTION: logs.print_in(name_function, 'EVENT_DETECTION', EVENT_DETECTION)
     #
+    
+    # CHEQUEO ERROR TX
     logs.print_inf(name_function, 'TEST_TX_ERRORS')
-    e.test_tx()
+    # LLAMO A FUNCIONES QUE SOLO CORREN SI NO HAY ERROR TX
+    #if e.test_tx():
+    if True:
+        #
+        # LLAMAO A FUNCIONES QUE SOLO CORREN CON DATALOGGER 8CH Y SIN ERRORES TX
+        if dlg_detection(DLGID) == '8CH':
+            #
+            # DETECCION DE EVENTOS
+            logs.print_inf(name_function, 'EVENT_DETECTION')
+            e.event_detection()
+            #
+            # ALTERNO LAS SALIDAS
+            logs.print_inf(name_function, 'SWITCH_OUTPUTS')
+            e.switch_outputs()
+            
+            #
+        elif dlg_detection(DLGID) == '5CH':
+            # DATALOGGER DE 5CH DETECTADO
+            #
+            logs.print_inf(name_function, 'DLG 5CH NO SE DETECTAN EVENTOS')
+            logs.print_inf(name_function, 'DLG 5CH NO SE ALTERNAN SALIDAS')
+            
+        else:
+            # NO SE DETECTA EL TIPO DE DATALOGGER
+            #
+            logs.print_inf(name_function, 'NO SE DETECTA EL TIPO DE DATALOGGER')
+            logs.script_performance(f'{name_function} => NO SE DETECTA EL TIPO DE DATALOGGER')
+    else:
+        logs.print_inf(name_function, 'NO SE DETECTAN EVENTOS POR ERROR TX')
+            
     #
     logs.print_inf(name_function, 'VISUAL')
     e.visual()
     #
-    logs.print_inf(name_function, 'EVENT_DETECTION')
-    e.event_detection()
+    
+    
     
     
     

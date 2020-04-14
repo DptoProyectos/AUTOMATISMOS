@@ -15,9 +15,8 @@ import json
 from CTRL_FREC.PROCESS.drv_visual import dic
 from drv_logs import *
 from drv_redis import Redis
-from drv_dlg import *
-from drv_dlg import read_param, douts
-from mypython import *
+from drv_dlg import douts,pump1,emerg_system,read_param,dlg_detection
+from mypython import lst2str,str2lst,str2bool,not_dec,config_var
 
 
 
@@ -243,6 +242,9 @@ class error_process_frec(object):
     def test_tx(self):
         '''
         detecta errores tx y RTC
+        return '' =>     si no existe el line del datalogger
+        return False =>  si hay errores TX
+        return True =>   cualquier otra opcion
         '''
         
         name_function = 'TEST_TX_ERRORS'
@@ -282,17 +284,13 @@ class error_process_frec(object):
             # ESCRIBO EN EL LOG
             self.logs.dlg_performance(f'< ERROR TX > [BAT = {bat}]')
             
-            return ''
+            return False
         else:
             self.logs.print_inf(name_function, 'TX OK')
             #
             # ESCRIBO EN REDIS LA ALARMA TX_ERROR
             self.redis.hset(self.DLGID, dic.get_dic('TX_ERROR', 'name'), dic.get_dic('TX_ERROR', 'False_value'))
             
-            
-            
-            
-        
         # CHEQUEO ERROR DE RTC
         #
         # DEVUELVO LOS VALORES DE last_fecha_data y last_hora_data asi como fecha_data y hora_data
@@ -322,12 +320,64 @@ class error_process_frec(object):
         else:
             self.logs.print_inf(name_function, 'RTC OK')
             
-    def visual(self):   
-        pass
-    
+        return True
+            
+    def visual(self): pass
+             
     def event_detection(self):
-        pass
+        
+        name_function = 'EVENT_DETECTION'
+        
+        # SI EVENT_DETECTION ES False INTERRUMPO LA FUNCION
+        if not(self.EVENT_DETECTION == ''):
+            if not(self.EVENT_DETECTION):
+                self.logs.print_inf(name_function, 'EVENT_DETECTION NO HABILIDATO')
+                return
+        
+            
+        # PIERTA DEL GABINETE
+        if read_param(self.DLGID,'GA') == '1':
+            self.logs.print_inf(name_function, 'GABINETE_ABIERTO')
+            #
+            # ESCRIBO EN EL LOG
+            self.logs.dlg_performance(f'< {name_function} > GABINETE_ABIERTO')
+            
+                
+        # FALLA ELECTRICA
+        if read_param(self.DLGID,'FE') == '1':
+            self.logs.print_inf(name_function, 'FALLA_ELECTRICA')
+            #
+            # ESCRIBO EN EL LOG
+            self.logs.dlg_performance(f'< {name_function} > FALLA_ELECTRICA')
+            
+            
+        # FALLA TERMICA 1
+        if read_param(self.DLGID,'FT1') == '1':
+            self.logs.print_inf(name_function, 'FALLA_TERMICA_1')
+            #
+            # ESCRIBO EN EL LOG
+            self.logs.dlg_performance(f'< {name_function} > FALLA_TERMICA_1')
+                
+        # TRABAJO EN MODO LOCAL
+        if read_param(self.DLGID,'LM') == '1': 
+            self.logs.print_inf(name_function, 'MODO_LOCAL')
+            #
+            # ESCRIBO EN EL LOG
+            self.logs.dlg_performance(f'< {name_function} > MODO_LOCAL')
+                
+    
     
     def switch_outputs(self):
-        pass
+        
+        name_function = 'SWITCH_OUTPUTS'
+        
+        #
+        # SI ESTA HABILITADO EL SWITCH_OUTPUTS
+        if not(self.SWITCH_OUTPUTS): 
+            self.logs.print_inf(name_function, 'SWITCH_OUTPUTS INHABILITADO')
+        
+       
+    
+        
+        
             

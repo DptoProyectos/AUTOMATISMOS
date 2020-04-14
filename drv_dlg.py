@@ -7,8 +7,9 @@ Created on 20 mar. 2020
 
 #CONEXIONES
 from drv_redis import Redis
+from multiprocessing.managers import AutoProxy
 
-# FUNCIONES}|
+# FUNCIONES
 def douts(dlgid,out_dec):
     '''
     DESCRIPTION
@@ -69,8 +70,7 @@ def pump1(dlgid,action):
     #
     # MANDO A SETEAR LAS SALIDAS DEL DATALOGGER
     redis.hset(dlgid,'OUTPUTS',out)
-
-    
+   
 def emerg_system(dlgid):
     '''
     DESCRIPTION
@@ -125,10 +125,13 @@ def read_param(dlgid,param):
     
     
     ## INSTANCIAS
+    
     redis = Redis()
     # LEO LINE
-    if redis.hexist(dlgid, 'LINE'): line = redis.hget(dlgid,'LINE')
-    else: line = ''
+    if redis.hexist(dlgid, 'LINE'): line = redis.hget(dlgid,'LINE') 
+    else: return None
+        
+        
     
     # DETECTO SI EXISTE CABECERA LINE
     if head_detect(line,'LINE'):
@@ -183,7 +186,20 @@ def read_param(dlgid,param):
                 out = '' 
         return out
 
+def dlg_detection(dlgid):
+    '''
+        Detecta el tipo de datalogger mirando el nombre del canal que mide la bateria
+    '''
+    if read_param(dlgid, 'BAT'):
+        return '8CH'
+    elif read_param(dlgid, 'bt'):
+        return '5CH'
+    else:
+        return 'None'
+    
 
+    
+    
     
 
  

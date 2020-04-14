@@ -33,8 +33,6 @@ def str2lst (str):
         return ''
     else:
         return lst
-        
-        
 
 def str2bool(str):
     '''
@@ -43,8 +41,7 @@ def str2bool(str):
     try: out = json.loads(str.lower()) 
     except: out = str
     return out
-    
-    
+   
 def not_dec(in_dec,bits):
     '''
     Invierte la representacion binaria del numero decimal entrado. Devuelve en decimal
@@ -79,7 +76,6 @@ def not_dec(in_dec,bits):
         out_bin = f"{out_bin}{int(not(int(x)))}"
         n += 1
     return int(out_bin,2)
-
 
 class config_var():
     '''

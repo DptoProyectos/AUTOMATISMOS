@@ -136,13 +136,15 @@ def read_config_var(DLGID):
         #logs.print_inf(FUNCTION_NAME,'NO SE EJECUTA EL SCRIPT')
         return ''
     #
-    # LEO CONFIGUTACION DE LA REDIS
+    
+    # LEO CONFIGURACION DE LA REDIS
     logs.print_inf(FUNCTION_NAME,'LEO CONFIG EN REDIS')
     vars_config = []
     for param in TAG_CONFIG:
         vars_config.append(param)
         vars_config.append(redis.hget(f'{DLGID}_ERROR',param))
     #
+    
     # MUESTRO VARIABLES LEIDAS
     n = 0
     for param in vars_config:
@@ -275,6 +277,7 @@ while True:
             
             # LEO LAS VARIABLES DE CONFIGURACION
             logs.print_inf(name_function,'READ_CONFIG_VAR')
+            
             
             if read_config_var(DLGID):
                 LIST_CONFIG=read_config_var(DLGID)

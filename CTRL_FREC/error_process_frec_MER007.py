@@ -25,8 +25,8 @@ LIST_CONFIG = [
                 
                 
                 #VARIABLES DE CONFIGURACION
-                'SWITCH_OUTPUTS',   False,                          # ALTERNA LAS SALIDAS Y TESTEA QUE LAS ENTRADAS LAS SIGAN [ True | False]
-                'EVENT_DETECTION',  False,                          # FORMA EN QUE EL VARIADOR DE VELOCIDAD DETECTA LAS ENTRADAS [ NPN (not_in)| PNP] 
+                'SWITCH_OUTPUTS',   True,                          # ALTERNA LAS SALIDAS Y TESTEA QUE LAS ENTRADAS LAS SIGAN [ True | False]
+                'EVENT_DETECTION',  True,                           # FORMA EN QUE EL VARIADOR DE VELOCIDAD DETECTA LAS ENTRADAS [ NPN (not_in)| PNP] 
                
             ]
 
