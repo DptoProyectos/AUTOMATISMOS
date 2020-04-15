@@ -19,6 +19,7 @@ from drv_redis import Redis
 from drv_logs import ctrl_logs
 from time import time   
 from email import quoprimime
+from builtins import True
 sel_start_time = time() 
 
 #---------------------------------------------------------------------------------------- 
@@ -56,7 +57,7 @@ if __name__ == '__main__':
         else:  TYPE = 'CHARGE'
     ## SE SE LE PASA UN SOLO ARGUMENTO SE LO ASIGNO A DLGID
     else:
-        print_log = False
+        print_log = True
         DLGID_CTRL = sys.argv[1]
         TYPE = 'CHARGE'
         
