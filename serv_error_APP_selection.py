@@ -73,24 +73,21 @@ def upgrade_config(DLGID,LIST_CONFIG):
             logs.print_in(FUNCTION_NAME,LIST_CONFIG[n],LIST_CONFIG[n+1])
             n += 2
     #
-    # ESCRIBO EN REDIS LAS VARIABLES DE CONFIGURACION
-    logs.print_inf(FUNCTION_NAME, 'ACTUALIZO CONFIG EN REDIS' )
-    n = 4
-    for param in LIST_CONFIG:
-        if n < (len(LIST_CONFIG)): 
-            redis.hset(f'{DLGID}_ERROR',LIST_CONFIG[n],LIST_CONFIG[n+1])
-            n += 2
     
-    # ELIMINO LAS VARIABLES DE CONFIGURACION ANTERIORES
-    if redis.hexist('serv_error_APP_selection',f'{DLGID}_TAG_CONFIG'):
-        last_TAG_CONFIG = redis.hget('serv_error_APP_selection',f'{DLGID}_TAG_CONFIG')
+    
+    
+    ## ELIMINO LAS VARIABLES DE CONFIGURACION ANTERIORES
+    if redis.hexist(f'{DLGID}_ERROR','TAG_CONFIG'):
+        last_TAG_CONFIG = redis.hget(f'{DLGID}_ERROR','TAG_CONFIG')
         #   
         for param in last_TAG_CONFIG.split(','):
             redis.hdel(f'{DLGID}_ERROR', param)
         #    
-        redis.hdel('serv_error_APP_selection',f'{DLGID}_TAG_CONFIG')
+        redis.hdel(f'{DLGID}_ERROR','TAG_CONFIG')
 
-    # ESCRIBO EN REDIS EL NOMBRE DE LAS VARIABLES DE CONFIGURACION PARA QUE PUEDAN SER LEIDAS
+    # ESCRIBO EN REDIS LAS VARIABLES DE CONFIGURACION
+    logs.print_inf(FUNCTION_NAME, 'ACTUALIZO CONFIG EN REDIS' )
+    
     TAG_CONFIG = []
     n = 4
     for param in LIST_CONFIG:
@@ -99,7 +96,8 @@ def upgrade_config(DLGID,LIST_CONFIG):
             TAG_CONFIG.append(LIST_CONFIG[n])
             n += 2
     #
-    redis.hset('serv_error_APP_selection',f'{DLGID}_TAG_CONFIG',lst2str(TAG_CONFIG))
+    # ESCRIBO EN REDIS EL NOMBRE DE LAS VARIABLES DE CONFIGURACION PARA QUE PUEDAN SER LEIDAS
+    redis.hset(f'{DLGID}_ERROR','TAG_CONFIG',lst2str(TAG_CONFIG))
     
     
     # LEO VARIABLES ESCRITAS
@@ -128,12 +126,12 @@ def read_config_var(DLGID):
     redis = Redis()
     # 
     # LEO LOS TAGS DE CONFIGURACION
-    if redis.hexist('serv_error_APP_selection',f'{DLGID}_TAG_CONFIG'): 
-        TAG_CONFIG = redis.hget('serv_error_APP_selection',f'{DLGID}_TAG_CONFIG')
+    if redis.hexist(f'{DLGID}_ERROR','TAG_CONFIG'): 
+        TAG_CONFIG = redis.hget(f'{DLGID}_ERROR', 'TAG_CONFIG')
         TAG_CONFIG = TAG_CONFIG.split(',')
     else: 
-        #logs.print_inf(FUNCTION_NAME,f'NO EXISTE {DLGID}_TAG_CONFIG IN serv_error_APP_selection')
-        #logs.print_inf(FUNCTION_NAME,'NO SE EJECUTA EL SCRIPT')
+        logs.print_inf(FUNCTION_NAME,f'NO EXISTE {DLGID}_TAG_CONFIG IN serv_error_APP_selection')
+        logs.print_inf(FUNCTION_NAME,'NO SE EJECUTA EL SCRIPT')
         return ''
     #
     
