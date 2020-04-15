@@ -18,8 +18,6 @@ from CTRL_FREC.PROCESS.ctrl_process_frec import control_process
 from drv_redis import Redis
 from drv_logs import ctrl_logs
 from time import time   
-from email import quoprimime
-from builtins import True
 sel_start_time = time() 
 
 #---------------------------------------------------------------------------------------- 
