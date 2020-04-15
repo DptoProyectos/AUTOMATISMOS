@@ -365,8 +365,6 @@ class error_process_frec(object):
             # ESCRIBO EN EL LOG
             self.logs.dlg_performance(f'< {name_function} > MODO_LOCAL')
                 
-    
-    
     def switch_outputs(self):
         
         name_function = 'SWITCH_OUTPUTS'
