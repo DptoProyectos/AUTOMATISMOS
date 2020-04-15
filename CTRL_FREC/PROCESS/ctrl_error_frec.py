@@ -64,8 +64,8 @@ def error_process(LIST_CONFIG):
     # CHEQUEO ERROR TX
     logs.print_inf(name_function, 'TEST_TX_ERRORS')
     # LLAMO A FUNCIONES QUE SOLO CORREN SI NO HAY ERROR TX
-    #if e.test_tx():
-    if True:
+    if e.test_tx():
+    #if True:
         #
         # LLAMAO A FUNCIONES QUE SOLO CORREN CON DATALOGGER 8CH Y SIN ERRORES TX
         if dlg_detection(DLGID) == '8CH':
