@@ -55,10 +55,7 @@ class ctrl_logs(object):
         
         # CREO EL ARCHIVO EN DONDE SE VAN A REGISTRAR LOS LOGS
         from io import open
-        script_performance = open(f"{current_path}/{self.project_folder_name}/SCRIPT_PERFORMANCE/ctrl_process_{self.DLGID_CTRL}/{self.DLGID_CTRL}_{fecha}",'a')
-        
-        # DOY PERMISOS 777 AL ARCHIVO CREADO
-        os.chmod(f"{current_path}/{self.project_folder_name}/SCRIPT_PERFORMANCE/ctrl_process_{self.DLGID_CTRL}/{self.DLGID_CTRL}_{fecha}",777)
+        script_performance = open(f"{current_path}/{self.project_folder_name}/SCRIPT_PERFORMANCE/ctrl_process_{self.DLGID_CTRL}/{self.DLGID_CTRL}_{fecha}.log",'a')
         
         # OBTENGO LA HORA FORMATEADA A 'HH:MM:SSD'
         hora = str(datetime.now()).split(' ')[1].split('.')[0]
@@ -68,6 +65,10 @@ class ctrl_logs(object):
         
         # CERRAMOS EL LOG
         script_performance.close()
+        
+        # DOY PERMISOS 777 AL ARCHIVO CREADO
+        os.chmod(f"{current_path}/{self.project_folder_name}/SCRIPT_PERFORMANCE/ctrl_process_{self.DLGID_CTRL}/{self.DLGID_CTRL}_{fecha}.log",777)
+        
       
     def dlg_performance(self,message):
         
@@ -79,17 +80,13 @@ class ctrl_logs(object):
         if not(os.path.exists(f"{current_path}/{self.project_folder_name}/DLG_PERFORMANCE/{self.DLGID_CTRL}")): 
             os.makedirs(f"{current_path}/{self.project_folder_name}/DLG_PERFORMANCE/{self.DLGID_CTRL}",0o777)
         
-        # DOY PERMISOS 777 AL ARCHIVO CREADO
-        os.chmod(f"{current_path}/{self.project_folder_name}/DLG_PERFORMANCE/{self.DLGID_CTRL}",777)
-        
         # OBTENGO LA FECHA FORMATEADA A 'AAAAMMDD'
         list_fecha = str(date.today()).split('-')
         fecha = list_fecha[0]+list_fecha[1]+list_fecha[2]
         
         # CREO EL ARCHIVO EN DONDE SE VAN A REGISTRAR LOS LOGS
         from io import open
-        script_performance = open(f"{current_path}/{self.project_folder_name}/DLG_PERFORMANCE/{self.DLGID_CTRL}/{self.DLGID_CTRL}_{fecha}",'a')
-        
+        dlg_performance = open(f"{current_path}/{self.project_folder_name}/DLG_PERFORMANCE/{self.DLGID_CTRL}/{self.DLGID_CTRL}_{fecha}.log",'a')
         
         
         # OBTENGO LA HORA DEL SERVER FORMATEADA A 'HH:MM:SSD'
@@ -102,10 +99,14 @@ class ctrl_logs(object):
         dlgid_time = read_param(self.DLGID_CTRL, 'TIME')
        
         # EXCRIBIMOS EL LOG
-        script_performance.write(f"{hora} [{dlgid_date}-{dlgid_time}] {message}\n") 
+        dlg_performance.write(f"{hora} [{dlgid_date}-{dlgid_time}] {message}\n") 
         
         # CERRAMOS EL LOG
-        script_performance.close()  
+        dlg_performance.close()  
+        
+        # DOY PERMISOS 777 AL ARCHIVO CREADO
+        os.chmod(f"{current_path}/{self.project_folder_name}/DLG_PERFORMANCE/{self.DLGID_CTRL}/{self.DLGID_CTRL}_{fecha}.log",777)
+        
         
      
         
