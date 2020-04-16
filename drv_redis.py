@@ -45,4 +45,17 @@ class Redis(object):
     def hdel (self,key,param):
         if self.connected:
             if self.rh.hexists(key, param): self.rh.hdel( key, param)
+    
+    def no_execution(self,key):
+        if self.connected:  
+            if not(self.rh.hexists(key, 'no_execution')):
+                self.rh.hset( key, 'no_execution', 0)
+            else:
+                no_execution = int(self.rh.hget(key, 'no_execution'))
+                no_execution += 1
+                self.rh.hset(key, 'no_execution', no_execution)
+                
+                    
+            
+    
             

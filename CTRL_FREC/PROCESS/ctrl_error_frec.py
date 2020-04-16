@@ -61,6 +61,9 @@ def error_process(LIST_CONFIG):
     if EVENT_DETECTION: logs.print_in(name_function, 'EVENT_DETECTION', EVENT_DETECTION)
     #
     
+    # ESCRIBO NUMERO DE EJECUCION
+    redis.no_execution(f'{DLGID}_ERROR')
+    
     # CHEQUEO ERROR TX
     logs.print_inf(name_function, 'TEST_TX_ERRORS')
     # LLAMO A FUNCIONES QUE SOLO CORREN SI NO HAY ERROR TX

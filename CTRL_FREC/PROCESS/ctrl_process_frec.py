@@ -78,7 +78,12 @@ def control_process(LIST_CONFIG):
     logs.print_in(name_function, 'CHANNEL_REF', CHANNEL_REF)
     logs.print_in(name_function, 'DLGID_REF_1', DLGID_REF_1)
     logs.print_in(name_function, 'CHANNEL_REF_1', CHANNEL_REF_1)
-    #
+    
+    
+    # ESCRIBO NUMERO DE EJECUCION
+    redis.no_execution(DLGID_CTRL)
+    
+    
     # CHEQUEO QUE EXISTAN LOS LINES DEL DATALOGGER DE CONTROL Y EL DE REFERENCIA.
     if not(redis.hexist(DLGID_CTRL,'LINE')): 
         logs.script_performance(f'{name_function} ==> NO EXISTE LINE {DLGID_CTRL}')
