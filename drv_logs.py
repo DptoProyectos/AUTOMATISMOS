@@ -67,7 +67,7 @@ class ctrl_logs(object):
         script_performance.close()
         
         # DOY PERMISOS 777 AL ARCHIVO CREADO
-        os.chmod(f"{current_path}/{self.project_folder_name}/SCRIPT_PERFORMANCE/ctrl_process_{self.DLGID_CTRL}/{self.DLGID_CTRL}_{fecha}.log",777)
+        #os.chmod(f"{current_path}/{self.project_folder_name}/SCRIPT_PERFORMANCE/ctrl_process_{self.DLGID_CTRL}/{self.DLGID_CTRL}_{fecha}.log",777)
         
       
     def dlg_performance(self,message):
@@ -105,7 +105,7 @@ class ctrl_logs(object):
         dlg_performance.close()  
         
         # DOY PERMISOS 777 AL ARCHIVO CREADO
-        os.chmod(f"{current_path}/{self.project_folder_name}/DLG_PERFORMANCE/{self.DLGID_CTRL}/{self.DLGID_CTRL}_{fecha}.log",777)
+        #os.chmod(f"{current_path}/{self.project_folder_name}/DLG_PERFORMANCE/{self.DLGID_CTRL}/{self.DLGID_CTRL}_{fecha}.log",777)
         
         
      
