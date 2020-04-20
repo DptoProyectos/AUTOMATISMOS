@@ -6,7 +6,7 @@ Created on 16 mar. 2020
 
 @author: Yosniel Cabrera
 
-Version 2.1.2 16-04-2020 12:58
+Version 2.1.3 16-04-2020 12:58
 ''' 
 
 ## LIBRERIAS
@@ -39,7 +39,7 @@ def error_process(LIST_CONFIG):
     EVENT_DETECTION = str2bool(conf.lst_get('EVENT_DETECTION'))
     
     ## INSTANCIAS
-    logs = ctrl_logs('CTRL_FREC',DLGID,print_log)
+    logs = ctrl_logs(TYPE,DLGID,print_log)
     redis = Redis()
     #
     # INSTANCIA DE error_process

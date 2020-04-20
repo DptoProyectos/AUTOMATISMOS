@@ -6,7 +6,7 @@ Created on 16 mar. 2020
 
 @author: Yosniel Cabrera
 
-Version 2.1.2 16-04-2020 12:58
+Version 2.1.3 16-04-2020 12:58
 ''' 
 
 # LIBRERIAS
@@ -51,7 +51,7 @@ class ctrl_process(object):
         self.CHANNEL_REF_1 = self.config.lst_get('CHANNEL_REF_1')
         
         ## INSTANCIAS
-        self.logs = ctrl_logs('CTRL_FREC',self.DLGID_CTRL,self.print_log)
+        self.logs = ctrl_logs(self.TYPE,self.DLGID_CTRL,self.print_log)
         self.redis = Redis()
         
     def chequeo_alarmas(self):
@@ -238,7 +238,7 @@ class error_process(object):
         self.EVENT_DETECTION = str2bool(self.config.lst_get('EVENT_DETECTION'))
         
         ## INSTANCIAS
-        self.logs = ctrl_logs('CTRL_FREC',self.DLGID,self.print_log)
+        self.logs = ctrl_logs(self.TYPE,self.DLGID,self.print_log)
         self.redis = Redis()   
         
     
