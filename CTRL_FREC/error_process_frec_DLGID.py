@@ -1,10 +1,13 @@
 #!/drbd/www/cgi-bin/spx/aut_env/bin/python3.6
-
 '''
-Created on 8 mar. 2020
+LLAMADO CON PARAMETROS A APLICACION DE CONTROL DE ERRORES EN CTRL_FREC
+
+Created on 16 mar. 2020 
 
 @author: Yosniel Cabrera
-'''
+
+Version 2.1.6 17-04-2020 14:17
+''' 
 
 ## LIBRERIAS
 import os                                                   
@@ -21,13 +24,14 @@ LIST_CONFIG = [
                 #VARIABLES DE EJECUCION
                 'print_log',        True,                           # VER LOS LOGS EN CONSOLA [ True | False ]
                 'DLGID',            'MER007',                       # ID DATALOGGER QUE EJECUTA LAS ACCIONES DE CONTROL
-                'TYPE',             'FREC',                         # CUANDO TIENE LE VALOR CHARGE SE CARGA LA CONFIGURACION DE LA db
+                'TYPE',             'CTRL_FREC',                    # [ CTRL_FREC | DELETED ] 
+                                                                    # DELETED => PARA DEJAR DE EJECUTAR EL SCRIPT QUE DETECTA ERRORES
                 
                 
                 #VARIABLES DE CONFIGURACION
-                'SWITCH_OUTPUTS',   True,                          # ALTERNA LAS SALIDAS Y TESTEA QUE LAS ENTRADAS LAS SIGAN [ True | False]
+                'SWITCH_OUTPUTS',   True,                           # ALTERNA LAS SALIDAS Y TESTEA QUE LAS ENTRADAS LAS SIGAN [ True | False]
                 'EVENT_DETECTION',  True,                           # FORMA EN QUE EL VARIADOR DE VELOCIDAD DETECTA LAS ENTRADAS [ NPN (not_in)| PNP] 
-               
+                'TIMER_POLL',       5,                              # TIEMPO DE POLLEO (en min) AL CUAL ESTA TRABAJANDO EL EQUIPO A TESTEAR
             ]
 
 

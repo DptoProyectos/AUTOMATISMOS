@@ -1,11 +1,13 @@
 #!/drbd/www/cgi-bin/spx/aut_env/bin/python3.6
 '''
-Created on 22 mar. 2020
+SERVICIO DE DETECCION DE AUTOMATISMOS
+
+Created on 16 mar. 2020 
 
 @author: Yosniel Cabrera
 
-Version 2.0.6 06-04-2020 10:41
-'''
+Version 2.1.1 16-04-2020 12:58
+''' 
 
 # LIBRERIAS
 import sys
@@ -14,7 +16,6 @@ import os
 
 # CONEXIONES
 from mypython import config_var, lst2str, str2lst
-from CTRL_FREC.PROCESS.ctrl_process_frec import control_process
 from drv_redis import Redis
 from drv_logs import ctrl_logs
 from time import time   
@@ -55,7 +56,7 @@ if __name__ == '__main__':
         else:  TYPE = 'CHARGE'
     ## SE SE LE PASA UN SOLO ARGUMENTO SE LO ASIGNO A DLGID
     else:
-        print_log = False
+        print_log = True
         DLGID_CTRL = sys.argv[1]
         TYPE = 'CHARGE'
         
@@ -183,16 +184,15 @@ def add_2_RUN(dlgid):
         lst_TAG_CONFIG = str2lst(TAG_CONFIG)
         try:
             lst_TAG_CONFIG.index(dlgid)
-            logs.print_out(name_function, 'RUN', TAG_CONFIG)
+            #logs.print_out(name_function, 'RUN', TAG_CONFIG)
         except:
             lst_TAG_CONFIG.append(dlgid)
             str_TAG_CONFIG = lst2str(lst_TAG_CONFIG)
             redis.hset('serv_error_APP_selection', 'RUN', str_TAG_CONFIG)
-            logs.print_out(name_function, 'RUN', str_TAG_CONFIG)
+            #logs.print_out(name_function, 'RUN', str_TAG_CONFIG)
             
     else:
         redis.hset('serv_error_APP_selection', 'RUN', dlgid)
-        logs.print_out(name_function, 'RUN', dlgid)
     
 def show_var_list(lst):
     n = 0
@@ -201,7 +201,34 @@ def show_var_list(lst):
             logs.print_out(name_function,lst[n],lst[n+1])
             n += 2
     
+def run_ctrl_process(LIST_CONFIG):
+    if bool(LIST_CONFIG):
+        #
+        # INSTANCIO config_var CON EL NUEVO LIST_CONFIG Y LEO TYPE
+        conf = config_var(LIST_CONFIG)
+        TYPE = conf.lst_get('TYPE')
+        #
+        import importlib.util
+        #
+        try:
+            #spec = importlib.util.spec_from_file_location("archivo", f"../{TYPE}/PROCESS/ctrl_process.py")
+            spec = importlib.util.spec_from_file_location("archivo", f"/drbd/www/cgi-bin/spx/AUTOMATISMOS/{TYPE}/PROCESS/ctrl_process.py")
+            archivo = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(archivo)
+            call_ctrl_process = True
+        except:
+            logs.print_inf(name_function, f'NO SE ENCUENTRA ../{TYPE}/PROCESS/ctrl_process.py')
+            call_ctrl_process = False
+        #
+        if call_ctrl_process:
+            archivo.control_process(LIST_CONFIG)
+            
+
+       
+    
 #----------------------------------------------------------------------------------------      
+
+
 name_function = 'APP_SELECTION'
 
 ## INSTANCIAS
@@ -217,7 +244,8 @@ logs.print_in(name_function,'DLGID_CTRL',DLGID_CTRL)
 #
 ## VARIABLES PARTICULARES QUE LE ENTRAN A APP_SELECTION
 #
-if TYPE in config['CTRL_CONFIG']['CTRL_ID']:
+
+if TYPE in str2lst(config['CTRL_CONFIG']['CTRL_ID']):
     # IMPRIMIR VARIABLES DE CONFIGURACION
     n = 4
     for param in LIST_CONFIG:
@@ -246,21 +274,19 @@ else:
 
 if bool(LIST_CONFIG):
     conf = config_var(LIST_CONFIG) 
-    if conf.lst_get('TYPE') in config['CTRL_CONFIG']['CTRL_ID']:
+    if conf.lst_get('TYPE') in str2lst(config['CTRL_CONFIG']['CTRL_ID']):
         #
         # ANADO DLGID_CTRL A 'DLGID_CTRL_TAG_CONFIG' PARA QUE SE EJECUTE EL ctrl_error_frec
-        logs.print_inf(name_function, 'ADD_VAR_TO_RUN')
         add_2_RUN(conf.lst_get('DLGID_CTRL'))
         #
         # ANADO DLGID_REF A 'DLGID_CTRL_TAG_CONFIG' PARA QUE SE EJECUTE EL ctrl_error_frec
-        logs.print_inf(name_function, 'ADD_VAR_TO_RUN')
         add_2_RUN(conf.lst_get('DLGID_REF'))
         #
         # MUESTRO LAS VARIABLES QUE SE LE VAN A PASAR AL PROCESS Y LO LLAMO
         show_var_list(LIST_CONFIG)
         #
         # LLAMO AL PROCESS DEL AUTOMATISMO Y LE PASO LIST_CONFIG
-        control_process(LIST_CONFIG)
+        run_ctrl_process(LIST_CONFIG)
         #
     else: 
         logs.print_inf(name_function,f"[TYPE = {conf.lst_get('TYPE')}]")

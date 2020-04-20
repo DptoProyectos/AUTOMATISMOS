@@ -1,10 +1,13 @@
 #!/drbd/www/cgi-bin/spx/aut_env/bin/python3.6
-
 '''
-Created on 23 mar. 2020
+DETECCION DE FUNCIONES ADICIONALES DE PYTHON
+
+Created on 16 mar. 2020 
 
 @author: Yosniel Cabrera
-'''
+
+Version 2.1.1 16-04-2020 12:58
+''' 
 
 # LIBRERIAS
 import json
@@ -87,13 +90,13 @@ class config_var():
     def str_get(self,param):
         my_list = self.var.split(',')
         try: return my_list[my_list.index(param)+1]
-        except: return ''
+        except: return False
      
     
     def lst_get(self,param):
         my_list = self.var
         try:return my_list[my_list.index(param)+1]
-        except: return ''
+        except: return False
              
         
     

@@ -1,9 +1,13 @@
 #!/drbd/www/cgi-bin/spx/aut_env/bin/python3.6
 '''
-Created on 20 mar. 2020
+DRIVER PARA EL TRABAJO CON REDIS
 
-@author: Yosniel
-'''
+Created on 16 mar. 2020 
+
+@author: Yosniel Cabrera
+
+Version 2.1.1 16-04-2020 12:58
+''' 
 
 import redis
 
@@ -38,7 +42,6 @@ class Redis(object):
                 return value.decode()
             else: return ''
             
-    
     def hexist(self,key, param): 
         if self.connected: return self.rh.hexists(key, param) 
         
@@ -55,7 +58,9 @@ class Redis(object):
                 no_execution += 1
                 self.rh.hset(key, 'no_execution', no_execution)
                 
-                    
+    def del_key(self,key):
+        if self.connected:
+            self.rh.delete(key)
             
     
             

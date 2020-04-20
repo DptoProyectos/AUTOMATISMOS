@@ -1,12 +1,13 @@
 #!/drbd/www/cgi-bin/spx/aut_env/bin/python3.6
-
 '''
-Created on 20 mar. 2020
+TEST DE DRIVERS DE AUTOMATISMO
+
+Created on 16 mar. 2020 
 
 @author: Yosniel Cabrera
 
-FICHERO DE TEST DE APLICACIONES
-'''
+Version 2.1.0 16-04-2020 12:58
+''' 
 
 print(__doc__)
 
@@ -14,8 +15,8 @@ import sys
 import os
 
 
-from drv_dlg import * 
-from mypython import *
+from drv_dlg import douts,read_param,pump1,emerg_system
+from mypython import not_dec
 
 
 

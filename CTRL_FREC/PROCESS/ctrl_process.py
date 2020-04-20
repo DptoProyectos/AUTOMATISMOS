@@ -1,12 +1,12 @@
 #!/drbd/www/cgi-bin/spx/aut_env/bin/python3.6
 '''
-SISTEMA DE CONTROL DE FRECUENCIA
+APLICACION DE CONTROL CTRL_FREC
 
-Created on 15 mar. 2020 
+Created on 16 mar. 2020 
 
 @author: Yosniel Cabrera
 
-Version 2.0.8 06-04-2020 16:28
+Version 2.1.0 16-04-2020 12:58
 ''' 
 
 
@@ -18,7 +18,7 @@ import configparser
 
 ## CONEXIONES
 from CTRL_FREC.PROCESS.drv_visual import dic
-from CTRL_FREC.PROCESS.ctrl_library import ctrl_process_frec
+#from CTRL_FREC.PROCESS.ctrl_library import ctrl_process_frec
 from drv_redis import Redis
 from drv_logs import ctrl_logs
 from mypython import str2bool, config_var
@@ -50,9 +50,21 @@ def control_process(LIST_CONFIG):
     
     ## INSTANCIAS
     logs = ctrl_logs('CTRL_FREC',DLGID_CTRL,print_log)
-    p = ctrl_process_frec(LIST_CONFIG)
     config = configparser.ConfigParser()
     redis = Redis()
+    
+    # INSTANCIA DE error_process
+    import importlib.util
+    #spec = importlib.util.spec_from_file_location("archivo", f"../{TYPE}/PROCESS/ctrl_library.py")
+    spec = importlib.util.spec_from_file_location("archivo", f"/drbd/www/cgi-bin/spx/AUTOMATISMOS/{TYPE}/PROCESS/ctrl_library.py")
+    archivo = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(archivo)
+    e = archivo.ctrl_process(LIST_CONFIG)
+    
+    
+    
+    #p = ctrl_process(LIST_CONFIG)
+    
     
     # OBTENFO LA CARPETA EN DONDE SE ENCUENTRA EL ARCHIVO ACTUAL
     current_path = os.path.dirname(os.path.abspath(__file__))

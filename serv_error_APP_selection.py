@@ -1,11 +1,13 @@
 #!/drbd/www/cgi-bin/spx/aut_env/bin/python3.6
 '''
-Created on 22 mar. 2020
+SERVICIO DE DETECCION DE ERRORES EN AUTOMATISMOS
+
+Created on 16 mar. 2020 
 
 @author: Yosniel Cabrera
 
-Version 2.0.6 13-04-2020 14:31
-'''
+Version 2.1.1 16-04-2020 12:58
+''' 
 
 # LIBRERIAS
 import os
@@ -15,8 +17,8 @@ import sys
 # CONEXIONES
 from drv_redis import Redis
 from mypython import str2lst, config_var, lst2str
-from CTRL_FREC.PROCESS.ctrl_error_frec import error_process
 from drv_logs import ctrl_logs
+
 
 
 #---------------------------------------------------------------------------------------- 
@@ -73,9 +75,6 @@ def upgrade_config(DLGID,LIST_CONFIG):
             logs.print_in(FUNCTION_NAME,LIST_CONFIG[n],LIST_CONFIG[n+1])
             n += 2
     #
-    
-    
-    
     ## ELIMINO LAS VARIABLES DE CONFIGURACION ANTERIORES
     if redis.hexist(f'{DLGID}_ERROR','TAG_CONFIG'):
         last_TAG_CONFIG = redis.hget(f'{DLGID}_ERROR','TAG_CONFIG')
@@ -174,8 +173,85 @@ def show_var_list(lst):
                 
 def run_error_process(LIST_CONFIG):
     if bool(LIST_CONFIG):
-        error_process(LIST_CONFIG)
+        # INSTANCIO config_var CON EL NUEVO LIST_CONFIG
+        conf = config_var(LIST_CONFIG)
+        #
+        TYPE = conf.lst_get('TYPE')
+        
+        import importlib.util
+        #
+        try:
+            #spec = importlib.util.spec_from_file_location("archivo", f"../{TYPE}/PROCESS/ctrl_error.py")
+            spec = importlib.util.spec_from_file_location("archivo", f"/drbd/www/cgi-bin/spx/AUTOMATISMOS/{TYPE}/PROCESS/ctrl_error.py")
+            archivo = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(archivo)
+            call_error_process = True
+            
+        except:
+            logs.print_inf(name_function, f'NO SE ENCUENTRA ../{TYPE}/PROCESS/ctrl_error.py')
+            call_error_process = False
+            #
+        
+        if call_error_process:  
+            archivo.error_process(LIST_CONFIG)
+            
+def add_2_RUN(dlgid):
+    '''
+        funcion que anade a serv_error_APP_selection / RUN 
+        el DLGID_CTRL y el DLGID_REF
+    '''
     
+    name_function = 'ADD_VAR_TO_RUN'
+    
+    if redis.hexist('serv_error_APP_selection','RUN'):
+        TAG_CONFIG = redis.hget('serv_error_APP_selection', 'RUN')
+        lst_TAG_CONFIG = str2lst(TAG_CONFIG)
+        try:
+            lst_TAG_CONFIG.index(dlgid)
+        except:
+            lst_TAG_CONFIG.append(dlgid)
+            str_TAG_CONFIG = lst2str(lst_TAG_CONFIG)
+            redis.hset('serv_error_APP_selection', 'RUN', str_TAG_CONFIG)
+            
+    else:
+        redis.hset('serv_error_APP_selection', 'RUN', dlgid)
+        
+def del_2_Run(dlgid):
+    '''
+        funcion que elimina de  serv_error_APP_selection / RUN dlgid
+    '''
+    
+    name_function = 'DEL_VAR_TO_RUN'
+    
+    if redis.hexist('serv_error_APP_selection','RUN'):
+        TAG_CONFIG = redis.hget('serv_error_APP_selection', 'RUN')
+        lst_TAG_CONFIG = str2lst(TAG_CONFIG)
+        try:
+            # ELIMINO EL DATALOGGER DE LA LISTA
+            lst_TAG_CONFIG.remove(dlgid)
+            #
+            #SI LA LISTA QUEDA VACIA ELIMINO LA VARIABLE RUN 
+            if not(bool(lst_TAG_CONFIG)):
+                redis.del_key('serv_error_APP_selection')
+                logs.print_inf(name_function, f'ELIMINO {dlgid} PARA QUE NO SE EJECUTE')
+                return False
+            #
+            # CONVIERO A STR LA LISTA
+            str_TAG_CONFIG = lst2str(lst_TAG_CONFIG)
+            #
+            # ACTUALIZO EL RUN EL LA REDIS
+            redis.hset('serv_error_APP_selection', 'RUN', str_TAG_CONFIG)
+            #
+            # LIMPIO RESTOS DE CONFIGURACION DE LA REDIS
+            redis.del_key(f'{dlgid}_ERROR')
+            #
+            # IMPRIMO LOG EN CONSOLA
+            logs.print_inf(name_function, f'ELIMINO {dlgid} PARA QUE NO SE EJECUTE')
+        except:
+            logs.print_inf(name_function, f'{dlgid} YA FUE ELIMINADO')
+            
+    
+         
 #----------------------------------------------------------------------------------------    
 name_function = 'APP_ERROR_SELECTION'
 
@@ -206,6 +282,15 @@ while True:
                 if n < (len(LIST_CONFIG)): 
                     logs.print_in(name_function,LIST_CONFIG[n],LIST_CONFIG[n+1])
                     n += 2     
+            
+            # DETENGO LA EJECUCION DEL SCRIPT SI TYPE = DELETED
+            if TYPE == 'DELETED':
+                del_2_Run(DLGID)
+                break
+            
+            
+            # ANADO DLGID_CTRL A 'DLGID_CTRL_TAG_CONFIG' PARA QUE SE EJECUTE EL ctrl_error_frec
+            add_2_RUN(conf.lst_get('DLGID'))
             
             # ACTUALIZO LA CONFIGURACION
             logs.print_inf(name_function,'UPGRADE CONFIG')

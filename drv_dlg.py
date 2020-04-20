@@ -1,9 +1,13 @@
 #!/drbd/www/cgi-bin/spx/aut_env/bin/python3.6
 '''
-Created on 20 mar. 2020
+DRIVER PARA EL TRABAJO CON EL DATALOGGER
+
+Created on 16 mar. 2020 
 
 @author: Yosniel Cabrera
-'''
+
+Version 2.1.0 16-04-2020 12:58
+''' 
 
 #CONEXIONES
 from drv_redis import Redis
