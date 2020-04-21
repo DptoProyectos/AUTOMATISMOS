@@ -21,8 +21,8 @@ from mypython import not_dec
 
 
 # FUNCION PARA LEER EL VALOR DE LOS PARAMETROS DE ENTRADA DEL DATALOGGER
-DLGID = 'MER001'
-DLGID = 'FWTEST5CH'
+#DLGID = 'UYCOL601'
+DLGID = 'MER007'
 PARAM = 'DATE'   #[DATE,TIME, other names in the data's frame]
 print(f"read_ param => {read_param(DLGID,PARAM)}")
 

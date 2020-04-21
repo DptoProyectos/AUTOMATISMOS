@@ -1,6 +1,6 @@
 #!/drbd/www/cgi-bin/spx/aut_env/bin/python3.6
 '''
-APLICACION DE CONTROL DE ERRORES EN CTRL_FREC
+APLICACION DE CONTROL DE ERRORES EN TEST_DLG
 
 Created on 16 mar. 2020 
 

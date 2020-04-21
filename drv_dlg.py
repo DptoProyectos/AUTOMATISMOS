@@ -6,7 +6,7 @@ Created on 16 mar. 2020
 
 @author: Yosniel Cabrera
 
-Version 2.1.0 16-04-2020 12:58
+Version 2.1.1 16-04-2020 12:58
 ''' 
 
 #CONEXIONES
@@ -124,7 +124,7 @@ def read_param(dlgid,param):
             if line[i] == char:
                 match += 1
             i += 1
-        if match == 4: return True
+        if match == 9: return True
         else: return False
     
     
@@ -138,7 +138,7 @@ def read_param(dlgid,param):
         
     
     # DETECTO SI EXISTE CABECERA LINE
-    if head_detect(line,'LINE'):
+    if head_detect(line,'LINE=DATE'):
         parsed_line = line.split(';')
         #
         # CREO UNA LISTA A PARTIR DE SEPARAR LOS CAMPOS DEL LINE
