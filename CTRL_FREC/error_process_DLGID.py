@@ -31,7 +31,7 @@ LIST_CONFIG = [
                 #VARIABLES DE CONFIGURACION
                 'SWITCH_OUTPUTS',   True,                           # ALTERNA LAS SALIDAS Y TESTEA QUE LAS ENTRADAS LAS SIGAN [ True | False]
                 'EVENT_DETECTION',  True,                           # FORMA EN QUE EL VARIADOR DE VELOCIDAD DETECTA LAS ENTRADAS [ NPN (not_in)| PNP] 
-                'TIMER_POLL',       5,                              # TIEMPO DE POLLEO (en min) AL CUAL ESTA TRABAJANDO EL EQUIPO A TESTEAR
+                'TIMER_POLL',       1,                              # TIEMPO DE POLLEO (en min) AL CUAL ESTA TRABAJANDO EL EQUIPO A TESTEAR
             ]
 
 
