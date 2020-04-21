@@ -23,7 +23,7 @@ gen_start_time = time()
 LIST_CONFIG = [
                 #VARIABLES DE EJECUCION
                 'print_log',        True,                           # VER LOS LOGS EN CONSOLA [ True | False ]
-                'DLGID',            'UYCOL601',                     # ID DATALOGGER QUE EJECUTA LAS ACCIONES DE CONTROL
+                'DLGID',            'UYCOL602',                     # ID DATALOGGER QUE EJECUTA LAS ACCIONES DE CONTROL
                 'TYPE',             'TEST_DLG',                     # [ TEST_DLG | DELETED ] 
                                                                     # DELETED => PARA DEJAR DE EJECUTAR EL SCRIPT QUE DETECTA ERRORES
                 
