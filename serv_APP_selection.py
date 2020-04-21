@@ -6,7 +6,7 @@ Created on 16 mar. 2020
 
 @author: Yosniel Cabrera
 
-Version 2.1.1 16-04-2020 12:58
+Version 2.1.2 16-04-2020 12:58
 ''' 
 
 # LIBRERIAS
@@ -171,7 +171,7 @@ def upgrade_config(DLGID_CTRL,LIST_CONFIG):
             logs.print_out(FUNCTION_NAME,check_config[n],check_config[n+1])
             n += 2
 
-def add_2_RUN(dlgid):
+def add_2_RUN(dlgid,type):
     '''
         funcion que anade a serv_error_APP_selection / RUN 
         el DLGID_CTRL y el DLGID_REF
@@ -179,6 +179,7 @@ def add_2_RUN(dlgid):
     
     name_function = 'ADD_VAR_TO_RUN'
     
+    # PREPARO EL RUN EN serv_error_APP_selection
     if redis.hexist('serv_error_APP_selection','RUN'):
         TAG_CONFIG = redis.hget('serv_error_APP_selection', 'RUN')
         lst_TAG_CONFIG = str2lst(TAG_CONFIG)
@@ -193,6 +194,11 @@ def add_2_RUN(dlgid):
             
     else:
         redis.hset('serv_error_APP_selection', 'RUN', dlgid)
+        
+    # PREPARO LA VARIABLE TYPE CON SU VALOR
+    redis.hset(f'{dlgid}_ERROR', 'TAG_CONFIG', 'TYPE')
+    redis.hset(f'{dlgid}_ERROR', 'TYPE', type)
+    
     
 def show_var_list(lst):
     n = 0
@@ -277,10 +283,10 @@ if bool(LIST_CONFIG):
     if conf.lst_get('TYPE') in str2lst(config['CTRL_CONFIG']['CTRL_ID']):
         #
         # ANADO DLGID_CTRL A 'DLGID_CTRL_TAG_CONFIG' PARA QUE SE EJECUTE EL ctrl_error_frec
-        add_2_RUN(conf.lst_get('DLGID_CTRL'))
+        add_2_RUN(conf.lst_get('DLGID_CTRL'),conf.lst_get('TYPE'))
         #
         # ANADO DLGID_REF A 'DLGID_CTRL_TAG_CONFIG' PARA QUE SE EJECUTE EL ctrl_error_frec
-        add_2_RUN(conf.lst_get('DLGID_REF'))
+        add_2_RUN(conf.lst_get('DLGID_REF'),conf.lst_get('TYPE'))
         #
         # MUESTRO LAS VARIABLES QUE SE LE VAN A PASAR AL PROCESS Y LO LLAMO
         show_var_list(LIST_CONFIG)

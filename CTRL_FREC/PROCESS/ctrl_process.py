@@ -6,7 +6,7 @@ Created on 16 mar. 2020
 
 @author: Yosniel Cabrera
 
-Version 2.1.0 16-04-2020 12:58
+Version 2.1.1 16-04-2020 12:58
 ''' 
 
 
@@ -59,7 +59,7 @@ def control_process(LIST_CONFIG):
     spec = importlib.util.spec_from_file_location("archivo", f"/drbd/www/cgi-bin/spx/AUTOMATISMOS/{TYPE}/PROCESS/ctrl_library.py")
     archivo = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(archivo)
-    e = archivo.ctrl_process(LIST_CONFIG)
+    p = archivo.ctrl_process(LIST_CONFIG)
     
     
     
