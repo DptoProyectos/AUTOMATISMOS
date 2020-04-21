@@ -23,15 +23,15 @@ gen_start_time = time()
 LIST_CONFIG = [
                 #VARIABLES DE EJECUCION
                 'print_log',        True,                           # VER LOS LOGS EN CONSOLA [ True | False ]
-                'DLGID',            'MER005',                       # ID DATALOGGER QUE EJECUTA LAS ACCIONES DE CONTROL
-                'TYPE',             'DELETED',                    # [ CTRL_FREC | DELETED ] 
+                'DLGID',            'MER007',                       # ID DATALOGGER QUE EJECUTA LAS ACCIONES DE CONTROL
+                'TYPE',             'CTRL_FREC',                    # [ CTRL_FREC | DELETED ] 
                                                                     # DELETED => PARA DEJAR DE EJECUTAR EL SCRIPT QUE DETECTA ERRORES
                 
                 
                 #VARIABLES DE CONFIGURACION
                 'SWITCH_OUTPUTS',   True,                           # ALTERNA LAS SALIDAS Y TESTEA QUE LAS ENTRADAS LAS SIGAN [ True | False]
                 'EVENT_DETECTION',  True,                           # FORMA EN QUE EL VARIADOR DE VELOCIDAD DETECTA LAS ENTRADAS [ NPN (not_in)| PNP] 
-                'TIMER_POLL',       1,                              # TIEMPO DE POLLEO (en min) AL CUAL ESTA TRABAJANDO EL EQUIPO A TESTEAR
+                'TIMER_POLL',       5,                              # TIEMPO DE POLLEO (en min) AL CUAL ESTA TRABAJANDO EL EQUIPO A TESTEAR
             ]
 
 

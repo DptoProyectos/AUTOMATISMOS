@@ -246,7 +246,7 @@ class error_process(object):
         '''
         detecta errores tx y RTC
         return '' =>     si no existe el line del datalogger
-        return False =>  si hay errores TX
+        return False =>  si hay errores TX de cualquier tipo
         return True =>   cualquier otra opcion
         '''
         
@@ -271,6 +271,7 @@ class error_process(object):
             last_line = self.redis.hget(self.DLGID, 'LINE')
             self.redis.hset(f'{self.DLGID}_ERROR', 'last_line', last_line)
             current_line = last_line
+            return True
             
         # ASIGNO EL VALOR DE LA BATERIA PARA MOSTRARLO EN LOS LOGS
         if read_param(self.DLGID, 'BAT'):
@@ -283,7 +284,7 @@ class error_process(object):
         def error_1min_TX(self):
             '''
             return True si hubo error de TX durante un minuto
-            return False si hubo error de TX durante un minuto
+            return False si no hubo error de TX durante un minuto
             '''
             
             if last_line == current_line:
@@ -433,27 +434,47 @@ class error_process(object):
                 # ESCRIBO EN EL LOG
                 self.logs.dlg_performance(f'< MAS DE {timer_poll} MIN CAIDO > [BAT = {bat}]')
                 #
+                return False
+            else:
+                return True
         else:    
             if error_10min:
+                
                 #
                 # MUESTRO LOG EN CONSOLA
                 self.logs.print_inf(name_function, 'TX STOPPED FOR MORE THAN 10 MIN')
+                self.logs.print_out(name_function, dic.get_dic('TX_ERROR', 'name'), dic.get_dic('TX_ERROR', 'True_value'))
                 #
                 # ESCRIBO EN EL LOG
                 self.logs.dlg_performance(f'< MAS DE 10 MIN CAIDO > [BAT = {bat}]')
                 #
-                # ESCRIBO EN REDIS LA ALARMA TX_ERROR
+                # ESCRIBO EN REDIS LA ALARMA TX_ERROR CON VALOR DE ALARMA PRENDIDA
                 self.redis.hset(self.DLGID, dic.get_dic('TX_ERROR', 'name'), dic.get_dic('TX_ERROR', 'True_value'))
+                #
+                return False
             else:
+                #
+                # ESCRIBO EN REDIS LA ALARMA TX_ERROR CON VALOR DE ALARMA APAGADA
+                self.redis.hset(self.DLGID, dic.get_dic('TX_ERROR', 'name'), dic.get_dic('TX_ERROR', 'False_value'))
+                #
+                #MUESTRO LOGS EN CONSOLA DE QUE SE ESCRIBIO LA ALARMA DE ERROR TX EN REDIS
+                self.logs.print_out(name_function, dic.get_dic('TX_ERROR', 'name'), dic.get_dic('TX_ERROR', 'False_value'))
+                #
                 if error_1min:
                     # MUESTRO LOG EN CONSOLA
                     self.logs.print_inf(name_function, 'TX STOPPED')
                     #
                     # ESCRIBO EN EL LOG
                     self.logs.dlg_performance(f'< ERROR TX > [BAT = {bat}]')
+                    #
+                    return False
+                else:
+                    return True
+                    
                 
-                # ESCRIBO EN REDIS LA ALARMA TX_ERROR
-                self.redis.hset(self.DLGID, dic.get_dic('TX_ERROR', 'name'), dic.get_dic('TX_ERROR', 'False_value'))
+                
+                
+            
         
     def visual(self): pass
              
@@ -464,7 +485,7 @@ class error_process(object):
         # SI EVENT_DETECTION ES False INTERRUMPO LA FUNCION
         if not(self.EVENT_DETECTION == ''):
             if not(self.EVENT_DETECTION):
-                self.logs.print_inf(name_function, 'EVENT_DETECTION NO HABILIDATO')
+                self.logs.print_inf(name_function, 'EVENT_DETECTION INHABILITADO')
                 return
         
             
