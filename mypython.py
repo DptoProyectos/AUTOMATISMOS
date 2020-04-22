@@ -80,6 +80,16 @@ def not_dec(in_dec,bits):
         n += 1
     return int(out_bin,2)
 
+def bin2dec(str_in):
+    '''
+    Le entra un string binario y devuelve su valor en decimal
+    '''
+    return int(str_in, 2)
+    
+    
+    
+    
+    
 class config_var():
     '''
     

@@ -17,7 +17,7 @@ import json
 from CTRL_FREC.PROCESS.drv_visual import dic
 from drv_logs import *
 from drv_redis import Redis
-from drv_dlg import douts,pump1,emerg_system,read_param,dlg_detection
+from drv_dlg import douts,pump1,emerg_system,read_param,dlg_detection,set_outs
 from mypython import lst2str,str2lst,str2bool,not_dec,config_var
 from _ast import Pass
 
@@ -227,7 +227,6 @@ class error_process(object):
         #
         self.config = config_var(LIST_CONFIG)
         #
-        
         #VARIABLES DE EJECUCION
         self.print_log = self.config.lst_get('print_log')
         self.DLGID = self.config.lst_get('DLGID')
@@ -237,7 +236,7 @@ class error_process(object):
         self.SWITCH_OUTPUTS = str2bool(self.config.lst_get('SWITCH_OUTPUTS'))
         self.EVENT_DETECTION = str2bool(self.config.lst_get('EVENT_DETECTION'))
         
-        ## INSTANCIAS
+        # INSTANCIAS
         self.logs = ctrl_logs(self.TYPE,self.DLGID,self.print_log)
         self.redis = Redis()   
         
@@ -471,11 +470,6 @@ class error_process(object):
                 else:
                     return True
                     
-                
-                
-                
-            
-        
     def visual(self): pass
              
     def event_detection(self):
@@ -527,8 +521,61 @@ class error_process(object):
         # SI ESTA HABILITADO EL SWITCH_OUTPUTS
         if not(self.SWITCH_OUTPUTS): 
             self.logs.print_inf(name_function, 'SWITCH_OUTPUTS INHABILITADO')
+            #
+            # ELIMINO EL MONITOR DE ESTADOS DE REDIS EN CASO DE QUE EXISTA
+            if self.redis.hexist(f'{self.DLGID}_ERROR', 'outputs_states'):
+                self.redis.hdel(f'{self.DLGID}_ERROR', 'outputs_states')
+            return 
         
+        # PREPARO INDICADOR DE ESTADOS
+        if not(self.redis.hexist(f'{self.DLGID}_ERROR', 'outputs_states')):
+            self.redis.hset(f'{self.DLGID}_ERROR', 'outputs_states', 0)
+            outputs_states = 0
+        else:
+            outputs_states = int(self.redis.hget(f'{self.DLGID}_ERROR', 'outputs_states'))
+            
+        
+           
+            
+        
+        
+        # DETECTO QUE TIPO DE AUTOMATISMO TENGO PARA EJECUTAR EL SWITCH DE LAS SALIDAS
+        if self.TYPE == 'CTRL_FREC':
+            # PASO POR ESTADOS
+            if outputs_states == 0:
+                DO_0 = 0;            
+                DO_1 = 0;
+            elif outputs_states == 1:
+                DO_0 = 1;            
+                DO_1 = 0;
+            elif outputs_states == 2:
+                DO_0 = 0;            
+                DO_1 = 1;
+            elif outputs_states == 3:
+                DO_0 = 1;            
+                DO_1 = 1;
+                
+            if outputs_states == 3:
+                outputs_states = 0
+            else:
+                outputs_states +=1
+                
+            # MUESTRO LOGS EN CONSOLA    
+            self.logs.print_out(name_function, 'DO_0', DO_0)
+            self.logs.print_out(name_function, 'DO_1', DO_1)
+            
+            # MANDO A SETEAR LAS SALIDAS
+            set_outs(self.DLGID,DO_0, DO_1)
+            
+        else:
+            self.logs.print_inf(name_function, 'AUTOMATISMO NO RECONOCIDO')
+            self.logs.print_out(name_function, 'TYPE', self.TYPE)
+            return
        
+        # ESCRIBO EL VALO DEL ESTADO    
+        self.redis.hset(f'{self.DLGID}_ERROR', 'outputs_states', outputs_states)
+        
+        
     
         
         

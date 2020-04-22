@@ -11,7 +11,10 @@ Version 2.1.1 16-04-2020 12:58
 
 #CONEXIONES
 from drv_redis import Redis
-from multiprocessing.managers import AutoProxy
+from mypython import bin2dec
+
+# INSTANCIAS
+redis = Redis()
 
 # FUNCIONES
 def douts(dlgid,out_dec):
@@ -201,7 +204,17 @@ def dlg_detection(dlgid):
     else:
         return 'None'
     
-
+def set_outs(dlgid,DO_0=0,DO_1=0,DO_2=0,DO_3=0,DO_4=0,DO_5=0,DO_6=0,DO_7=0):
+    #
+    str_outputs = f'{DO_7}{DO_6}{DO_5}{DO_4}{DO_3}{DO_2}{DO_1}{DO_0}'
+    #
+    dec_outputs = bin2dec(str_outputs)
+    #
+    redis.hset(dlgid, 'OUTPUTS', dec_outputs)
+    
+    
+    
+    
     
     
     
