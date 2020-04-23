@@ -6,7 +6,7 @@ Created on 16 mar. 2020
 
 @author: Yosniel Cabrera
 
-Version 2.1.3 16-04-2020 12:58
+Version 2.1.4 16-04-2020 12:58
 ''' 
 
 # LIBRERIAS
@@ -17,9 +17,9 @@ import json
 from CTRL_FREC.PROCESS.drv_visual import dic
 from drv_logs import *
 from drv_redis import Redis
-from drv_dlg import douts,pump1,emerg_system,read_param,dlg_detection,set_outs
+from drv_dlg import douts,pump1,emerg_system,read_param,dlg_detection,set_outs,get_outs
 from mypython import lst2str,str2lst,str2bool,not_dec,config_var
-from _ast import Pass
+
 
 
 
@@ -215,6 +215,15 @@ class ctrl_process(object):
         self.logs.print_out(name_function, 'CURR_FREC', FREC)    
         self.redis.hset(self.DLGID_CTRL,'FREC',FREC)
 
+    def latch__outpust(self,dlgid):
+        if self.redis.hexist(dlgid, 'current_OUTPUTS'):
+            last_OUTPUTS = self.redis.hget(dlgid, 'current_OUTPUTS')
+            self.redis.hset(dlgid, 'last_OUTPUTS', last_OUTPUTS)
+    
+        if self.redis.hget(dlgid, 'OUTPUTS') != '-1':
+            current_OUTPUTS = self.redis.hget(dlgid, 'OUTPUTS')
+            self.redis.hset(dlgid, 'current_OUTPUTS', current_OUTPUTS)
+        
 class error_process(object):  
     '''
     FUNCIONES USADAS POR ctrl_error_frec.py
@@ -234,7 +243,11 @@ class error_process(object):
         #
         #VARIABLES DE CONFIGURACION
         self.SWITCH_OUTPUTS = str2bool(self.config.lst_get('SWITCH_OUTPUTS'))
+        self.TEST_OUTPUTS = str2bool(self.config.lst_get('TEST_OUTPUTS'))
+        self.RESET_ENABLE = str2bool(self.config.lst_get('RESET_ENABLE'))
         self.EVENT_DETECTION = str2bool(self.config.lst_get('EVENT_DETECTION'))
+        self.TIMER_POLL = str2bool(self.config.lst_get('TIMER_POLL'))
+        #
         
         # INSTANCIAS
         self.logs = ctrl_logs(self.TYPE,self.DLGID,self.print_log)
@@ -477,7 +490,7 @@ class error_process(object):
         name_function = 'EVENT_DETECTION'
         
         # SI EVENT_DETECTION ES False INTERRUMPO LA FUNCION
-        if not(self.EVENT_DETECTION == ''):
+        if not(self.EVENT_DETECTION == None):
             if not(self.EVENT_DETECTION):
                 self.logs.print_inf(name_function, 'EVENT_DETECTION INHABILITADO')
                 return
@@ -575,8 +588,100 @@ class error_process(object):
         # ESCRIBO EL VALO DEL ESTADO    
         self.redis.hset(f'{self.DLGID}_ERROR', 'outputs_states', outputs_states)
         
+    def test_outputs(self): 
+        '''
+        return True =>     SI EL TESTEO FUE SATISFACTORIO
+        return False =>    SI HUBO ERRORES E/S
+        retur None =>      SI TEST_OUTPUTS INHABILITADO
+                           SI SE TRABAJA EN MODO LOCAL O HAY FALLA ELECTRICA
+                           OTROS ERRORES
+        '''   
         
-    
+        name_function = 'TEST_OUTPUTS'
         
+        # SI TEST_OUTPUTS ES False INTERRUMPO LA FUNCION
+        # DEJO QUE SE TESTEEN LAS SALIDAS SI NO SE CARGA TEST_OUTPUTS
+        if not(self.TEST_OUTPUTS == None):
+            if not(self.TEST_OUTPUTS):
+                self.logs.print_inf(name_function, 'TEST_OUTPUTS INHABILITADO')
+                return None
+        
+        # LEO EL VALOR ANTERIOR DE LAS SALIDAS
+        last_OUTPUTS = self.redis.hget(self.DLGID, 'last_OUTPUTS')
+        #
+        # SELECCIONO EL TEST DE ACUERDO AL TIPO DE AUTOMATISMO
+        if self.TYPE == 'CTRL_FREC':
+            # DEFINO SALIDAS A TESTEAR
+            DO_0 = get_outs(self.DLGID,last_OUTPUTS,0)
+            DO_1 = get_outs(self.DLGID,last_OUTPUTS,1)
+            #
+            # DEFINO ENTRADAS A VERIFICAR
+            BR1 = int(read_param(self.DLGID, 'BR1'))
+            TM = int(read_param(self.DLGID, 'TM'))
+            FT1 = int(read_param(self.DLGID, 'FT1'))
+            
+            
+            # PREVEO QUE NO SE TESTEEN LAS SALIDAS BAJO MODO LOCAL O FALLA ELECTRICA
+            if read_param(self.DLGID, 'LM') == '1' or read_param(self.DLGID, 'FE') == '1':
+                self.logs.print_in(name_function, 'LM', read_param(self.DLGID, 'LM'))
+                self.logs.print_in(name_function, 'FE', read_param(self.DLGID, 'FE'))
+                self.logs.print_inf(name_function, 'NO SE TESTEAN SALIDAS POR TRABAJO EN MODO LOCAL O FALLA ELECTRICA')
+                return None
+                
+            # STATE: MODO DE EMERGENCIA
+            if DO_0 == 0:
+                if TM == 0:
+                    if not(BR1 == 0 and FT1 == 0):
+                        self.logs.dlg_performance(f'< ERROR_E/S > [ TM = {TM} ], [ DO_1 = {DO_1}, DO_0 = {DO_0} ] <=> [ BR1 = {BR1}, FT1 = {FT1} ]')
+                        self.logs.print_inf(name_function, f'< ERROR_E/S > [ TM = {TM} ] - [ DO_1 = {DO_1}, DO_0 = {DO_0} ] <=> [ BR1 = {BR1}, FT1 = {FT1} ]') 
+                        return False
+                    else:
+                        self.logs.print_inf(name_function, 'OUTPUTS OK')
+                        return True
+                elif TM == 1:
+                    if not(BR1 == 1 or FT1 == 1):
+                        self.logs.dlg_performance(f'< ERROR_E/S > [ TM = {TM} ], [ DO_1 = {DO_1}, DO_0 = {DO_0} ] <=> [ BR1 = {BR1}, FT1 = {FT1} ]')
+                        self.logs.print_inf(name_function, f'< ERROR_E/S > [ TM = {TM} ] - [ DO_1 = {DO_1}, DO_0 = {DO_0} ] <=> [ BR1 = {BR1}, FT1 = {FT1} ]') 
+                        return False
+                    else:
+                        self.logs.print_inf(name_function, 'OUTPUTS OK')
+                        return True
+                else:
+                    self.logs.print_inf(name_function,f'VALOR NO RECONOCIDO EN TM [ TM = {TM} ]')
+                    self.logs.script_performance(f'VALOR NO RECONOCIDO EN TM [ TM = {TM} ]')
+                    return None
+            
+            elif DO_0 == 1:
+                if DO_1 == 0:
+                    if not(BR1 == 0 and FT1 == 0):
+                        self.logs.dlg_performance(f'< ERROR_E/S > [ DO_1 = {DO_1}, DO_0 = {DO_0} ] <=> [ BR1 = {BR1}, FT1 = {FT1} ]')
+                        self.logs.print_inf(name_function, f'< ERROR_E/S > [ DO_1 = {DO_1}, DO_0 = {DO_0} ] <=> [ BR1 = {BR1}, FT1 = {FT1} ]') 
+                        return False
+                    else:
+                        self.logs.print_inf(name_function, 'OUTPUTS OK')
+                        return True
+                elif DO_1 == 1:
+                    if not(BR1 == 1 or FT1 == 1):
+                        self.logs.dlg_performance(f'< ERROR_E/S > [ DO_1 = {DO_1}, DO_0 = {DO_0} ] <=> [ BR1 = {BR1}, FT1 = {FT1} ]')
+                        self.logs.print_inf(name_function, f'< ERROR_E/S > [ DO_1 = {DO_1}, DO_0 = {DO_0} ] <=> [ BR1 = {BR1}, FT1 = {FT1} ]') 
+                        return False
+                    else:
+                        return True
+                        self.logs.print_inf(name_function, 'OUTPUTS OK')            
+                else:
+                    self.logs.print_inf(name_function,f'VALOR NO RECONOCIDO EN DO_1 [ DO_1 = {DO_1} ]')
+                    self.logs.script_performance(f'VALOR NO RECONOCIDO EN DO_1 [ DO_1 = {DO_1} ]')
+                    return None
+            # MODO DE CONTROL
+            else:
+                self.logs.print_inf(name_function,f'VALOR NO RECONOCIDO EN D0_0 [ DO_0 = {DO_0} ]')
+                self.logs.script_performance(f'VALOR NO RECONOCIDO EN D0_0 [ DO_0 = {DO_0} ]')
+                return None       
+                
+                
+           
+                
+            
+            
         
             

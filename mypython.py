@@ -6,7 +6,7 @@ Created on 16 mar. 2020
 
 @author: Yosniel Cabrera
 
-Version 2.1.1 16-04-2020 12:58
+Version 2.1.2 16-04-2020 12:58
 ''' 
 
 # LIBRERIAS
@@ -85,11 +85,7 @@ def bin2dec(str_in):
     Le entra un string binario y devuelve su valor en decimal
     '''
     return int(str_in, 2)
-    
-    
-    
-    
-    
+   
 class config_var():
     '''
     
@@ -100,13 +96,13 @@ class config_var():
     def str_get(self,param):
         my_list = self.var.split(',')
         try: return my_list[my_list.index(param)+1]
-        except: return False
+        except: return None
      
     
     def lst_get(self,param):
         my_list = self.var
         try:return my_list[my_list.index(param)+1]
-        except: return False
+        except: return None
              
         
     

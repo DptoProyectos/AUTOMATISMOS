@@ -201,7 +201,11 @@ def control_process(LIST_CONFIG):
         # DEJAR REGISTRO DEL ERROR
         logs.script_performance(f"error in {name_function}, LM = {read_param(DLGID_CTRL,'LM')}")
             
-          
+    
+    p.latch__outpust(DLGID_CTRL)
+    
+    
+    
     #
     # CALCULO TIEMPO DE DEMORA
     #print('')

@@ -6,7 +6,7 @@ Created on 16 mar. 2020
 
 @author: Yosniel Cabrera
 
-Version 2.1.1 16-04-2020 12:58
+Version 2.1.2 16-04-2020 12:58
 ''' 
 
 #CONEXIONES
@@ -108,6 +108,7 @@ def read_param(dlgid,param):
     '''
     DESCRIPTION
         Se encarga de leer del datalogger el canal con el nombre 'param'
+        devuelve un string
         
     LEYENDA:
         dlgid => datalogger id
@@ -211,6 +212,25 @@ def set_outs(dlgid,DO_0=0,DO_1=0,DO_2=0,DO_3=0,DO_4=0,DO_5=0,DO_6=0,DO_7=0):
     dec_outputs = bin2dec(str_outputs)
     #
     redis.hset(dlgid, 'OUTPUTS', dec_outputs)
+
+def get_outs(dlgid,dec_value_outs,no_out):
+    '''
+    dec_value_outs => valor decimal del OUTPUTS que se escribe en la Redis
+    no_out = numero de la salida [0:7]
+    return => estado de la salida referida en no_out
+    '''
+    #
+    if no_out > 7: return None
+    #
+    bin_value_outs = bin(int(dec_value_outs))
+    str_value_outs = bin_value_outs[2:]
+    #
+    if no_out >= len(str_value_outs):
+        return 0
+    else:
+        return int(str_value_outs[abs(no_out - (len(str_value_outs) - 1))])
+         
+    
     
     
     

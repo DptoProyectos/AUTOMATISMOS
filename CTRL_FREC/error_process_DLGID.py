@@ -15,6 +15,7 @@ import os
 ## CONEXIONES
 from mypython import lst2str
 from time import time 
+from _elementtree import TreeBuilder
 
   
 gen_start_time = time()  
@@ -24,13 +25,15 @@ LIST_CONFIG = [
                 #VARIABLES DE EJECUCION
                 'print_log',        True,                           # VER LOS LOGS EN CONSOLA [ True | False ]
                 'DLGID',            'MER007',                       # ID DATALOGGER QUE EJECUTA LAS ACCIONES DE CONTROL
-                'TYPE',             'CTRL_FREC',                    # [ CTRL_FREC | DELETED ] 
+                'TYPE',             'DELETED',                      # [ CTRL_FREC | DELETED ] 
                                                                     # DELETED => PARA DEJAR DE EJECUTAR EL SCRIPT QUE DETECTA ERRORES
                 
                 
                 #VARIABLES DE CONFIGURACION
                 'SWITCH_OUTPUTS',   True,                           # ALTERNA LAS SALIDAS Y TESTEA QUE LAS ENTRADAS LAS SIGAN [ True | False]
-                'EVENT_DETECTION',  True,                           # FORMA EN QUE EL VARIADOR DE VELOCIDAD DETECTA LAS ENTRADAS [ NPN (not_in)| PNP] 
+                'TEST_OUTPUTS',     True,                           # TESTEA LAS SALIDAS Y EN CASO DE 3 ERRORES CONSECUTIVOS APLICAR RESET SI RESET_ENABLE ESTA HABILITADO
+                'RESET_ENABLE',     True,                           # HABILITA O NO EL RESET TRAS ERRORES CONSECUTIVOS DE E/S
+                'EVENT_DETECTION',  True,                           # DEJA REGISTRO DE ALGUNOS EVENTOS EN LOS TABLEROS DE CONTROL
                 'TIMER_POLL',       1,                              # TIEMPO DE POLLEO (en min) AL CUAL ESTA TRABAJANDO EL EQUIPO A TESTEAR
             ]
 
