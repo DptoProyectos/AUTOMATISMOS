@@ -25,7 +25,7 @@ LIST_CONFIG = [
                 #VARIABLES DE EJECUCION
                 'print_log',        True,                           # VER LOS LOGS EN CONSOLA [ True | False ]
                 'DLGID',            'MER007',                       # ID DATALOGGER QUE EJECUTA LAS ACCIONES DE CONTROL
-                'TYPE',             'DELETED',                      # [ CTRL_FREC | DELETED ] 
+                'TYPE',             'CTRL_FREC',                      # [ CTRL_FREC | DELETED ] 
                                                                     # DELETED => PARA DEJAR DE EJECUTAR EL SCRIPT QUE DETECTA ERRORES
                 
                 

@@ -51,7 +51,8 @@ class ctrl_process(object):
         self.CHANNEL_REF_1 = self.config.lst_get('CHANNEL_REF_1')
         
         ## INSTANCIAS
-        self.logs = ctrl_logs(self.TYPE,self.DLGID_CTRL,self.print_log)
+        #self.logs = ctrl_logs(self.TYPE,self.DLGID_CTRL,self.print_log)
+        self.logs = ctrl_logs(self.TYPE,'ctrl_process',self.DLGID_CTRL,self.print_log)
         self.redis = Redis()
         
     def chequeo_alarmas(self):
@@ -250,7 +251,9 @@ class error_process(object):
         #
         
         # INSTANCIAS
-        self.logs = ctrl_logs(self.TYPE,self.DLGID,self.print_log)
+        #self.logs = ctrl_logs(self.TYPE,self.DLGID,self.print_log)
+        self.logs = ctrl_logs(self.TYPE,'ctrl_error',self.DLGID,self.print_log)
+        
         self.redis = Redis()   
         
     
@@ -547,11 +550,6 @@ class error_process(object):
         else:
             outputs_states = int(self.redis.hget(f'{self.DLGID}_ERROR', 'outputs_states'))
             
-        
-           
-            
-        
-        
         # DETECTO QUE TIPO DE AUTOMATISMO TENGO PARA EJECUTAR EL SWITCH DE LAS SALIDAS
         if self.TYPE == 'CTRL_FREC':
             # PASO POR ESTADOS
@@ -579,6 +577,10 @@ class error_process(object):
             
             # MANDO A SETEAR LAS SALIDAS
             set_outs(self.DLGID,DO_0, DO_1)
+            
+            # LATCHEO LAS SALIDAS
+            error_process.latch__outpust(self, self.DLGID)
+            
             
         else:
             self.logs.print_inf(name_function, 'AUTOMATISMO NO RECONOCIDO')
@@ -608,6 +610,12 @@ class error_process(object):
         
         # LEO EL VALOR ANTERIOR DE LAS SALIDAS
         last_OUTPUTS = self.redis.hget(self.DLGID, 'last_OUTPUTS')
+        #
+        # CHEQUEO EL VALOR ANTERIOR DE LAS SALIDAS ES VALIDO
+        if not(last_OUTPUTS):
+            self.logs.print_inf(name_function, f'NO EXISTE last_OUTPUTS en {self.DLGID}')
+            self.logs.print_inf(name_function, 'NO SE TESTEAN SALIDAS')
+            return None
         #
         # SELECCIONO EL TEST DE ACUERDO AL TIPO DE AUTOMATISMO
         if self.TYPE == 'CTRL_FREC':
@@ -666,8 +674,8 @@ class error_process(object):
                         self.logs.print_inf(name_function, f'< ERROR_E/S > [ DO_1 = {DO_1}, DO_0 = {DO_0} ] <=> [ BR1 = {BR1}, FT1 = {FT1} ]') 
                         return False
                     else:
-                        return True
-                        self.logs.print_inf(name_function, 'OUTPUTS OK')            
+                        self.logs.print_inf(name_function, 'OUTPUTS OK')   
+                        return True         
                 else:
                     self.logs.print_inf(name_function,f'VALOR NO RECONOCIDO EN DO_1 [ DO_1 = {DO_1} ]')
                     self.logs.script_performance(f'VALOR NO RECONOCIDO EN DO_1 [ DO_1 = {DO_1} ]')
@@ -678,7 +686,14 @@ class error_process(object):
                 self.logs.script_performance(f'VALOR NO RECONOCIDO EN D0_0 [ DO_0 = {DO_0} ]')
                 return None       
                 
-                
+    def latch__outpust(self,dlgid):
+        if self.redis.hexist(dlgid, 'current_OUTPUTS'):
+            last_OUTPUTS = self.redis.hget(dlgid, 'current_OUTPUTS')
+            self.redis.hset(dlgid, 'last_OUTPUTS', last_OUTPUTS)
+    
+        if self.redis.hget(dlgid, 'OUTPUTS') != '-1':
+            current_OUTPUTS = self.redis.hget(dlgid, 'OUTPUTS')
+            self.redis.hset(dlgid, 'current_OUTPUTS', current_OUTPUTS)           
            
                 
             

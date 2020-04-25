@@ -49,7 +49,8 @@ def control_process(LIST_CONFIG):
     CHANNEL_REF_1 = conf.lst_get('CHANNEL_REF_1') 
     
     ## INSTANCIAS
-    logs = ctrl_logs('CTRL_FREC',DLGID_CTRL,print_log)
+    #logs = ctrl_logs('CTRL_FREC',DLGID_CTRL,print_log)
+    logs = ctrl_logs(TYPE,'ctrl_process',DLGID_CTRL,print_log)
     config = configparser.ConfigParser()
     redis = Redis()
     
@@ -77,7 +78,8 @@ def control_process(LIST_CONFIG):
     logs.print_log(__doc__)
     
     # ESCRIBO LA EJECUCION DEL SCRIPT
-    logs.script_performance(f"{name_function}")
+    logs.print_log(f"{name_function}")
+    #logs.script_performance(f"{name_function}")
     
     
     # MUESTRO VARIABLES DE ENTRADA
@@ -201,7 +203,7 @@ def control_process(LIST_CONFIG):
         # DEJAR REGISTRO DEL ERROR
         logs.script_performance(f"error in {name_function}, LM = {read_param(DLGID_CTRL,'LM')}")
             
-    
+    # LATCHEO LAS SALIDAS
     p.latch__outpust(DLGID_CTRL)
     
     

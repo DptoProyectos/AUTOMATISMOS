@@ -11,18 +11,25 @@ Version 2.1.0 16-04-2020 12:58
 
 
 
-#                keys                 #name              #True_value   #False_value    #value_1     #value_2
+#                keys                     #name              #True_value       #False_value    #value_1     #value_2
 
 visual_dic = {  
-                'WEB_MODE':         [ 'SW1',                'AUTO',     'REMOTO',       'BOYA',     'TIMER'   ],
-                'LMIN':             [ 'LMIN_TQ',            1                                                 ],
-                'LMAX':             [ 'LMAX_TQ',            1.5                                               ],
-                'PUMP_1_WEB_MODE':  [ 'SW2',                'ON',       'OFF',                                ],
-                'TX_ERROR':         [ 'TX_ERROR',           'SI',       'NO',                                 ],
+                'WEB_MODE':             [ 'SW1',                'AUTO',         'REMOTO',       'BOYA',     'TIMER'   ],
+                'PUMP_1_WEB_MODE':      [ 'SW2',                'ON',           'OFF',                                ],
+                'LMIN':                 [ 'LMIN_TQ',            1                                                     ],
+                'LMAX':                 [ 'LMAX_TQ',            1.5                                                   ],
                 
-                'GABINETE_ABIERTO': [ 'GABINETE_ABIERTO',   'SI',       'NO',                                 ],
-                'FALLA_ELECTRICA':  [ 'FALLA_ELECTRICA',    'SI',       'NO',                                 ],
-                'FALLA_TERMICA_1':  [ 'FALLA_TERMICA_1',    'SI',       'NO',                                 ],
+                'TX_ERROR':             [ 'TX_ERROR',           'SI',           'NO',                                 ],
+                'MODO_LOCAL':           [ 'LOCAL_MODE',         'SI',           'NO',                                 ],
+                'GABINETE_ABIERTO':     [ 'GABINETE_ABIERTO',   'SI',           'NO',                                 ],
+                'FALLA_ELECTRICA':      [ 'FALLA_ELECTRICA',    'SI',           'NO',                                 ],
+                'FALLA_TERMICA_1':      [ 'FALLA_TERMICA_1',    'SI',           'NO',                                 ],
+                'DATA_DATE_TIME':       [ 'LAST_FECHA_DATA',    '20200424_151649'                                     ],
+                'PUMP1_STATE':          [ 'PUMP1_REC_STATE',    'ON',           'OFF',                                ],
+                'PUMP1_DAILY_TIME':     [ 'D_EXEC_REC_PUMP1',   '0h 0m'                                               ],
+                'PUMP1_MONTHLY_TIME':   [ 'M_EXEC_REC_PUMP1',   '0 horas'                                             ],
+                'PUMP1_TOTAL_TIME':     [ 'T_EXEC_REC_PUMP1',   '0 horas'                                             ],
+                
                 
     }
 

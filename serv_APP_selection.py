@@ -6,7 +6,7 @@ Created on 16 mar. 2020
 
 @author: Yosniel Cabrera
 
-Version 2.1.2 16-04-2020 12:58
+Version 2.1.3 16-04-2020 12:58
 ''' 
 
 # LIBRERIAS
@@ -68,7 +68,7 @@ def read_config_var(DLGID_CTRL):
     FUNCTION_NAME = 'READ_CONFIG_VAR'
     
     ## INSTANCIAS
-    logs = ctrl_logs('CTRL_FREC',DLGID_CTRL,print_log)
+    logs = ctrl_logs(False,'ctrl_process',DLGID_CTRL,print_log)
     redis = Redis()
     # 
     # LEO LOS TAGS DE CONFIGURACION
@@ -115,7 +115,7 @@ def upgrade_config(DLGID_CTRL,LIST_CONFIG):
     
     #
     ## INSTANCIAS
-    logs = ctrl_logs('CTRL_FREC',DLGID_CTRL,print_log)
+    logs = ctrl_logs(False,'ctrl_process',DLGID_CTRL,print_log)
     #
     # IMPRIMIR VARIABLES DE CONFIGURACION
     n = 4
@@ -196,9 +196,9 @@ def add_2_RUN(dlgid,type):
         redis.hset('serv_error_APP_selection', 'RUN', dlgid)
         
     # PREPARO LA VARIABLE TYPE CON SU VALOR
-    redis.hset(f'{dlgid}_ERROR', 'TAG_CONFIG', 'TYPE')
-    redis.hset(f'{dlgid}_ERROR', 'TYPE', type)
-    
+    if not(redis.hexist(f'{dlgid}_ERROR', 'TAG_CONFIG')):
+        redis.hset(f'{dlgid}_ERROR', 'TAG_CONFIG', 'TYPE')
+        redis.hset(f'{dlgid}_ERROR', 'TYPE', type)
     
 def show_var_list(lst):
     n = 0
@@ -238,7 +238,8 @@ def run_ctrl_process(LIST_CONFIG):
 name_function = 'APP_SELECTION'
 
 ## INSTANCIAS
-logs = ctrl_logs('CTRL_FREC',DLGID_CTRL,print_log)
+#logs = ctrl_logs('CTRL_FREC',DLGID_CTRL,print_log)
+logs = ctrl_logs(False,'ctrl_process',DLGID_CTRL,print_log)
 redis = Redis()
 
 ## VARIABLES GLOBALES QUE LE ENTRAN A CORE

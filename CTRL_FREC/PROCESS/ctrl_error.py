@@ -42,7 +42,8 @@ def error_process(LIST_CONFIG):
     TIMER_POLL = str2bool(conf.lst_get('TIMER_POLL'))
     
     ## INSTANCIAS
-    logs = ctrl_logs(TYPE,DLGID,print_log)
+    #logs = ctrl_logs(TYPE,DLGID,print_log)
+    logs = ctrl_logs(TYPE,'ctrl_error',DLGID,print_log)
     redis = Redis()
     #
     # INSTANCIA DE error_process

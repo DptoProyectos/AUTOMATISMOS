@@ -1,12 +1,12 @@
 #!/drbd/www/cgi-bin/spx/aut_env/bin/python3.6
 '''
-APLICACION DE CONTROL DE ERRORES EN TEST_DLG
+APLICACION DE CONTROL DE ERRORES EN CTRL_FREC
 
 Created on 16 mar. 2020 
 
 @author: Yosniel Cabrera
 
-Version 2.1.3 16-04-2020 12:58
+Version 2.1.4 16-04-2020 12:58
 ''' 
 
 ## LIBRERIAS
@@ -36,10 +36,14 @@ def error_process(LIST_CONFIG):
     
     #VARIABLES DE CONFIGURACION
     SWITCH_OUTPUTS = str2bool(conf.lst_get('SWITCH_OUTPUTS'))
+    TEST_OUTPUTS = str2bool(conf.lst_get('TEST_OUTPUTS'))
+    RESET_ENABLE = str2bool(conf.lst_get('RESET_ENABLE'))
     EVENT_DETECTION = str2bool(conf.lst_get('EVENT_DETECTION'))
+    TIMER_POLL = str2bool(conf.lst_get('TIMER_POLL'))
     
     ## INSTANCIAS
-    logs = ctrl_logs(TYPE,DLGID,print_log)
+    #logs = ctrl_logs(TYPE,DLGID,print_log)
+    logs = ctrl_logs(TYPE,'ctrl_error',DLGID,print_log)
     redis = Redis()
     #
     # INSTANCIA DE error_process
@@ -66,7 +70,10 @@ def error_process(LIST_CONFIG):
     logs.print_in(name_function, 'TYPE', TYPE)
     #
     if SWITCH_OUTPUTS: logs.print_in(name_function, 'SWITCH_OUTPUTS', SWITCH_OUTPUTS)
+    if SWITCH_OUTPUTS: logs.print_in(name_function, 'TEST_OUTPUTS', TEST_OUTPUTS)
+    if SWITCH_OUTPUTS: logs.print_in(name_function, 'RESET_ENABLE', RESET_ENABLE)
     if EVENT_DETECTION: logs.print_in(name_function, 'EVENT_DETECTION', EVENT_DETECTION)
+    if EVENT_DETECTION: logs.print_in(name_function, 'TIMER_POLL', TIMER_POLL)
     #
     
     # ESCRIBO NUMERO DE EJECUCION
@@ -88,6 +95,13 @@ def error_process(LIST_CONFIG):
             # ALTERNO LAS SALIDAS
             logs.print_inf(name_function, 'SWITCH_OUTPUTS')
             e.switch_outputs()
+            #
+            # TESTEO LAS SALIDAS
+            logs.print_inf(name_function, 'TEST_OUTPUTS')
+            state_test_outputs = e.test_outputs()
+            
+            #
+            
             
             #
         elif dlg_detection(DLGID) == '5CH':
