@@ -77,8 +77,7 @@ class manage_dic():
             return None
         
 dic = manage_dic(visual_dic)
-#value = dic.get_dic('LMIN', 'True_value')
-#print(f'###########################{value}')
+
 
             
             
