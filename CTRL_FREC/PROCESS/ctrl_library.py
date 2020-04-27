@@ -6,7 +6,7 @@ Created on 16 mar. 2020
 
 @author: Yosniel Cabrera
 
-Version 2.1.4 16-04-2020 12:58
+Version 3.1.4 27-04-2020 15:30
 ''' 
 
 # LIBRERIAS
@@ -113,7 +113,14 @@ class ctrl_process(object):
         
         pump_state = False
         #
-        
+        # SI NO EXISTE PUMP_FREC LO CREO CON VALOR 100%
+        if not(self.redis.hexist(self.DLGID_CTRL, dic.get_dic('PUMP_FREC', 'name'))): 
+            self.redis.hset(self.DLGID_CTRL, dic.get_dic('PUMP_FREC', 'name'), dic.get_dic('PUMP_FREC', 'True_value'))
+            PUMP_FREC = 7
+        else:
+            PUMP_FREC = int((int(self.redis.hget(self.DLGID_CTRL, dic.get_dic('PUMP_FREC', 'name'))))/100 * 7)
+            print(f'PUMP_FREC = {PUMP_FREC}')
+            
         # SI NO EXISTE SW2 LO CREO CON VALOR OFF
         if not(self.redis.hexist(self.DLGID_CTRL, 'SW2')): 
             self.redis.hset(self.DLGID_CTRL, 'SW2', 'OFF')
@@ -121,10 +128,13 @@ class ctrl_process(object):
         # REVISO LA ACCION TOMADA EN EL SERVER RESPECTO A LA BOMBA
         if self.redis.hget(self.DLGID_CTRL, 'SW2') == 'ON':
             self.logs.print_inf(name_function, 'PRENDER BOMBA')
+            self.logs.dlg_performance(f'< {name_function} > PRENDER BOMBA [ PUMP_FREC = {PUMP_FREC} ]')
+            #
             pump_state = True
             #
         elif self.redis.hget(self.DLGID_CTRL, 'SW2') == 'OFF':    
             self.logs.print_inf(name_function, 'APAGAR BOMBA')
+            self.logs.dlg_performance(f'< {name_function} > APAGAR BOMBA')
             #
         else:
             self.logs.print_inf(name_function, f"error in {name_function}, SW2 = {read_param(self.DLGID_CTRL,'SW2')}")
@@ -134,11 +144,11 @@ class ctrl_process(object):
         # REVISO ACCION DE LAS SALIDAS    
         if self.ENABLE_OUTPUTS:
             if pump_state:
-                # SETEO LA MAXIMA FRECUENCIA PARA MADAR A PRENDER LA BOMBA
+                # SETEO LA FRECUENCIA A LA QUE SE QUIERE PRENDER LA BOMBA
                 if self.TYPE_IN_FREC == 'NPN':
-                    douts(self.DLGID_CTRL,not_dec(7,3))
+                    douts(self.DLGID_CTRL,not_dec(PUMP_FREC,3))
                 elif self.TYPE_IN_FREC == 'PNP': 
-                    douts(self.DLGID_CTRL,7)
+                    douts(self.DLGID_CTRL,PUMP_FREC)
                 else: 
                     self.logs.print_inf(name_function, f"error in {name_function}, TYPE_IN_FREC = {self.TYPE_IN_FREC}")    
                     self.logs.script_performance(f"error in {name_function}, TYPE_IN_FREC = {self.TYPE_IN_FREC}")
@@ -154,17 +164,19 @@ class ctrl_process(object):
         
         name_function = 'CONTROL_SISTEMA'
         
+        WND = 0.1       # VENTANA DE FRECUENCIA ABIERTA
+        
         # SI NO EXISTE LMIN LO CREO CON VALOR 1
-        if not(self.redis.hexist(self.DLGID_CTRL, dic.get_dic('LMIN', 'name'))): 
-            self.redis.hset(self.DLGID_CTRL, dic.get_dic('LMIN', 'name'), dic.get_dic('LMIN', 'True_value'))
-        # SI NO EXISTE LMAX LO CREO CON VALOR 1.5
-        if not(self.redis.hexist(self.DLGID_CTRL, dic.get_dic('LMAX', 'name'))): 
-            self.redis.hset(self.DLGID_CTRL, dic.get_dic('LMAX', 'name'), dic.get_dic('LMAX', 'True_value'))
+        if not(self.redis.hexist(self.DLGID_CTRL, dic.get_dic('MAG_REF', 'name'))): 
+            self.redis.hset(self.DLGID_CTRL, dic.get_dic('MAG_REF', 'name'), dic.get_dic('MAG_REF', 'True_value'))
         #
         # LEO LAS VARIABLES LMIN Y LMAX
-        LMIN = float(self.redis.hget(self.DLGID_CTRL, dic.get_dic('LMIN', 'name')))
-        LMAX = float(self.redis.hget(self.DLGID_CTRL, dic.get_dic('LMAX', 'name')))
-        
+        MAG_REF = float(self.redis.hget(self.DLGID_CTRL, dic.get_dic('MAG_REF', 'name')))
+        #
+        #ESTABLEZCO LMIN Y LMAX A PARTIR DE WND
+        LMIN = MAG_REF - WND
+        LMAX = MAG_REF + WND
+        #
         if self.redis.hexist(self.DLGID_REF,'LINE'):
             REF = float(read_param(self.DLGID_REF,self.CHANNEL_REF))
         else:
@@ -172,8 +184,8 @@ class ctrl_process(object):
         
         self.logs.print_in(name_function, 'ENABLE_OUTPUTS', self.ENABLE_OUTPUTS)
         self.logs.print_in(name_function, 'TYPE_IN_FREC', self.TYPE_IN_FREC)
-        self.logs.print_in(name_function, 'LMIN', LMIN)
-        self.logs.print_in(name_function, 'LMAX', LMAX)
+        self.logs.print_in(name_function, 'MAG_REF', MAG_REF)
+        self.logs.print_in(name_function, 'WND', WND)
         self.logs.print_in(name_function, 'REF', REF)
         
         # SI NO FREC LMIN LO CREO CON VALOR 0
@@ -190,7 +202,7 @@ class ctrl_process(object):
                 #
             else: 
                 self.logs.print_inf(name_function, 'SE ALCANZA FRECUENCIA MAXIMA')
-                self.logs.script_performance(f'{name_function} ==> SE ALCANZA FRECUENCIA MAXIMA')
+                self.logs.dlg_performance(f'< {name_function} > SE ALCANZA FRECUENCIA MAXIMA')
                         
         elif REF > LMAX:
             self.logs.print_inf(name_function, 'PRESION ALTA')
@@ -291,69 +303,6 @@ class ctrl_process(object):
             # GUARDO pump_total_time EN REDIS
             str_pump_total_time = f'{pump_total_time.year},{pump_total_time.month},{pump_total_time.day},{pump_total_time.hour},{pump_total_time.minute},{pump_total_time.second},{pump_total_time.microsecond}'
             self.redis.hset(self.DLGID_CTRL, f'pump{no_pump}_total_time',str_pump_total_time)
-            
-        
-           
-        
-         
-        
-        
-        
-        
-        
-            
-            
-            
-        
-            
-        #print('dsafhgfg')
-        #if pump1_state == 1
-        
-    
-    
-'''
-#import datetime
-#import calendar     
-
-
-reset_datetime = datetime.datetime(2020,1,1,0,0,0,0)
-print(reset_datetime)
-
-#hours
-#weeks
-#minutes
-current_datetime = reset_datetime + datetime.timedelta(minutes=3)
-
-print(current_datetime)
-
-
-#hora1 = time(0, 0, 0)  # Asigna 10h 5m 0s
-#print(hora1)
-ahora = datetime.datetime.utcnow()
-#ahora = ahora - datetime.datetime.utcnow()
-print(ahora)
-print(datetime.timedelta(hours=3))
-hora1 = ahora + datetime.timedelta(hours=3)
-print(hora1)
-
-my = datetime.datetime(2020,8,25,5,25,2,829363)
-print(my)
-
-
-
-#ahora = datetime.now()  # Obtiene fecha y hora actual
-  
-#print(ahora - ahora)
-
-
-
-'''
-
-
-
-
-
-
 
             
         

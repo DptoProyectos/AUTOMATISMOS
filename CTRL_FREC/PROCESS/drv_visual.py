@@ -6,7 +6,7 @@ Created on 16 mar. 2020
 
 @author: Yosniel Cabrera
 
-Version 2.1.0 16-04-2020 12:58
+Version 3.1.0 27-04-2020 14:53
 ''' 
 
 
@@ -16,8 +16,8 @@ Version 2.1.0 16-04-2020 12:58
 visual_dic = {  
                 'WEB_MODE':             [ 'SW1',                'AUTO',         'REMOTO',       'BOYA',     'TIMER'   ],
                 'PUMP_1_WEB_MODE':      [ 'SW2',                'ON',           'OFF',                                ],
-                'LMIN':                 [ 'LMIN_TQ',            1                                                     ],
-                'LMAX':                 [ 'LMAX_TQ',            1.5                                                   ],
+                'MAG_REF':              [ 'MAG_REF',            1                                                     ],
+                'PUMP_FREC':            [ 'PUMP_FREC',          100                                                   ],
                 
                 'TX_ERROR':             [ 'TX_ERROR',           'SI',           'NO',                                 ],
                 'MODO_LOCAL':           [ 'LOCAL_MODE',         'SI',           'NO',                                 ],

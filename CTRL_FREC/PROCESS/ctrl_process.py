@@ -6,7 +6,7 @@ Created on 16 mar. 2020
 
 @author: Yosniel Cabrera
 
-Version 2.1.1 27-04-2020 14:34
+Version 3.1.1 27-04-2020 14:34
 ''' 
 
 
@@ -61,11 +61,6 @@ def control_process(LIST_CONFIG):
     archivo = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(archivo)
     p = archivo.ctrl_process(LIST_CONFIG)
-    
-    
-    
-    #p = ctrl_process(LIST_CONFIG)
-    
     
     # OBTENFO LA CARPETA EN DONDE SE ENCUENTRA EL ARCHIVO ACTUAL
     current_path = os.path.dirname(os.path.abspath(__file__))
@@ -161,14 +156,12 @@ def control_process(LIST_CONFIG):
         elif WEB_MODE == 'AUTO':
             logs.print_inf(name_function, 'TRABAJO EN MODO AUTOMATICO')
             #
-            
             # SI NO EXISTE LA VARIABLE TX_ERROR EN DLGID_REF LA CREO CON VALOR NO
             if not(redis.hexist(DLGID_REF, dic.get_dic('TX_ERROR', 'name'))): 
                 redis.hset(DLGID_REF, dic.get_dic('TX_ERROR', 'name'), dic.get_dic('TX_ERROR', 'False_value'))
             #
             # LEO TX_ERROR
             TX_ERROR = redis.hget(DLGID_REF, dic.get_dic('TX_ERROR', 'name'))
-            
             #
             # CHEQUEO ERROR TX EN EL DLG DE REFERENCIA
             if TX_ERROR == 'SI':
