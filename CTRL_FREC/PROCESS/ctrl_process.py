@@ -6,7 +6,7 @@ Created on 16 mar. 2020
 
 @author: Yosniel Cabrera
 
-Version 2.1.1 16-04-2020 12:58
+Version 2.1.1 27-04-2020 14:34
 ''' 
 
 
@@ -205,6 +205,17 @@ def control_process(LIST_CONFIG):
             
     # LATCHEO LAS SALIDAS
     p.latch__outpust(DLGID_CTRL)
+    
+    # PREPARO DATA_DATE_TIME PARA MOSTRAR EN LA VISUALIZACION EN EL DATALOGGER DE CONTROL
+    logs.print_inf(name_function, 'SHOW_DATA_DATE_TIME')
+    p.show_DATA_DATE_TIME(DLGID_CTRL)
+    
+    # PREPARO DATA_DATE_TIME PARA MOSTRAR EN LA VISUALIZACION EN EL DATALOGGER DE REFERENCIA
+    p.show_DATA_DATE_TIME(DLGID_REF)
+    
+    # PREPARO PUMP1_STATE PARA MOSTRAR EL ESTADO DE LA BOMBA
+    logs.print_inf(name_function, 'PUMP1_STATE')
+    p.pump1_state('BR1')
     
     
     

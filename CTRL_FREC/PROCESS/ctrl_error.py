@@ -99,10 +99,10 @@ def error_process(LIST_CONFIG):
             # TESTEO LAS SALIDAS
             logs.print_inf(name_function, 'TEST_OUTPUTS')
             state_test_outputs = e.test_outputs()
-            
             #
-            
-            
+            # PREPARO VARIABLES DE TIEMPO QUE SE MUESTRAN EN LA VISUALIZACION
+            logs.print_inf(name_function, 'PUMP1_TIME')
+            e.pump_time('BR1',1)
             #
         elif dlg_detection(DLGID) == '5CH':
             # DATALOGGER DE 5CH DETECTADO

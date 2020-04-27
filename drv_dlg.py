@@ -6,7 +6,7 @@ Created on 16 mar. 2020
 
 @author: Yosniel Cabrera
 
-Version 2.1.2 16-04-2020 12:58
+Version 2.1.3 16-04-2020 12:58
 ''' 
 
 #CONEXIONES
@@ -159,7 +159,7 @@ def read_param(dlgid,param):
             n = n+1
             
         # VEO SI SE ESTA SELECCIONADO DATE O TIME 
-        if param == 'DATE': out = my_list[1]
+        if param == 'DATE': out = f'20{my_list[1]}'
         else: 
             try:
                 out = my_list[my_list.index(param)+1]

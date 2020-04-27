@@ -224,6 +224,138 @@ class ctrl_process(object):
         if self.redis.hget(dlgid, 'OUTPUTS') != '-1':
             current_OUTPUTS = self.redis.hget(dlgid, 'OUTPUTS')
             self.redis.hset(dlgid, 'current_OUTPUTS', current_OUTPUTS)
+   
+    def show_DATA_DATE_TIME(self,dlgid):  
+        #
+        name_function = 'SHOW_DATA_DATE_TIME'
+        #  
+        DATA_DATE_TIME = f"{read_param(dlgid, 'DATE')}_{read_param(dlgid, 'TIME')}"
+        #
+        self.redis.hset(dlgid, dic.get_dic('DATA_DATE_TIME', 'name'), DATA_DATE_TIME)
+        #
+        self.logs.print_out(name_function, f'[{dlgid}] - DATA_DATE_TIME', DATA_DATE_TIME)
+        
+    def pump1_state(self,channel_pump_name):
+        #
+        name_function = 'PUMP1_STATE'
+        #
+        pump1_state = int(read_param(self.DLGID_CTRL, channel_pump_name))
+        #
+        if pump1_state == 1:
+            self.redis.hset(self.DLGID_CTRL, dic.get_dic('PUMP1_STATE', 'name'), dic.get_dic('PUMP1_STATE', 'True_value'))
+            self.logs.print_out(name_function, dic.get_dic('PUMP1_STATE', 'name'), dic.get_dic('PUMP1_STATE', 'True_value'))
+            
+        elif pump1_state == 0:
+            self.redis.hset(self.DLGID_CTRL, dic.get_dic('PUMP1_STATE', 'name'), dic.get_dic('PUMP1_STATE', 'False_value'))
+            self.logs.print_out(name_function, dic.get_dic('PUMP1_STATE', 'name'), dic.get_dic('PUMP1_STATE', 'False_value'))
+        
+    def pump_time(self,channel_pump_name,no_pump):
+        #
+        name_function = f'PUMP{no_pump}_TIME'
+        #
+        from datetime import datetime, date, time, timedelta
+        #
+        pump_state = int(read_param(self.DLGID_CTRL, channel_pump_name))
+        #
+        # PREPARO VARIABLES DE TIEMPO 
+        #
+        ## TIEMPO TOTAL
+        if not(self.redis.hexist(self.DLGID_CTRL, f'pump{no_pump}_total_time')):
+            self.redis.hset(self.DLGID_CTRL, f'pump{no_pump}_total_time','2020,1,1,0,0,0,0')
+            pump_total_time = datetime(2020,1,1,0,0,0,0)
+            #
+            # ESCRIBO LA VARIABLE DE VISUALIZACION
+            self.redis.hset(self.DLGID_CTRL, dic.get_dic(f'PUMP{no_pump}_TOTAL_TIME', 'name'), '0 horas')
+        else:
+            # OBTENGO pump_total_time EN FORMATO datetime
+            str_pump_total_time = self.redis.hget(self.DLGID_CTRL, f'pump{no_pump}_total_time')
+            lst_pump_total_time = str_pump_total_time.split(',')
+            pump_total_time = datetime(int(lst_pump_total_time[0]),int(lst_pump_total_time[1]),int(lst_pump_total_time[2]),int(lst_pump_total_time[3]),int(lst_pump_total_time[4]),int(lst_pump_total_time[5]),int(lst_pump_total_time[6]))
+            #
+            # INCREMENTO 1 MINUTO EN pump_total_time SI LA BOMBA ESTA PRENDIDA
+            if pump_state == 1:
+                # SUMO UN MINUTO AL CONTEO DE TIEMPO
+                pump_total_time = pump_total_time + timedelta(minutes=1)
+                #
+                # VEO LA DIFERENCIA DE TIEMPO RESPECTO A LA REFERENCIA INICIAL
+                delta_total_time = pump_total_time - datetime(2020,1,1,0,0,0,0)
+                #
+                # CONVIERTO LA DIFERENCIA A HORAS
+                delta_total_time_hours = int(delta_total_time.days * 24 + delta_total_time.seconds / 3600)
+                #
+                # ESCRIBO LA VARIABLE DE VISUALIZACION
+                self.redis.hset(self.DLGID_CTRL, dic.get_dic(f'PUMP{no_pump}_TOTAL_TIME', 'name'), f'{delta_total_time_hours} horas')
+                #
+                self.logs.print_out(name_function, dic.get_dic(f'PUMP{no_pump}_TOTAL_TIME', 'name'), f'{delta_total_time_hours} horas')
+            #
+            # GUARDO pump_total_time EN REDIS
+            str_pump_total_time = f'{pump_total_time.year},{pump_total_time.month},{pump_total_time.day},{pump_total_time.hour},{pump_total_time.minute},{pump_total_time.second},{pump_total_time.microsecond}'
+            self.redis.hset(self.DLGID_CTRL, f'pump{no_pump}_total_time',str_pump_total_time)
+            
+        
+           
+        
+         
+        
+        
+        
+        
+        
+            
+            
+            
+        
+            
+        #print('dsafhgfg')
+        #if pump1_state == 1
+        
+    
+    
+'''
+#import datetime
+#import calendar     
+
+
+reset_datetime = datetime.datetime(2020,1,1,0,0,0,0)
+print(reset_datetime)
+
+#hours
+#weeks
+#minutes
+current_datetime = reset_datetime + datetime.timedelta(minutes=3)
+
+print(current_datetime)
+
+
+#hora1 = time(0, 0, 0)  # Asigna 10h 5m 0s
+#print(hora1)
+ahora = datetime.datetime.utcnow()
+#ahora = ahora - datetime.datetime.utcnow()
+print(ahora)
+print(datetime.timedelta(hours=3))
+hora1 = ahora + datetime.timedelta(hours=3)
+print(hora1)
+
+my = datetime.datetime(2020,8,25,5,25,2,829363)
+print(my)
+
+
+
+#ahora = datetime.now()  # Obtiene fecha y hora actual
+  
+#print(ahora - ahora)
+
+
+
+'''
+
+
+
+
+
+
+
+            
         
 class error_process(object):  
     '''
@@ -695,8 +827,50 @@ class error_process(object):
             current_OUTPUTS = self.redis.hget(dlgid, 'OUTPUTS')
             self.redis.hset(dlgid, 'current_OUTPUTS', current_OUTPUTS)           
            
-                
+    def pump_time(self,channel_pump_name,no_pump):
+        #
+        name_function = f'PUMP{no_pump}_TIME'
+        #
+        from datetime import datetime, date, time, timedelta
+        #
+        pump_state = int(read_param(self.DLGID, channel_pump_name))
+        #
+        # PREPARO VARIABLES DE TIEMPO 
+        #
+        ## TIEMPO TOTAL
+        if not(self.redis.hexist(f'{self.DLGID}_ERROR', f'pump{no_pump}_total_time')):
+            self.redis.hset(f'{self.DLGID}_ERROR', f'pump{no_pump}_total_time','2020,1,1,0,0,0,0')
+            pump_total_time = datetime(2020,1,1,0,0,0,0)
+            #
+            # ESCRIBO LA VARIABLE DE VISUALIZACION
+            self.redis.hset(self.DLGID, dic.get_dic(f'PUMP{no_pump}_TOTAL_TIME', 'name'), '0 horas')
+        else:
+            # OBTENGO pump_total_time EN FORMATO datetime
+            str_pump_total_time = self.redis.hget(f'{self.DLGID}_ERROR', f'pump{no_pump}_total_time')
+            lst_pump_total_time = str_pump_total_time.split(',')
+            pump_total_time = datetime(int(lst_pump_total_time[0]),int(lst_pump_total_time[1]),int(lst_pump_total_time[2]),int(lst_pump_total_time[3]),int(lst_pump_total_time[4]),int(lst_pump_total_time[5]),int(lst_pump_total_time[6]))
+            #
+            # INCREMENTO 1 MINUTO EN pump_total_time SI LA BOMBA ESTA PRENDIDA
+            if pump_state == 1:
+                # SUMO UN MINUTO AL CONTEO DE TIEMPO
+                pump_total_time = pump_total_time + timedelta(minutes=1)
+                #
+                # VEO LA DIFERENCIA DE TIEMPO RESPECTO A LA REFERENCIA INICIAL
+                delta_total_time = pump_total_time - datetime(2020,1,1,0,0,0,0)
+                #
+                # CONVIERTO LA DIFERENCIA A HORAS
+                delta_total_time_hours = int(delta_total_time.days * 24 + delta_total_time.seconds / 3600)
+                #
+                # ESCRIBO LA VARIABLE DE VISUALIZACION
+                self.redis.hset(self.DLGID, dic.get_dic(f'PUMP{no_pump}_TOTAL_TIME', 'name'), f'{delta_total_time_hours} horas')
+                #
+                self.logs.print_out(name_function, dic.get_dic(f'PUMP{no_pump}_TOTAL_TIME', 'name'), f'{delta_total_time_hours} horas')
+            #
+            # GUARDO pump_total_time EN REDIS
+            str_pump_total_time = f'{pump_total_time.year},{pump_total_time.month},{pump_total_time.day},{pump_total_time.hour},{pump_total_time.minute},{pump_total_time.second},{pump_total_time.microsecond}'
+            self.redis.hset(f'{self.DLGID}_ERROR', f'pump{no_pump}_total_time',str_pump_total_time)
             
+                  
             
         
             
