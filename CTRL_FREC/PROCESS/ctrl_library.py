@@ -6,7 +6,7 @@ Created on 16 mar. 2020
 
 @author: Yosniel Cabrera
 
-Version 3.1.4 27-04-2020 15:30
+Version 3.1.7 27-04-2020 15:30
 ''' 
 
 # LIBRERIAS
@@ -119,7 +119,6 @@ class ctrl_process(object):
             PUMP_FREC = 7
         else:
             PUMP_FREC = int((int(self.redis.hget(self.DLGID_CTRL, dic.get_dic('PUMP_FREC', 'name'))))/100 * 7)
-            print(f'PUMP_FREC = {PUMP_FREC}')
             
         # SI NO EXISTE SW2 LO CREO CON VALOR OFF
         if not(self.redis.hexist(self.DLGID_CTRL, 'SW2')): 
@@ -127,14 +126,12 @@ class ctrl_process(object):
         #
         # REVISO LA ACCION TOMADA EN EL SERVER RESPECTO A LA BOMBA
         if self.redis.hget(self.DLGID_CTRL, 'SW2') == 'ON':
-            self.logs.print_inf(name_function, 'PRENDER BOMBA')
-            self.logs.dlg_performance(f'< {name_function} > PRENDER BOMBA [ PUMP_FREC = {PUMP_FREC} ]')
+            self.logs.print_inf(name_function, f'PRENDER BOMBA [ PUMP_FREC = {PUMP_FREC} ]')
             #
             pump_state = True
             #
         elif self.redis.hget(self.DLGID_CTRL, 'SW2') == 'OFF':    
             self.logs.print_inf(name_function, 'APAGAR BOMBA')
-            self.logs.dlg_performance(f'< {name_function} > APAGAR BOMBA')
             #
         else:
             self.logs.print_inf(name_function, f"error in {name_function}, SW2 = {read_param(self.DLGID_CTRL,'SW2')}")
@@ -337,7 +334,6 @@ class error_process(object):
         
         self.redis = Redis()   
         
-    
     def test_tx(self):
         '''
         detecta errores tx y RTC
@@ -609,6 +605,28 @@ class error_process(object):
             #
             # ESCRIBO EN EL LOG
             self.logs.dlg_performance(f'< {name_function} > MODO_LOCAL')
+            
+        # TRABAJO EN MODO REMOTO
+        if self.redis.hget(self.DLGID, dic.get_dic('WEB_MODE', 'name')) == dic.get_dic('WEB_MODE', 'False_value'):
+            #
+            # CHEQUEO QUE SE ESTE MANDANDO A PRENDER LA BOMBA
+            if self.redis.hget(self.DLGID, dic.get_dic('PUMP_1_WEB_MODE', 'name')) == dic.get_dic('PUMP_1_WEB_MODE', 'True_value'):
+                #
+                # ESCRIBO EN EL LOG
+                PUMP_FREC = self.redis.hget(self.DLGID, dic.get_dic('PUMP_FREC', 'name'))
+                self.logs.dlg_performance(f'< {name_function} > MODO REMOTO => PRENDER BOMBA [ PUMP_FREC = {PUMP_FREC} ]')
+                #
+            elif self.redis.hget(self.DLGID, dic.get_dic('PUMP_1_WEB_MODE', 'name')) == dic.get_dic('PUMP_1_WEB_MODE', 'False_value'):
+                # ESCRIBO EN EL LOG
+                self.logs.dlg_performance(f'< {name_function} > MODO REMOTO => APAGAR BOMBA') 
+                
+        # TRABAJO EN MODO EMERGENCIA
+        if self.redis.hget(self.DLGID, dic.get_dic('WEB_MODE', 'name')) == dic.get_dic('WEB_MODE', 'value_1') or self.redis.hget(self.DLGID, dic.get_dic('WEB_MODE', 'name')) == dic.get_dic('WEB_MODE', 'value_2'):
+            #
+            # ESCRIBO EN EL LOG
+            self.logs.dlg_performance(f'< {name_function} > MODO BOYA O TIMER')
+                
+                
                 
     def switch_outputs(self):
         
