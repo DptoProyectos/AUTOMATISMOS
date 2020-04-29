@@ -6,7 +6,7 @@ Created on 16 mar. 2020
 
 @author: Yosniel Cabrera
 
-Version 3.1.7 27-04-2020 15:30
+Version 3.1.8 29-04-2020 09:33
 ''' 
 
 # LIBRERIAS
@@ -556,11 +556,18 @@ class error_process(object):
                     # MUESTRO LOG EN CONSOLA
                     self.logs.print_inf(name_function, 'TX STOPPED')
                     #
+                    # ESCRIBO EN REDIS ALARMA DE 1MIN EL EQUIPO CAIDO
+                    self.redis.hset(self.DLGID, 'error_1min', 'SI')
+                    #
                     # ESCRIBO EN EL LOG
                     self.logs.dlg_performance(f'< ERROR TX > [BAT = {bat}]')
                     #
                     return False
                 else:
+                    #
+                    # ESCRIBO EN REDIS ALARMA DE 1MIN QUE INDICA QUE EL DATO QUE ESTA LLEGADNO ES VALIDO
+                    self.redis.hset(self.DLGID, 'error_1min', 'NO')
+                    #
                     return True
                     
     def visual(self): pass
@@ -625,8 +632,6 @@ class error_process(object):
             #
             # ESCRIBO EN EL LOG
             self.logs.dlg_performance(f'< {name_function} > MODO BOYA O TIMER')
-                
-                
                 
     def switch_outputs(self):
         

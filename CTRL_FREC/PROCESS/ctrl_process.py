@@ -6,7 +6,7 @@ Created on 16 mar. 2020
 
 @author: Yosniel Cabrera
 
-Version 3.1.1 27-04-2020 14:34
+Version 3.1.2 29-04-2020 09:33
 ''' 
 
 
@@ -160,24 +160,29 @@ def control_process(LIST_CONFIG):
             if not(redis.hexist(DLGID_REF, dic.get_dic('TX_ERROR', 'name'))): 
                 redis.hset(DLGID_REF, dic.get_dic('TX_ERROR', 'name'), dic.get_dic('TX_ERROR', 'False_value'))
             #
-            # LEO TX_ERROR
+            # LEO TX_ERROR y error_1min
             TX_ERROR = redis.hget(DLGID_REF, dic.get_dic('TX_ERROR', 'name'))
+            error_1min = redis.hget(DLGID_REF,'error_1min')
             #
-            # CHEQUEO ERROR TX EN EL DLG DE REFERENCIA
+            # CHEQUEO ERROR TX EN EL DLG DE REFERENCIA (SE DECLARA ERROR_TX CUANDO PASAN 10 MIN SIN TRANSMITIR)
             if TX_ERROR == 'SI':
                 logs.print_inf(name_function, 'ERROR TX EN SISTEMA DE REFERENCIA')
                 logs.print_inf(name_function, 'AUTOMATISMO TRABAJADO CON SISTEMA DE EMERGENCIA')
                 emerg_system(DLGID_CTRL)
             elif TX_ERROR == 'NO':
-                # CHEQUEO ERROR EN EL SENSOR
-                if not(p.chequeo_sensor()):
-                    logs.print_inf(name_function, 'ERROR DE SENSOR EN SISTEMA DE REFERENCIA')
-                    logs.print_inf(name_function, 'AUTOMATISMO TRABAJADO CON SISTEMA DE EMERGENCIA')
-                    emerg_system(DLGID_CTRL)
+                # ME ASEGURO QUE LA REFENCIA ME HAYA MANDADO UN DATO NUEVO 
+                if error_1min == 'NO':
+                    # CHEQUEO ERROR EN EL SENSOR
+                    if not(p.chequeo_sensor()):
+                        logs.print_inf(name_function, 'ERROR DE SENSOR EN SISTEMA DE REFERENCIA')
+                        logs.print_inf(name_function, 'AUTOMATISMO TRABAJADO CON SISTEMA DE EMERGENCIA')
+                        emerg_system(DLGID_CTRL)
+                    else:
+                        logs.print_inf(name_function, 'CONTROL_SISTEMA')
+                        p.control_sistema()
                 else:
-                    logs.print_inf(name_function, 'CONTROL_SISTEMA')
-                    p.control_sistema()
-                    
+                    logs.print_inf(name_function, 'EN ESPERA DE DATOS DE LA REFERENCIA')
+                        
             else:
                 logs.print_inf(name_function, "error in [0], [1] = [2]".format(name_function,dic.get_dic('TX_ERROR', 'name'),TX_ERROR))
                 # DEJAR REGISTRO DEL ERROR
