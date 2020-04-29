@@ -166,9 +166,11 @@ def control_process(LIST_CONFIG):
             #
             # CHEQUEO ERROR TX EN EL DLG DE REFERENCIA (SE DECLARA ERROR_TX CUANDO PASAN 10 MIN SIN TRANSMITIR)
             if TX_ERROR == 'SI':
-                logs.print_inf(name_function, 'ERROR TX EN SISTEMA DE REFERENCIA')
+                logs.print_inf(name_function, f'ERROR TX EN SISTEMA DE REFERENCIA [ {DLGID_REF} ]')
                 logs.print_inf(name_function, 'AUTOMATISMO TRABAJADO CON SISTEMA DE EMERGENCIA')
+                #
                 emerg_system(DLGID_CTRL)
+                #
             elif TX_ERROR == 'NO':
                 # ME ASEGURO QUE LA REFENCIA ME HAYA MANDADO UN DATO NUEVO 
                 if error_1min == 'NO':
@@ -176,6 +178,7 @@ def control_process(LIST_CONFIG):
                     if not(p.chequeo_sensor()):
                         logs.print_inf(name_function, 'ERROR DE SENSOR EN SISTEMA DE REFERENCIA')
                         logs.print_inf(name_function, 'AUTOMATISMO TRABAJADO CON SISTEMA DE EMERGENCIA')
+                        #
                         emerg_system(DLGID_CTRL)
                     else:
                         logs.print_inf(name_function, 'CONTROL_SISTEMA')
@@ -187,8 +190,6 @@ def control_process(LIST_CONFIG):
                 logs.print_inf(name_function, "error in [0], [1] = [2]".format(name_function,dic.get_dic('TX_ERROR', 'name'),TX_ERROR))
                 # DEJAR REGISTRO DEL ERROR
                 logs.script_performance("error in [0], [1] = [2]".format(name_function,dic.get_dic('TX_ERROR', 'name'),TX_ERROR))
-            
-            
             #
         else:
             logs.print_inf(name_function, 'error in [0], [1] = [2]'.format(name_function,dic.get_dic('WEB_MODE', 'name'),WEB_MODE))

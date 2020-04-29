@@ -6,7 +6,8 @@ Created on 16 mar. 2020
 
 @author: Yosniel Cabrera
 
-Version 3.1.8 29-04-2020 09:33
+Version 3.2.9 29-04-2020 13:48
+
 ''' 
 
 # LIBRERIAS
@@ -209,6 +210,9 @@ class ctrl_process(object):
         else: 
             self.logs.print_inf(name_function, 'PRESION DENTRO DEL RANGO SELECCIONADO')    
         
+        # MANDO A PRENDER LA BOMBA
+        pump1(self.DLGID_CTRL, True)
+        
         # CHEQUEO SI LAS SALIDAS TIENEN QUE ACOPLARSE A ENTRADAS NPN o PNP Y MANDO A SETEAR EN CASO DE ENABLE_OUTPUTS
         if self.ENABLE_OUTPUTS:
             if self.TYPE_IN_FREC == 'NPN':
@@ -222,6 +226,7 @@ class ctrl_process(object):
             self.logs.print_inf(name_function, f"SALIDAS DESCACTIVADAS [ENABLE_OUTPUTS = {self.ENABLE_OUTPUTS}]")    
             self.logs.script_performance(f"{name_function} ==> SALIDAS DESCACTIVADAS [ENABLE_OUTPUTS = {self.ENABLE_OUTPUTS}]")
         
+        # GUARODO LA FRECUENCIA ACTUAL DE TRABAJO
         self.logs.print_out(name_function, 'CURR_FREC', FREC)    
         self.redis.hset(self.DLGID_CTRL,'FREC',FREC)
 
@@ -531,7 +536,6 @@ class error_process(object):
                 return True
         else:    
             if error_10min:
-                
                 #
                 # MUESTRO LOG EN CONSOLA
                 self.logs.print_inf(name_function, 'TX STOPPED FOR MORE THAN 10 MIN')
