@@ -1,6 +1,5 @@
 /drbd/www/cgi-bin/spx/AUTOMATISMOS/CTRL_FREC/SCRIPT_PERFORMANCE
 /drbd/www/cgi-bin/spx/AUTOMATISMOS/CTRL_FREC/DLG_PERFORMANCE
-CTRL_FREC/ctrl_process_frec_DLGID.py
-
+/drbd/www/cgi-bin/spx/AUTOMATISMOS/CTRL_FREC/ctrl_process_frec_DLGID.py
 /drbd/www/cgi-bin/spx/AUTOMATISMOS/TEST_DLG/SCRIPT_PERFORMANCE
 /drbd/www/cgi-bin/spx/AUTOMATISMOS/TEST_DLG/DLG_PERFORMANCE
