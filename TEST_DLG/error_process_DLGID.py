@@ -53,5 +53,5 @@ os.system('{0}/serv_error_APP_selection.py {1}'.format(file_path,STR_CONFIG))
 #print(f'control_process_frec_{LIST_CONFIG[3]} TERMINADO A {time()-gen_start_time} s')
 
 
-
+#
 ####
