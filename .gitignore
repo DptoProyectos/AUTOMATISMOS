@@ -1,2 +1,9 @@
 *.ini
 *.log
+PROCESS/__pycache__/
+__pycache__
+CTRL_FREC/call_ctrl_process_frec.py
+CTRL_FREC/ctrl_process_frec_DLGID.py
+CTRL_FREC/error_process_DLGID.py
+TEST_DLG/error_process_DLGID.py
+
