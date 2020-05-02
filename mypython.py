@@ -6,11 +6,12 @@ Created on 16 mar. 2020
 
 @author: Yosniel Cabrera
 
-Version 2.1.2 16-04-2020 12:58
+Version 2.1.3 02-05-2020 16:22
 ''' 
 
 # LIBRERIAS
 import json
+import os
 
 def lst2str(list):
     '''
@@ -103,8 +104,12 @@ class config_var():
         my_list = self.var
         try:return my_list[my_list.index(param)+1]
         except: return None
-             
-        
+     
+     
+# OTHERS             
+project_path = os.path.dirname(os.path.abspath(__file__))
+
+       
     
 
 
