@@ -201,7 +201,7 @@ class ctrl_process(object):
                 #
             else: 
                 self.logs.print_inf(name_function, 'SE ALCANZA FRECUENCIA MAXIMA')
-                self.logs.dlg_performance(f'< {name_function} > SE ALCANZA FRECUENCIA MAXIMA')
+                #self.logs.dlg_performance(f'< {name_function} > SE ALCANZA FRECUENCIA MAXIMA')
                         
         elif REF > LMAX:
             self.logs.print_inf(name_function, 'PRESION ALTA')
@@ -673,7 +673,9 @@ class error_process(object):
             self.logs.print_inf(name_function, f'TRABAJO CON LA REFERENCIA_1 [ FREC = {FREC} ]')
             self.logs.dlg_performance(f'< {name_function} > TRABAJO CON LA REFERENCIA_1 [ FREC = {FREC} ]')
             
-            
+        # TRABAJO CON FRECUENCIA MAXIMA
+        if int(self.redis.hget(self.DLGID, 'FREC')) == 7:
+            self.logs.dlg_performance(f'< {name_function} > SE ALCANZA FRECUENCIA MAXIMA')
                 
     def switch_outputs(self):
         
