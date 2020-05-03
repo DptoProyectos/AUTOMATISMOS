@@ -6,7 +6,7 @@ Created on 16 mar. 2020
 
 @author: Yosniel Cabrera
 
-Version 3.1.2 29-04-2020 09:33
+Version 3.1.3 29-04-2020 09:33
 ''' 
 
 
@@ -110,8 +110,8 @@ def control_process(LIST_CONFIG):
     logs.print_inf(name_function, 'CHEQUEO_ALARMAS')
     p.chequeo_alarmas()
     #
-    logs.print_inf(name_function, 'CHEQUEO_SENSOR')   
-    p.chequeo_sensor()
+    #logs.print_inf(name_function, 'CHEQUEO_SENSOR')   
+    #p.chequeo_sensor()
     #
     logs.print_inf(name_function, 'MAIN')   
     
@@ -160,6 +160,12 @@ def control_process(LIST_CONFIG):
             if not(redis.hexist(DLGID_REF, dic.get_dic('TX_ERROR', 'name'))): 
                 redis.hset(DLGID_REF, dic.get_dic('TX_ERROR', 'name'), dic.get_dic('TX_ERROR', 'False_value'))
             #
+            # LEO MAG_REF SELECCIONADA POR EL CLIENTE. SI NO EXISTE LMIN LO CREO CON VALOR 1
+            if not(redis.hexist(DLGID_CTRL, dic.get_dic('MAG_REF', 'name'))): 
+                redis.hset(DLGID_CTRL, dic.get_dic('MAG_REF', 'name'), dic.get_dic('MAG_REF', 'True_value'))
+            else:
+                MAG_REF = float(redis.hget(DLGID_CTRL, dic.get_dic('MAG_REF', 'name')))
+            #
             # LEO TX_ERROR y error_1min
             TX_ERROR = redis.hget(DLGID_REF, dic.get_dic('TX_ERROR', 'name'))
             error_1min = redis.hget(DLGID_REF,'error_1min')
@@ -167,22 +173,43 @@ def control_process(LIST_CONFIG):
             # CHEQUEO ERROR TX EN EL DLG DE REFERENCIA (SE DECLARA ERROR_TX CUANDO PASAN 10 MIN SIN TRANSMITIR)
             if TX_ERROR == 'SI':
                 logs.print_inf(name_function, f'ERROR TX EN SISTEMA DE REFERENCIA [ {DLGID_REF} ]')
-                logs.print_inf(name_function, 'AUTOMATISMO TRABAJADO CON SISTEMA DE EMERGENCIA')
+                #logs.print_inf(name_function, 'AUTOMATISMO TRABAJADO CON SISTEMA DE EMERGENCIA')
                 #
-                emerg_system(DLGID_CTRL)
+                # CHEQUEO QUE SE HAYA ESCRITO LA DIFERENCIA EN MAGNITUD ENTRE LOS SENSORES
+                if redis.hexist(DLGID_CTRL,'delta_ref1_ref'):
+                    #
+                    # LEO LA DIFERENCIA ENTRE LAS MAGNITUDES DE REFERENCIA
+                    delta_ref1_ref = float(redis.hget(DLGID_CTRL,'delta_ref1_ref'))
+                    #
+                    # CHEQUEO EL ESTADO DEL SENSOR DE REFERENCIA 1
+                    if not(p.chequeo_sensor(DLGID_REF_1,CHANNEL_REF_1)):
+                        logs.print_inf(name_function, 'ERROR DE SENSOR EN SISTEMA DE REFERENCIA 1')
+                        logs.print_inf(name_function, 'AUTOMATISMO TRABAJADO CON SISTEMA DE EMERGENCIA')
+                        emerg_system(DLGID_CTRL)
+                    else:
+                        logs.print_inf(name_function, 'AUTOMATISMO TRABAJADO CON SISTEMA DE REFERENCIA 1')
+                        
+                        p.control_sistema(DLGID_REF_1,CHANNEL_REF_1,MAG_REF + delta_ref1_ref)
                 #
+                else:
+                    logs.print_inf(name_function, 'AUTOMATISMO TRABAJADO CON SISTEMA DE EMERGENCIA')
+                    emerg_system(DLGID_CTRL)
+                    
             elif TX_ERROR == 'NO':
                 # ME ASEGURO QUE LA REFENCIA ME HAYA MANDADO UN DATO NUEVO 
                 if error_1min == 'NO':
                     # CHEQUEO ERROR EN EL SENSOR
-                    if not(p.chequeo_sensor()):
+                    if not(p.chequeo_sensor(DLGID_REF,CHANNEL_REF)):
                         logs.print_inf(name_function, 'ERROR DE SENSOR EN SISTEMA DE REFERENCIA')
                         logs.print_inf(name_function, 'AUTOMATISMO TRABAJADO CON SISTEMA DE EMERGENCIA')
                         #
                         emerg_system(DLGID_CTRL)
                     else:
                         logs.print_inf(name_function, 'CONTROL_SISTEMA')
-                        p.control_sistema()
+                        p.control_sistema(DLGID_REF,CHANNEL_REF,MAG_REF)
+                        #
+                        logs.print_inf(name_function, 'DELTA_MAG')
+                        p.delta_mag()
                 else:
                     logs.print_inf(name_function, 'EN ESPERA DE DATOS DE LA REFERENCIA')
                         

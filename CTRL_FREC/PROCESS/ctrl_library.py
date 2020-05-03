@@ -6,7 +6,7 @@ Created on 16 mar. 2020
 
 @author: Yosniel Cabrera
 
-Version 3.2.9 29-04-2020 13:48
+Version 3.3.0 29-04-2020 13:48
 
 ''' 
 
@@ -20,6 +20,7 @@ from drv_logs import *
 from drv_redis import Redis
 from drv_dlg import douts,pump1,emerg_system,read_param,dlg_detection,set_outs,get_outs
 from mypython import lst2str,str2lst,str2bool,not_dec,config_var
+from posix import read
 
 
 
@@ -99,7 +100,7 @@ class ctrl_process(object):
             # DEJAR REGISTRO DEL ERROR
             self.logs.script_performance(f"error in {name_function}, FT1 = {read_param(self.DLGID_CTRL,'FT1')}")
         
-    def chequeo_sensor(self):
+    def chequeo_sensor(self,dlgid,channel_came):
         
         name_function = 'CHEQUEO_SENSOR'
     
@@ -158,7 +159,7 @@ class ctrl_process(object):
             self.logs.print_inf(name_function, f"SALIDAS DESCACTIVADAS [ENABLE_OUTPUTS = {self.ENABLE_OUTPUTS}]")    
             self.logs.script_performance(f"{name_function} ==> SALIDAS DESCACTIVADAS [ENABLE_OUTPUTS = {self.ENABLE_OUTPUTS}]")
             
-    def control_sistema(self):
+    def control_sistema(self,dlgid_ref,channel_ref,MAG_REF):
         
         name_function = 'CONTROL_SISTEMA'
         
@@ -167,19 +168,19 @@ class ctrl_process(object):
         # SI NO EXISTE LMIN LO CREO CON VALOR 1
         if not(self.redis.hexist(self.DLGID_CTRL, dic.get_dic('MAG_REF', 'name'))): 
             self.redis.hset(self.DLGID_CTRL, dic.get_dic('MAG_REF', 'name'), dic.get_dic('MAG_REF', 'True_value'))
-        #
-        # LEO LAS VARIABLES LMIN Y LMAX
-        MAG_REF = float(self.redis.hget(self.DLGID_CTRL, dic.get_dic('MAG_REF', 'name')))
+        
         #
         #ESTABLEZCO LMIN Y LMAX A PARTIR DE WND
         LMIN = MAG_REF - WND
         LMAX = MAG_REF + WND
         #
-        if self.redis.hexist(self.DLGID_REF,'LINE'):
-            REF = float(read_param(self.DLGID_REF,self.CHANNEL_REF))
+        # LEO EL CANAL DE REFERENCIA
+        if self.redis.hexist(dlgid_ref,'LINE'):
+            REF = float(read_param(dlgid_ref,channel_ref))
         else:
-            self.logs.script_performance(f"error in {name_function}, {self.CHANNEL_REF} = {read_param(self.DLGID_CTRL,self.CHANNEL_REF)}")
-        
+            self.logs.print_inf(name_function,f"error in {name_function}, {self.CHANNEL_REF} = {read_param(self.DLGID_CTRL,self.CHANNEL_REF)}")
+         
+        # MUESTRO LOGS    
         self.logs.print_in(name_function, 'ENABLE_OUTPUTS', self.ENABLE_OUTPUTS)
         self.logs.print_in(name_function, 'TYPE_IN_FREC', self.TYPE_IN_FREC)
         self.logs.print_in(name_function, 'MAG_REF', MAG_REF)
@@ -306,6 +307,29 @@ class ctrl_process(object):
             str_pump_total_time = f'{pump_total_time.year},{pump_total_time.month},{pump_total_time.day},{pump_total_time.hour},{pump_total_time.minute},{pump_total_time.second},{pump_total_time.microsecond}'
             self.redis.hset(self.DLGID_CTRL, f'pump{no_pump}_total_time',str_pump_total_time)
 
+    def delta_mag(self):
+        '''
+        Escribe en DLGID_CTRL/delta_ref_ref1 la diferencia entre las magnitudes de la referencia y la referencia 1
+        '''
+        
+        name_function = 'DELTA_MAG'
+        
+        if (self.DLGID_REF_1 != '' and self.CHANNEL_REF_1 != ''):
+            #
+            mag_in_ref = float(read_param(self.DLGID_REF, self.CHANNEL_REF))
+            mag_in_ref_1 = float(read_param(self.DLGID_REF_1, self.CHANNEL_REF_1))
+            delta_ref1_ref = round(mag_in_ref_1 - mag_in_ref,2)
+            #
+            # ESCRIBO EN REDIS LA DIFERENCIA
+            self.redis.hset(self.DLGID_CTRL, 'delta_ref1_ref', delta_ref1_ref)
+            #
+            # IMPRIMO LOGS
+            self.logs.print_out(name_function, 'delta_ref1_ref', delta_ref1_ref)
+        else:
+            self.redis.hdel(self.DLGID_CTRL, 'delta_ref1_ref')
+            self.logs.print_inf(name_function, 'NO HAY SISTEMA DE REFERENCIA 1')
+            
+            
             
         
 class error_process(object):  
