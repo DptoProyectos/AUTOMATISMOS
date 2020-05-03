@@ -649,17 +649,31 @@ class error_process(object):
                 #
                 # ESCRIBO EN EL LOG
                 PUMP_FREC = self.redis.hget(self.DLGID, dic.get_dic('PUMP_FREC', 'name'))
+                self.logs.print_inf(name_function, f'MODO REMOTO => PRENDER BOMBA [ PUMP_FREC = {PUMP_FREC} ]')
                 self.logs.dlg_performance(f'< {name_function} > MODO REMOTO => PRENDER BOMBA [ PUMP_FREC = {PUMP_FREC} ]')
                 #
             elif self.redis.hget(self.DLGID, dic.get_dic('PUMP_1_WEB_MODE', 'name')) == dic.get_dic('PUMP_1_WEB_MODE', 'False_value'):
                 # ESCRIBO EN EL LOG
+                self.logs.print_inf(name_function, f'MODO REMOTO => APAGAR BOMBA')
                 self.logs.dlg_performance(f'< {name_function} > MODO REMOTO => APAGAR BOMBA') 
                 
         # TRABAJO EN MODO EMERGENCIA
         if self.redis.hget(self.DLGID, dic.get_dic('WEB_MODE', 'name')) == dic.get_dic('WEB_MODE', 'value_1') or self.redis.hget(self.DLGID, dic.get_dic('WEB_MODE', 'name')) == dic.get_dic('WEB_MODE', 'value_2'):
             #
             # ESCRIBO EN EL LOG
+            self.logs.print_inf(name_function, f'MODO BOYA O TIMER')
             self.logs.dlg_performance(f'< {name_function} > MODO BOYA O TIMER')
+               
+        # TRABAJO CON EL SISTEMA DE REFERENCIA_1
+        if self.redis.hget(self.DLGID, 'flag_work_syst_ref_1') == 'SI':
+            #
+            FREC = self.redis.hget(self.DLGID, 'FREC')
+            #
+            # ESCRIBO EN EL LOG
+            self.logs.print_inf(name_function, f'TRABAJO CON LA REFERENCIA_1 [ FREC = {FREC} ]')
+            self.logs.dlg_performance(f'< {name_function} > TRABAJO CON LA REFERENCIA_1 [ FREC = {FREC} ]')
+            
+            
                 
     def switch_outputs(self):
         

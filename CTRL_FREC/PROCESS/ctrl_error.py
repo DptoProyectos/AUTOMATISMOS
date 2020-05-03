@@ -34,7 +34,6 @@ def error_process(LIST_CONFIG):
     DLGID = conf.lst_get('DLGID') 
     TYPE = conf.lst_get('TYPE')                  
     
-    
     #VARIABLES DE CONFIGURACION
     SWITCH_OUTPUTS = str2bool(conf.lst_get('SWITCH_OUTPUTS'))
     TEST_OUTPUTS = str2bool(conf.lst_get('TEST_OUTPUTS'))
@@ -129,15 +128,6 @@ def error_process(LIST_CONFIG):
     
     
     
-    '''
-    if redis.hexist(f'{DLGID}_ERROR', '#_RUN'):
-        no_RUN = int(redis.hget(f'{DLGID}_ERROR', '#_RUN'))
-        no_RUN += 1
-        redis.hset(f'{DLGID}_ERROR', '#_RUN',no_RUN)
-    else:
-        redis.hset(f'{DLGID}_ERROR', '#_RUN',0)
-        '''
-        
-    #
+    
     
     

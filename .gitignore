@@ -1,7 +1,13 @@
+# EXTENCIONES IGNORADAS
 *.ini
 *.log
-PROCESS/__pycache__/
-__pycache__
+
+# DIRECTORIOS IGNORADOS
+__pycache__/
+CTRL_FREC/PROCESS/__pycache__/
+TEST_DLG/PROCESS/__pycache__/
+
+#ARCHIVOS IGNORADOS
 CTRL_FREC/call_ctrl_process_frec.py
 CTRL_FREC/ctrl_process_frec_DLGID.py
 CTRL_FREC/error_process_DLGID.py

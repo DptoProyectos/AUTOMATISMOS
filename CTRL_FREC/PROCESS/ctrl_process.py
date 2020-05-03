@@ -119,6 +119,12 @@ def control_process(LIST_CONFIG):
     
     name_function = 'MAIN'
     
+    # CONDICIONES INICIALES
+    #
+    ## ACTIVO BANDERA PARA QUE control_error NOTIFIQUE QUE SE ESTA TRABAJANDO CON REFERENCIA_1
+    redis.hset(DLGID_CTRL, 'flag_work_syst_ref_1','NO')
+    
+    
     # REVISO SI ESTA TRABAJANDO EN MODO LOCAL EN EL TABLERO
     if read_param(DLGID_CTRL,'LM') == '1': 
         logs.print_inf(name_function, 'TRABAJO EN MODO LOCAL')
@@ -188,7 +194,11 @@ def control_process(LIST_CONFIG):
                         emerg_system(DLGID_CTRL)
                     else:
                         logs.print_inf(name_function, 'AUTOMATISMO TRABAJADO CON SISTEMA DE REFERENCIA 1')
-                        
+                        #
+                        # ACTIVO BANDERA PARA QUE control_error NOTIFIQUE QUE SE ESTA TRABAJANDO CON REFERENCIA_1
+                        redis.hset(DLGID_CTRL, 'flag_work_syst_ref_1','SI')
+                        #
+                        # LLAMO AL CONTROL DEL SISTEMA
                         p.control_sistema(DLGID_REF_1,CHANNEL_REF_1,MAG_REF + delta_ref1_ref)
                 #
                 else:
