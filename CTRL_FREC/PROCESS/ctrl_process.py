@@ -116,7 +116,6 @@ def control_process(LIST_CONFIG):
     logs.print_inf(name_function, 'MAIN')   
     
     # FUNCION MAIN
-    
     name_function = 'MAIN'
     
     # CONDICIONES INICIALES
@@ -171,6 +170,7 @@ def control_process(LIST_CONFIG):
                 redis.hset(DLGID_CTRL, dic.get_dic('MAG_REF', 'name'), dic.get_dic('MAG_REF', 'True_value'))
             else:
                 MAG_REF = float(redis.hget(DLGID_CTRL, dic.get_dic('MAG_REF', 'name')))
+                
             #
             # LEO TX_ERROR y error_1min
             TX_ERROR = redis.hget(DLGID_REF, dic.get_dic('TX_ERROR', 'name'))
@@ -250,10 +250,12 @@ def control_process(LIST_CONFIG):
     p.show_DATA_DATE_TIME(DLGID_REF)
     
     # PREPARO PUMP1_STATE PARA MOSTRAR EL ESTADO DE LA BOMBA
-    logs.print_inf(name_function, 'PUMP1_STATE')
-    p.pump1_state('BR1')
+    logs.print_inf(name_function, 'SHOW_PUMP1_STATE')
+    p.show_pump1_state('BR1')
     
-    
+    # MUESTRA LA FRECUENCIA ACTUAL A LA QUE SE ESTA TRABAJANDO 
+    logs.print_inf(name_function, 'SHOW_WORK_FREQUENCY')
+    p.show_work_frequency()
     
     #
     # CALCULO TIEMPO DE DEMORA

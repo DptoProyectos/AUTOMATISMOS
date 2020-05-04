@@ -6,7 +6,7 @@ Created on 16 mar. 2020
 
 @author: Yosniel Cabrera
 
-Version 3.3.0 29-04-2020 13:48
+Version 3.3.1 29-04-2020 13:48
 
 ''' 
 
@@ -250,9 +250,9 @@ class ctrl_process(object):
         #
         self.logs.print_out(name_function, f'[{dlgid}] - DATA_DATE_TIME', DATA_DATE_TIME)
         
-    def pump1_state(self,channel_pump_name):
+    def show_pump1_state(self,channel_pump_name):
         #
-        name_function = 'PUMP1_STATE'
+        name_function = 'SHOW_PUMP1_STATE'
         #
         pump1_state = int(read_param(self.DLGID_CTRL, channel_pump_name))
         #
@@ -263,6 +263,25 @@ class ctrl_process(object):
         elif pump1_state == 0:
             self.redis.hset(self.DLGID_CTRL, dic.get_dic('PUMP1_STATE', 'name'), dic.get_dic('PUMP1_STATE', 'False_value'))
             self.logs.print_out(name_function, dic.get_dic('PUMP1_STATE', 'name'), dic.get_dic('PUMP1_STATE', 'False_value'))
+        
+    def show_work_frequency(self):
+        
+        name_function = 'SHOW_WORK_FREQUENCY'
+        
+        str_PROGRAMMED_FREC = self.redis.hget(self.DLGID_CTRL, 'PROGRAMMED_FREC')
+        lst_PROGRAMMED_FREC = str_PROGRAMMED_FREC.split('/')
+        FREC = int(self.redis.hget(self.DLGID_CTRL, 'FREC'))
+        WORKING_FREQUENCY = lst_PROGRAMMED_FREC[FREC]
+        
+        if FREC == 0:
+            self.redis.hset(self.DLGID_CTRL, dic.get_dic('WORKING_FREC', 'name'), f'[MIN]  {WORKING_FREQUENCY} Hz')
+            self.logs.print_out(name_function, dic.get_dic('WORKING_FREC', 'name'), f'[MIN]  {WORKING_FREQUENCY} Hz')
+        elif FREC == 7:
+            self.redis.hset(self.DLGID_CTRL, dic.get_dic('WORKING_FREC', 'name'), f'[MAX]  {WORKING_FREQUENCY} Hz')
+            self.logs.print_out(name_function, dic.get_dic('WORKING_FREC', 'name'), f'[MAX]  {WORKING_FREQUENCY} Hz')
+        else:
+            self.redis.hset(self.DLGID_CTRL, dic.get_dic('WORKING_FREC', 'name'), f'{WORKING_FREQUENCY} Hz')
+            self.logs.print_out(name_function, dic.get_dic('WORKING_FREC', 'name'), f'{WORKING_FREQUENCY} Hz')
         
     def pump_time(self,channel_pump_name,no_pump):
         #
@@ -329,7 +348,7 @@ class ctrl_process(object):
             self.redis.hdel(self.DLGID_CTRL, 'delta_ref1_ref')
             self.logs.print_inf(name_function, 'NO HAY SISTEMA DE REFERENCIA 1')
             
-            
+    
             
         
 class error_process(object):  

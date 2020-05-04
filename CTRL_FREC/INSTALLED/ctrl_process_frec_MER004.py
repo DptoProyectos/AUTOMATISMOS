@@ -30,6 +30,8 @@ LIST_CONFIG = [
                 #VARIABLES DE CONFIGURACION
                 'ENABLE_OUTPUTS',   True,                           # ACTIVA Y DESACTIVA LA ACCION DE LAS SALIDAS PARA ESTE DLGID_CTRL [ True | False]
                 'TYPE_IN_FREC',     'NPN',                          # FORMA EN QUE EL VARIADOR DE VELOCIDAD DETECTA LAS ENTRADAS [ NPN (not_in)| PNP] 
+                'PROGRAMMED_FREC',  '20.0/23.7/27.4/31.1/34.9/38.6/42.3/46.0',
+                                                                    # FRECUENCIAS QUE SE LE PROGRAMAN AL VARIADOR DE FRECUENCIA [ frec_1/frec_2/.../frec_8 ]
                 'DLGID_REF',        'MER005',                       # DATALOGGER QUE SE USA DE REFERENCIA PARA EL AUTOMATIMO
                 'CHANNEL_REF',      'PMP',                          # NOMBRE DEL CANAL CON LA MEDIDA DE REFERENCIA PARA EL AUTOMATISMO
                 

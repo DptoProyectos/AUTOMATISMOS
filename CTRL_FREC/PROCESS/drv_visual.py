@@ -21,6 +21,7 @@ visual_dic = {
                 
                 'TX_ERROR':             [ 'TX_ERROR',           'SI',           'NO',                                 ],
                 'MODO_LOCAL':           [ 'LOCAL_MODE',         'SI',           'NO',                                 ],
+                'WORKING_FREC':         [ 'D_EXEC_REC_PUMP1',   '50 Hz',                                              ],
                 'GABINETE_ABIERTO':     [ 'GABINETE_ABIERTO',   'SI',           'NO',                                 ],
                 'FALLA_ELECTRICA':      [ 'FALLA_ELECTRICA',    'SI',           'NO',                                 ],
                 'FALLA_TERMICA_1':      [ 'FALLA_TERMICA_1',    'SI',           'NO',                                 ],
