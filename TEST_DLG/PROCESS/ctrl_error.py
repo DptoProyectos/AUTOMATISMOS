@@ -1,12 +1,12 @@
 #!/drbd/www/cgi-bin/spx/aut_env/bin/python3.6
 '''
-APLICACION DE CONTROL DE ERRORES EN CTRL_FREC
+APLICACION DE CONTROL DE ERRORES EN TEST_DLG
 
 Created on 16 mar. 2020 
 
 @author: Yosniel Cabrera
 
-Version 2.1.4 16-04-2020 12:58
+Version 2.1.6 16-04-2020 12:58
 ''' 
 
 ## LIBRERIAS
@@ -128,14 +128,7 @@ def error_process(LIST_CONFIG):
     
     
     
-    '''
-    if redis.hexist(f'{DLGID}_ERROR', '#_RUN'):
-        no_RUN = int(redis.hget(f'{DLGID}_ERROR', '#_RUN'))
-        no_RUN += 1
-        redis.hset(f'{DLGID}_ERROR', '#_RUN',no_RUN)
-    else:
-        redis.hset(f'{DLGID}_ERROR', '#_RUN',0)
-        '''
+    
         
     
     
