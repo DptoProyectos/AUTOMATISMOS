@@ -15,15 +15,16 @@ import sys
 import os
 import configparser
 
-
 ## CONEXIONES
 from CTRL_FREC.PROCESS.drv_visual import dic
-#from CTRL_FREC.PROCESS.ctrl_library import ctrl_process_frec
 from drv_redis import Redis
 from drv_logs import ctrl_logs
 from mypython import str2bool, config_var
 from drv_dlg import emerg_system, read_param
 from time import time  
+#from drv_db_GDA import GDA
+from drv_config import serv_APP_config
+
 ctrl_start_time = time() 
 
 
@@ -49,10 +50,11 @@ def control_process(LIST_CONFIG):
     CHANNEL_REF_1 = conf.lst_get('CHANNEL_REF_1') 
     
     ## INSTANCIAS
-    #logs = ctrl_logs('CTRL_FREC',DLGID_CTRL,print_log)
     logs = ctrl_logs(TYPE,'ctrl_process',DLGID_CTRL,print_log)
     config = configparser.ConfigParser()
     redis = Redis()
+    #gda = GDA(serv_APP_config['CONFIG']['working_mode'])
+    
     
     # INSTANCIA DE error_process
     import importlib.util
