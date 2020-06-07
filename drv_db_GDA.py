@@ -6,50 +6,36 @@ Created on 16 mar. 2020
 
 @author: Yosniel Cabrera
 
-Version 2.1.0 16-04-2020 12:58
+Version 2.1.1 07-06-2020
 ''' 
-
-#LIBRERIAS
-import os
-import configparser
-
 
 # CANEXIONES
 from sqlalchemy import create_engine
 from sqlalchemy import text
 from collections import defaultdict
-from drv_config import serv_APP_config
-
-
-
+from drv_config import dbuser,dbpasswd,dbhost,dbaseName
 
 class GDA(object):
     '''
-    classdocs
+        trabajo con base de datos con la estructura GDA
+        parametros necesarios
+        dbuser
+        dbpasswd
+        dbhost
+        dbaseName
     '''
 
-    def __init__(self, modo='LOCAL'):
+    def __init__(self, dbuser = dbuser, dbpasswd = dbpasswd, dbhost = dbhost, dbaseName = dbaseName ):
         '''
         Constructor
         '''
-    
         self.datasource = ''
         self.engine = ''
         self.conn = ''
         self.connected = False
-        #self.server = server
-        self.url = ''
-
+        self.url = 'mysql://{0}:{1}@{2}/{3}'.format(dbuser,dbpasswd,dbhost,dbaseName)
         
-        if modo == 'SPY':
-            self.url = serv_APP_config['BDATOS']['url_gda_spymovil']
-        elif modo == 'LOCAL':
-            self.url = serv_APP_config['BDATOS']['url_gda_local']
-            
-        
-        return
-
-    def connect(self, tag='GDA'):
+    def connect(self):
         """
         Retorna True/False si es posible generar una conexion a la bd GDA
         """
@@ -61,23 +47,22 @@ class GDA(object):
             self.engine = create_engine(self.url)
         except Exception as err_var:
             self.connected = False
-            #print('ERROR_{0}: engine NOT created. ABORT !!'.format(tag))
-            #print('ERROR: EXCEPTION_{0} {1}'.format(tag, err_var))
+            print('ERROR_{0}: engine NOT created. ABORT !!'.format(dbaseName))
+            print('ERROR: EXCEPTION_{0} {1}'.format(dbaseName, err_var))
             exit(1)
         
-               
         try:
             self.conn = self.engine.connect()
             self.connected = True
         except Exception as err_var:
             self.connected = False
-            #print('ERROR_{0}: NOT connected. ABORT !!'.format(tag))
-            #print('ERROR: EXCEPTION_{0} {1}'.format(tag, err_var))
+            print('ERROR_{0}: NOT connected. ABORT !!'.format(dbaseName))
+            print('ERROR: EXCEPTION_{0} {1}'.format(dbaseName, err_var))
             exit(1)
 
         return self.connected
 
-    def read_all_dlg_conf(self, dlgid, tag='GDA'):
+    def read_all_dlg_conf(self, dlgid):
         '''
         Leo la configuracion desde GDA
                 +----------+---------------+------------------------+----------+
@@ -92,7 +77,7 @@ class GDA(object):
                 
         '''
         
-        if not self.connect(tag):
+        if not self.connect():
             return
 
         sql = """SELECT spx_unidades_configuracion.nombre as 'canal', spx_configuracion_parametros.parametro, 
@@ -106,11 +91,13 @@ class GDA(object):
         try:
             query = text(sql)
         except Exception as err_var:
+            print(err_var)
             return False
 
         try:
             rp = self.conn.execute(query)
         except Exception as err_var:
+            print(err_var)
             return False
 
         results = rp.fetchall()
@@ -127,8 +114,7 @@ class GDA(object):
         key = (canal, param)
         return dlg_config.get(key)
         
-
-
-gda = GDA(serv_APP_config['CONFIG']['working_mode'])
-print(gda.read_dlg_conf('MER001','BASE','TPOLL'))
+gda = GDA()
+value = gda.read_dlg_conf('MER001','BASE','TPOLL')
+print(value)
 
