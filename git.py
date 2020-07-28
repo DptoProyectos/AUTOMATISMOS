@@ -13,7 +13,6 @@ from datetime import datetime
 
 version = 'Version 3.0.6'
 
-#ya soporta el firmware nuevo en los tanques.
 
 
 mode = 'upload'                     # [ upload | download ]    
