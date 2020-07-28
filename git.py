@@ -21,6 +21,7 @@ url_remote = 'http://git.spymovil.com/ycabrera/automatismos.git'
 
 # PONER EN ESTA LISTA LOS ARCHVIS QUE SE QUIEREN MANTENER ACTUALIZADOS EN EL SERVIDOR       
 
+
 staged_files = [
                     # PROCESS CTRL_FREC
                     'CTRL_FREC/call_ctrl_process_frec.py',
