@@ -232,13 +232,21 @@ class ctrl_process(object):
         self.redis.hset(self.DLGID_CTRL,'FREC',FREC)
 
     def latch__outpust(self,dlgid):
+        
+        name_function = 'LATCH_OUTPUTS'
+        
         if self.redis.hexist(dlgid, 'current_OUTPUTS'):
             last_OUTPUTS = self.redis.hget(dlgid, 'current_OUTPUTS')
             self.redis.hset(dlgid, 'last_OUTPUTS', last_OUTPUTS)
     
-        if self.redis.hget(dlgid, 'OUTPUTS') != '-1':
-            current_OUTPUTS = self.redis.hget(dlgid, 'OUTPUTS')
-            self.redis.hset(dlgid, 'current_OUTPUTS', current_OUTPUTS)
+        if self.redis.hexist(dlgid, 'OUTPUTS'):
+            if self.redis.hget(dlgid, 'OUTPUTS') != '-1':
+                current_OUTPUTS = self.redis.hget(dlgid, 'OUTPUTS')
+                self.redis.hset(dlgid, 'current_OUTPUTS', current_OUTPUTS)
+        else:
+            self.logs.print_inf(name_function,f'NO EXISTE OUTPUTS EN {self.DLGID_CTRL}')
+            self.logs.print_inf(name_function,'EJECUCION INTERRUMPIDA')
+            quit()
    
     def show_DATA_DATE_TIME(self,dlgid):  
         #
@@ -270,8 +278,15 @@ class ctrl_process(object):
         
         str_PROGRAMMED_FREC = self.redis.hget(self.DLGID_CTRL, 'PROGRAMMED_FREC')
         lst_PROGRAMMED_FREC = str_PROGRAMMED_FREC.split('/')
-        FREC = int(self.redis.hget(self.DLGID_CTRL, 'FREC'))
-        WORKING_FREQUENCY = lst_PROGRAMMED_FREC[FREC]
+        
+        if self.redis.hexist(self.DLGID_CTRL, 'FREC'):
+            FREC = int(self.redis.hget(self.DLGID_CTRL, 'FREC'))
+            WORKING_FREQUENCY = lst_PROGRAMMED_FREC[FREC]
+        else:
+            self.logs.print_inf(name_function, f'NO EXISTE LA VARIABLE FREC EN {self.DLGID_CTRL}')
+            self.logs.print_inf(name_function, 'NO SE MUESTRA FRECUENCIA DE TRABAJO')
+            return False
+        
         
         if FREC == 0:
             self.redis.hset(self.DLGID_CTRL, dic.get_dic('WORKING_FREC', 'name'), f'[MIN]  {WORKING_FREQUENCY} Hz')

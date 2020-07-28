@@ -62,7 +62,7 @@ def error_process(LIST_CONFIG):
     logs.print_log(__doc__)
     
     # ESCRIBO LA EJECUCION DEL SCRIPT
-    logs.script_performance(f"{name_function}")
+    logs.print_inf(name_function, '')
     
     # MUESTRO VARIABLES DE ENTRADA
     logs.print_in(name_function, 'print_log', print_log)

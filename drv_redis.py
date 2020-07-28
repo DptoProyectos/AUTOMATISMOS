@@ -6,7 +6,7 @@ Created on 16 mar. 2020
 
 @author: Yosniel Cabrera
 
-Version 2.1.1 16-04-2020 12:58
+Version 2.1.2 06-07-2020
 ''' 
 
 import redis
@@ -40,7 +40,7 @@ class Redis(object):
             if self.rh.hexists(key, param): 
                 value = self.rh.hget(key, param)
                 return value.decode()
-            else: return ''
+            else: return None
             
     def hexist(self,key, param): 
         if self.connected: return self.rh.hexists(key, param) 

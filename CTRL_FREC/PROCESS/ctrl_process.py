@@ -97,13 +97,13 @@ def control_process(LIST_CONFIG):
     
     # CHEQUEO QUE EXISTAN LOS LINES DEL DATALOGGER DE CONTROL Y EL DE REFERENCIA.
     if not(redis.hexist(DLGID_CTRL,'LINE')): 
-        logs.script_performance(f'{name_function} ==> NO EXISTE LINE {DLGID_CTRL}')
+        #logs.script_performance(f'{name_function} ==> NO EXISTE LINE {DLGID_CTRL}')
         logs.print_inf(name_function,f'NO EXISTE LINE {DLGID_CTRL}')
         logs.print_inf(name_function,'EJECUCION INTERRUMPIDA')
         quit()
     
     if not(redis.hexist(DLGID_REF,'LINE')): 
-        logs.script_performance(f'NO EXISTE LINE {DLGID_REF}')
+        #logs.script_performance(f'NO EXISTE LINE {DLGID_REF}')
         logs.print_inf(name_function,f'NO EXISTE LINE {DLGID_REF}')
         logs.print_inf(name_function,'EJECUCION INTERRUMPIDA')
         quit()
@@ -139,8 +139,8 @@ def control_process(LIST_CONFIG):
             # MUESTRO LOGS DE ADVERTENCIA
             logs.print_inf(name_function, 'NO EXISTE LA VARIABLE SW1 EN REDIS')
             logs.print_inf(name_function, 'SE CREA LA VARIABLE CON VALOR [0]'.format(dic.get_dic('WEB_MODE', 'True_value')))
-            logs.script_performance('error in [0] [1] = ,'.format(name_function,dic.get_dic('WEB_MODE', 'name')))
-            logs.script_performance('error in [0], SE CREA [1] = [2]'.format(name_function,dic.get_dic('WEB_MODE', 'name'),dic.get_dic('WEB_MODE', 'True_value')))
+            #logs.script_performance('error in [0] [1] = ,'.format(name_function,dic.get_dic('WEB_MODE', 'name')))
+            #logs.script_performance('error in [0], SE CREA [1] = [2]'.format(name_function,dic.get_dic('WEB_MODE', 'name'),dic.get_dic('WEB_MODE', 'True_value')))
         #
         # LEO VAERIABLE WEB_MODE
         WEB_MODE = redis.hget(DLGID_CTRL, dic.get_dic('WEB_MODE', 'name'))
@@ -158,7 +158,7 @@ def control_process(LIST_CONFIG):
                 emerg_system(DLGID_CTRL)
             else:
                 logs.print_inf(name_function, f"SALIDAS DESCACTIVADAS [ENABLE_OUTPUTS = {ENABLE_OUTPUTS}]")    
-                logs.script_performance(f"{name_function} ==> SALIDAS DESCACTIVADAS [ENABLE_OUTPUTS = {ENABLE_OUTPUTS}]")
+                #logs.script_performance(f"{name_function} ==> SALIDAS DESCACTIVADAS [ENABLE_OUTPUTS = {ENABLE_OUTPUTS}]")
             
         elif WEB_MODE == 'AUTO':
             logs.print_inf(name_function, 'TRABAJO EN MODO AUTOMATICO')
@@ -173,11 +173,11 @@ def control_process(LIST_CONFIG):
             else:
                 MAG_REF = float(redis.hget(DLGID_CTRL, dic.get_dic('MAG_REF', 'name')))
                 
-            #
-            # LEO TX_ERROR y error_1min
+            
+            # LEO TX_ERROR Y # error_1min
             TX_ERROR = redis.hget(DLGID_REF, dic.get_dic('TX_ERROR', 'name'))
             error_1min = redis.hget(DLGID_REF,'error_1min')
-            #
+                                         
             # CHEQUEO ERROR TX EN EL DLG DE REFERENCIA (SE DECLARA ERROR_TX CUANDO PASAN 10 MIN SIN TRANSMITIR)
             if TX_ERROR == 'SI':
                 logs.print_inf(name_function, f'ERROR TX EN SISTEMA DE REFERENCIA [ {DLGID_REF} ]')
@@ -228,18 +228,18 @@ def control_process(LIST_CONFIG):
             else:
                 logs.print_inf(name_function, "error in [0], [1] = [2]".format(name_function,dic.get_dic('TX_ERROR', 'name'),TX_ERROR))
                 # DEJAR REGISTRO DEL ERROR
-                logs.script_performance("error in [0], [1] = [2]".format(name_function,dic.get_dic('TX_ERROR', 'name'),TX_ERROR))
+                #logs.script_performance("error in [0], [1] = [2]".format(name_function,dic.get_dic('TX_ERROR', 'name'),TX_ERROR))
             #
         else:
             logs.print_inf(name_function, 'error in [0], [1] = [2]'.format(name_function,dic.get_dic('WEB_MODE', 'name'),WEB_MODE))
             # DEJAR REGISTRO DEL ERROR
-            logs.script_performance('error in [0], [1] = [2]'.format(name_function,dic.get_dic('WEB_MODE', 'name'),WEB_MODE))
+            #logs.script_performance('error in [0], [1] = [2]'.format(name_function,dic.get_dic('WEB_MODE', 'name'),WEB_MODE))
             
     else:
         logs.print_inf(name_function, f"error in {name_function}, LM = {read_param(DLGID_CTRL,'LM')}")
         logs.print_inf(name_function,'EJECUCION INTERRUMPIDA')
         # DEJAR REGISTRO DEL ERROR
-        logs.script_performance(f"error in {name_function}, LM = {read_param(DLGID_CTRL,'LM')}")
+        #logs.script_performance(f"error in {name_function}, LM = {read_param(DLGID_CTRL,'LM')}")
             
     # LATCHEO LAS SALIDAS
     p.latch__outpust(DLGID_CTRL)
