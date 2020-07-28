@@ -114,7 +114,5 @@ class GDA(object):
         key = (canal, param)
         return dlg_config.get(key)
         
-gda = GDA()
-value = gda.read_dlg_conf('MER001','BASE','TPOLL')
-print(value)
+
 

@@ -6,7 +6,7 @@ Created on 16 mar. 2020
 
 @author: Yosniel Cabrera
 
-Version 2.1.5 16-04-2020 12:58
+Version 2.1.6 07-06-2020 12:58
 
 ''' 
 
@@ -62,7 +62,8 @@ def error_process(LIST_CONFIG):
     logs.print_log(__doc__)
     
     # ESCRIBO LA EJECUCION DEL SCRIPT
-    logs.script_performance(f"{name_function}")
+    logs.print_inf(name_function,'')
+    
     
     # MUESTRO VARIABLES DE ENTRADA
     logs.print_in(name_function, 'print_log', print_log)

@@ -6,7 +6,7 @@ Created on 16 mar. 2020
 
 @author: Yosniel Cabrera
 
-Version 2.1.3 16-04-2020 12:58
+Version 2.1.4 28-04-2020
 ''' 
 
 # LIBRERIAS
@@ -56,7 +56,7 @@ if __name__ == '__main__':
         else:  TYPE = 'CHARGE'
     ## SE SE LE PASA UN SOLO ARGUMENTO SE LO ASIGNO A DLGID
     else:
-        print_log = False
+        print_log = True
         DLGID_CTRL = sys.argv[1]
         TYPE = 'CHARGE'
         
@@ -229,11 +229,30 @@ def run_ctrl_process(LIST_CONFIG):
         if call_ctrl_process:
             archivo.control_process(LIST_CONFIG)
             
+def run_perforation_process(dlgid):
+    
+    text = '''
+    
+    PERFORACIONES EN PERL
+    '''
+    
+    logs.print_inf(name_function,text )
+    
+    import os;
 
+    path = '/drbd/www/cgi-bin/spx/PERFORACIONES/'
+    file = 'ext_call.pl'
+    param = '--dlgid'
+    param_value = dlgid
+    
+    try:
+        os.system('{0}{1} {2} {3}'.format(path,file,param,param_value));
+    except:
+        logs.print_inf(name_function, 'ERROR AL CORRER LAS PERFORACIONES EN PERL')
+        
        
     
 #----------------------------------------------------------------------------------------      
-
 
 name_function = 'APP_SELECTION'
 
@@ -241,6 +260,17 @@ name_function = 'APP_SELECTION'
 #logs = ctrl_logs('CTRL_FREC',DLGID_CTRL,print_log)
 logs = ctrl_logs(False,'ctrl_process',DLGID_CTRL,print_log)
 redis = Redis()
+
+# SE CORRE EL PROCESO DE LAS PERFORACIONES EN PERL
+run_perforation_process(DLGID_CTRL)
+
+# AQUI COMIENZA LO QUE SERIA EL AUTOATISMO EN PYTON
+text = '''
+    
+    AUTOMATISMOS EN PYTHON
+    '''
+logs.print_inf(name_function,text )
+
 
 ## VARIABLES GLOBALES QUE LE ENTRAN A CORE
 logs.print_log(f"EXECUTE: {name_function}")      

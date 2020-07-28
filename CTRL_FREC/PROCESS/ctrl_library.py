@@ -6,7 +6,7 @@ Created on 16 mar. 2020
 
 @author: Yosniel Cabrera
 
-Version 3.3.1 29-04-2020 13:48
+Version 3.3.2 07-06-2020
 
 ''' 
 

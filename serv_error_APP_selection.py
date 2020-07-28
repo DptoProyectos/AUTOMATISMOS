@@ -195,10 +195,11 @@ def run_error_process(LIST_CONFIG):
             #
         
         if call_error_process:  
-            try:
-                archivo.error_process(LIST_CONFIG)
-            except: 
-                logs.print_inf(name_function, f'ERROR AL CORRER ../{TYPE}/PROCESS/ctrl_error.py - error_process(LIST_CONFIG)')
+        #    try:
+        #        archivo.error_process(LIST_CONFIG)
+        #    except: 
+        #        logs.print_inf(name_function, f'ERROR AL CORRER ../{TYPE}/PROCESS/ctrl_error.py - error_process(LIST_CONFIG)')
+            archivo.error_process(LIST_CONFIG)
                 
 def add_2_RUN(dlgid):
     '''

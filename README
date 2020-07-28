@@ -1,0 +1,24 @@
+README
+  Esta es la carpeta contenedora de todos los automatismos.
+   
+
+ 
+# FORMA DE LLAMADA:
+## DETECCION DE ERRORES DESDE EL CRONTAB
+/var/etc/crontab => 
+	*/1 * * * * root /drbd/www/cgi-bin/spx/AUTOMATISMOS/serv_error_APP_selection.py > /dev/null 2>&1
+	NOTA: EN EL CRONTAB SE EJECUTA TODO LO RELACIONADO A DETECCION DE ERRORES
+
+
+## PROCESS DEL AUTOMATIMSO DESDE EL SERVIDOR EN PYTHON
+//drbd/www/cgi-bin/SPY/spy.conf =>
+	
+	[CALLBACKS_PATH]
+	cbk_path = /drbd/www/cgi-bin/spx/AUTOMATISMOS
+
+	[CALLBACKS_PROGRAM]
+	cbk_program = serv_APP_selection.py
+	
+	NOTA: CADA VEZ QUE EL DATALOGGER TRANSMITE SE LLAMA A LA FUNCION process_perf Y SE LE PASA EL DATALOGGER ID
+
+

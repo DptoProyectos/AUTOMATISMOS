@@ -6,12 +6,13 @@ Created on 16 mar. 2020
 
 @author: Yosniel Cabrera
 
-Version 2.1.3 02-05-2020 16:22
+Version 2.1.4 07-06-2020
 ''' 
 
 # LIBRERIAS
 import json
 import os
+from datetime import date, datetime
 
 def lst2str(list):
     '''
@@ -107,10 +108,14 @@ class config_var():
      
      
 # OTHERS             
-project_path = os.path.dirname(os.path.abspath(__file__))
-
-       
-    
+project_path = os.path.dirname(os.path.abspath(__file__))   
+                
+system_hour = str(datetime.now()).split(' ')[1].split('.')[0]               # HORA DEL SERVER FORMATEADA A 'HH:MM:SS'
+                                                                              
+dt = str(datetime.now()).split(' ')[0].split('-')
+system_date = f'{dt[2]}/{dt[1]}/{dt[0]}'                                    # FECHA DEL SERVER FORMATEADA A 'DD/MM/AAAA' 
+system_date_raw = f'{dt[0]}{dt[1]}{dt[2]}'                                  # FECHA DEL SERVER FORMATEADA A 'AAAAMMDD' 
+   
 
 
 

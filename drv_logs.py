@@ -6,7 +6,7 @@ Created on 16 mar. 2020
 
 @author: Yosniel Cabrera
 
-Version 2.1.0 16-04-2020 12:58
+Version 2.1.1 07-06-2020 
 ''' 
 
 ## LIBRERIAS
@@ -14,13 +14,59 @@ import os
 import json
 
 #CONEXIONES
-from datetime import date
-from datetime import datetime
 from drv_dlg import read_param
+from drv_config import path_log,project_path,easy_log
+from io import open
+from mypython import system_date,system_date_raw,system_hour
 
 
-
+class saved_logs(object):
+    '''
+        Clase que genera los logs que se guardan en la PC
+        
+        header => 07/06/2020 20:01:22 [MER001] TEXTO
+    '''
+    def __init__(self,name_log, dlgid = 'null', path_log = path_log):
+        '''
+            name_log = nombre del archivo que va a servir de log
+            dlgid    = datalogger que genera el log.
+            path_log = ruta en donde se va a crear el log
+        '''
+        self.name_log = name_log
+        self.path_log = path_log
+        self.dlgid = dlgid
+        
+        # CREO LA CARPETA DONDE VA A ESTAR EL LOG
+        if not(os.path.exists(path_log)): 
+            os.makedirs(f"{path_log}",0o777)
+            
+        # CREO EL ARCHIVO EN DONDE SE VAN A REGISTRAR LOS LOGS
+        log = open(f"{path_log}{name_log}.log",'a')
+        #
+        # CERRAMOS EL LOG
+        log.close()
+        #
+        # DOY PERMISOS 777 AL ARCHIVO CREADO
+        try:
+            os.chmod(f"{path_log}{name_log}.log", 0o777)
+        except Exception as err_var:
+            log.write(f"{system_date} {system_hour} [{self.dlgid}] {err_var}\n") 
+        
+    def write(self, message): 
+        # ABRO EL ARCHIVO LOG
+        log = open(f"{self.path_log}{self.name_log}.log",'a')
+               
+        # EXCRIBIMOS EL LOG
+        log.write(f"{system_date} {system_hour} [{self.dlgid}] {message}\n") 
+        
+        # CERRAMOS EL LOG
+        log.close()
+        
 class ctrl_logs(object):
+    '''
+        Clase que maneja el tema de los logs tanto de pantalla como de archivo
+        que se mandan desde los scripts
+    '''
     def __init__(self,project_folder_name,process_name,DLGID_CTRL,show_log):
         '''
         Constructor
@@ -28,6 +74,8 @@ class ctrl_logs(object):
         self.project_folder_name = project_folder_name
         self.process_name = process_name
         self.DLGID_CTRL = DLGID_CTRL
+        self.script_performance = saved_logs(f'auto_{self.process_name}', self.DLGID_CTRL)
+        
         # GARANTIZO QUE SIEMPRE ME ENTRE UN BOOL
         try: self.show_log = json.loads(show_log.lower()) 
         except: self.show_log = show_log
@@ -36,121 +84,31 @@ class ctrl_logs(object):
         if self.show_log: print(message)
         #
         # DEJO REGISTRO EN EL LOGS
-        #logs = ctrl_logs(self.project_folder_name,self.DLGID_CTRL,self.show_log) 
-        logs = ctrl_logs(self.project_folder_name,self.process_name,self.DLGID_CTRL,self.show_log)
-        logs.script_performance(message)
+        self.script_performance.write(message)
             
     def print_in(self,name_function,name_var,value_var):
         if self.show_log: print(f"{name_function} <= [{name_var} = {value_var}]")
         #
         # DEJO REGISTRO EN EL LOGS
-        #logs = ctrl_logs(self.project_folder_name,self.DLGID_CTRL,self.show_log) 
-        logs = ctrl_logs(self.project_folder_name,self.process_name,self.DLGID_CTRL,self.show_log)
-        logs.script_performance(f"{name_function} <= [{name_var} = {value_var}]")
+        self.script_performance.write(f"{name_function} <= [{name_var} = {value_var}]")
     
     def print_out(self,name_function,name_var,value_var):
         if self.show_log: print(f"{name_function} => [{name_var} = {value_var}]")
         #
         # DEJO REGISTRO EN EL LOGS
-        #logs = ctrl_logs(self.project_folder_name,self.DLGID_CTRL,self.show_log) 
-        logs = ctrl_logs(self.project_folder_name,self.process_name,self.DLGID_CTRL,self.show_log)
-        logs.script_performance(f"{name_function} => [{name_var} = {value_var}]")
+        self.script_performance.write(f"{name_function} => [{name_var} = {value_var}]")
     
     def print_inf(self,name_function,message):
         if self.show_log: print(f"{name_function} ==> {message}")
         #
         # DEJO REGISTRO EN EL LOGS
-        #logs = ctrl_logs(self.project_folder_name,self.DLGID_CTRL,self.show_log) 
-        logs = ctrl_logs(self.project_folder_name,self.process_name,self.DLGID_CTRL,self.show_log)
-        logs.script_performance(f"{name_function} ==> {message}")
+        self.script_performance.write(f"{name_function} ==> {message}")
         
-    def script_performance(self,message):
-        
-        #SI ME LLEGA QUE project_folder_name ES False NO TENGO QUE IMPRIMIR LOGS
-        if not(self.project_folder_name): return
-        
-        # OBTENFO LA CARPETA EN DONDE SE ENCUENTRA EL ARCHIVO ACTUAL
-        current_path = os.path.dirname(os.path.abspath(__file__))
-        
-        # CREO LA CARPETA DONDE VA A ESTAR EL LOG
-        ## CREO LA CARPETA SOLO SI ESTA NO EXISTE
-        if not(os.path.exists(f"{current_path}/{self.project_folder_name}/SCRIPT_PERFORMANCE")): 
-            os.makedirs(f"{current_path}/{self.project_folder_name}/SCRIPT_PERFORMANCE/",0o777)
-        
-        # OBTENGO LA FECHA FORMATEADA A 'AAAAMMDD'
-        list_fecha = str(date.today()).split('-')
-        fecha = list_fecha[0]+list_fecha[1]+list_fecha[2]
-        
-        # CREO EL ARCHIVO EN DONDE SE VAN A REGISTRAR LOS LOGS
-        from io import open
-        script_performance = open(f"{current_path}/{self.project_folder_name}/SCRIPT_PERFORMANCE/{self.process_name}_{fecha}.log",'a')
-        
-        # OBTENGO LA HORA FORMATEADA A 'HH:MM:SSD'
-        hora = str(datetime.now()).split(' ')[1].split('.')[0]
-        
-        # EXCRIBIMOS EL LOG
-        script_performance.write(f"{hora} [{self.DLGID_CTRL}] {message}\n") 
-        
-        # CERRAMOS EL LOG
-        script_performance.close()
-        
-        # DOY PERMISOS 777 AL ARCHIVO CREADO
-        try:
-            os.chmod(f"{current_path}/{self.project_folder_name}/SCRIPT_PERFORMANCE/{self.process_name}_{fecha}.log", 0o777)
-        except:
-            pass
-    
-    def script_performance_old(self,message):
-        
-        # OBTENFO LA CARPETA EN DONDE SE ENCUENTRA EL ARCHIVO ACTUAL
-        current_path = os.path.dirname(os.path.abspath(__file__))
-        
-        # CREO LA CARPETA DONDE VA A ESTAR EL LOG
-        ## CREO LA CARPETA SOLO SI ESTA NO EXISTE
-        if not(os.path.exists(f"{current_path}/{self.project_folder_name}/SCRIPT_PERFORMANCE/ctrl_process_{self.DLGID_CTRL}")): 
-            os.makedirs(f"{current_path}/{self.project_folder_name}/SCRIPT_PERFORMANCE/ctrl_process_{self.DLGID_CTRL}",0o777)
-        
-        # OBTENGO LA FECHA FORMATEADA A 'AAAAMMDD'
-        list_fecha = str(date.today()).split('-')
-        fecha = list_fecha[0]+list_fecha[1]+list_fecha[2]
-        
-        # CREO EL ARCHIVO EN DONDE SE VAN A REGISTRAR LOS LOGS
-        from io import open
-        script_performance = open(f"{current_path}/{self.project_folder_name}/SCRIPT_PERFORMANCE/ctrl_process_{self.DLGID_CTRL}/{self.DLGID_CTRL}_{fecha}.log",'a')
-        
-        # OBTENGO LA HORA FORMATEADA A 'HH:MM:SSD'
-        hora = str(datetime.now()).split(' ')[1].split('.')[0]
-        
-        # EXCRIBIMOS EL LOG
-        script_performance.write(f"{hora} {message}\n") 
-        
-        # CERRAMOS EL LOG
-        script_performance.close()
-        
-        # DOY PERMISOS 777 AL ARCHIVO CREADO
-        os.chmod(f"{current_path}/{self.project_folder_name}/SCRIPT_PERFORMANCE/ctrl_process_{self.DLGID_CTRL}/{self.DLGID_CTRL}_{fecha}.log", 0o777)
-         
     def dlg_performance(self,message):
         
-        # OBTENFO LA CARPETA EN DONDE SE ENCUENTRA EL ARCHIVO ACTUAL
-        current_path = os.path.dirname(os.path.abspath(__file__))
+        # CREO EL OBJETO dlg_performance 
+        dlg_performance = saved_logs('auto_dlg_performance', self.DLGID_CTRL)
         
-        # CREO LA CARPETA DONDE VA A ESTAR EL LOG
-        ## CREO LA CARPETA SOLO SI ESTA NO EXISTE
-        if not(os.path.exists(f"{current_path}/{self.project_folder_name}/DLG_PERFORMANCE/{self.DLGID_CTRL}")): 
-            os.makedirs(f"{current_path}/{self.project_folder_name}/DLG_PERFORMANCE/{self.DLGID_CTRL}",0o777)
-        
-        # OBTENGO LA FECHA FORMATEADA A 'AAAAMMDD'
-        list_fecha = str(date.today()).split('-')
-        fecha = list_fecha[0]+list_fecha[1]+list_fecha[2]
-        
-        # CREO EL ARCHIVO EN DONDE SE VAN A REGISTRAR LOS LOGS
-        from io import open
-        dlg_performance = open(f"{current_path}/{self.project_folder_name}/DLG_PERFORMANCE/{self.DLGID_CTRL}/{self.DLGID_CTRL}_{fecha}.log",'a')
-        
-        
-        # OBTENGO LA HORA DEL SERVER FORMATEADA A 'HH:MM:SSD'
-        hora = str(datetime.now()).split(' ')[1].split('.')[0]
         
         # OBTENGO LA FECHA DEL DLGID
         dlgid_date = read_param(self.DLGID_CTRL, 'DATE')
@@ -158,18 +116,20 @@ class ctrl_logs(object):
         # OBTENGO LA HORA DEL DLGID 
         dlgid_time = read_param(self.DLGID_CTRL, 'TIME')
        
-        # EXCRIBIMOS EL LOG
-        dlg_performance.write(f"{hora} [{self.DLGID_CTRL}] [{dlgid_date}-{dlgid_time}] {message}\n") 
+        # ESCRIBO EL LOGS
+        dlg_performance.write(f'[{dlgid_date}-{dlgid_time}] {message}')
         
-        # CERRAMOS EL LOG
-        dlg_performance.close()  
-        
-        # DOY PERMISOS 777 AL ARCHIVO CREADO
-        try:
-            os.chmod(f"{current_path}/{self.project_folder_name}/DLG_PERFORMANCE/{self.DLGID_CTRL}/{self.DLGID_CTRL}_{fecha}.log",0o777)
-        except:
-            pass
-        
-        
+        # ESCRIBO EL LOG FACIL EN CASO DE QUE ESTE HABILITADO
+        if easy_log:
+            # CREO EL OBJETO easy_dlg_performance_check   MER004_20200501.log
+            easy_dlg_performance_check = saved_logs(f'{self.DLGID_CTRL}_{system_date_raw}', self.DLGID_CTRL, f'{project_path}/{self.project_folder_name}/DLG_PERFORMANCE/')
+            #
+            # ESCRIBO EL LOGS
+            easy_dlg_performance_check.write(f'[{dlgid_date}-{dlgid_time}] {message}')
+
+
+
+
+
      
         
