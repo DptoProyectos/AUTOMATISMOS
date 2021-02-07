@@ -1,4 +1,4 @@
-#!/datos/cgi-bin/spx/aut_env/bin/python3.8
+#!/usr/aut_env/bin/python3.8
 '''
 APLICACION DE CONTROL CTRL_FREC
 

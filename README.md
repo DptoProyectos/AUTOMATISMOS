@@ -3,6 +3,7 @@ ROYECTO DE SISTEMAS CON AUTOMATISMOS
 FLOWCHART: project => https://drive.google.com/file/d/1YFjm_3HncAyEX1VBOtet1D0vdXyxPA-W/view?usp=sharing
 		   serv_APP_selection => https://drive.google.com/file/d/1ImChibsiLTjf7Fgl6tJeAeD8pxPpUmb0/view?usp=sharing
 
+ENVIROMENT: #!/usr/aut_env/bin/python3.8
 
 
 # FORMA DE LLAMADA:

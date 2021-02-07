@@ -34,8 +34,6 @@ LIST_CONFIG = [
                                                                     # FRECUENCIAS QUE SE LE PROGRAMAN AL VARIADOR DE FRECUENCIA [ frec_1/frec_2/.../frec_8 ]
                 'DLGID_REF',        'MER005',                       # DATALOGGER QUE SE USA DE REFERENCIA PARA EL AUTOMATIMO
                 'CHANNEL_REF',      'PMP',                          # NOMBRE DEL CANAL CON LA MEDIDA DE REFERENCIA PARA EL AUTOMATISMO
-                
-                # VARIABLES OPCIONALES. EN CASO DE NO USARLAS SETEAR ''
                 'DLGID_REF_1',      'MER004',                       # DATALOGGER AUXILIAR QUE SE VA A USAR DE REFERENCIA EN CASO DE FALLAS DE COMUNICACION DEL PRINCIPAL
                 'CHANNEL_REF_1',    'LTQA',                         # NOMBRE DEL CANAL AUXILIAR CON LA MEDIDA DE REFERENCIA PARA EL AUTOMATISMO
                 

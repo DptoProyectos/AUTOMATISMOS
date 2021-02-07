@@ -1,4 +1,4 @@
-#!/datos/cgi-bin/spx/aut_env/bin/python3.6
+#!/usr/aut_env/bin/python3.8
 '''
 Created on 28 jul. 2020
 
