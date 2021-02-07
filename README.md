@@ -31,8 +31,45 @@ FLOWCHART: project => https://drive.google.com/file/d/1YFjm_3HncAyEX1VBOtet1D0vd
 
 * actualizar el repositorio local con sus ramas y configurar el remoto
 * crear el flowchart del automatismo
-- descargar el automatismo que esta en el servidor y hacer un merge con el automatismo actual
-- hacer que el automatismo actual funcione con recursos locales
+* descargar el automatismo que esta en el servidor .9 y hacer un merge con el automatismo actual
+	* drv_config
+	* drv_db_GDA
+	* drv_dlg
+	* drv_logs
+	* drv_redis
+	* mypython
+	* serv_APP_config
+	* serv_APP_selection
+	* serv_error_APP_selection
+	* ctrl_error
+	* ctrl_library
+	* ctrl_process
+	* drv_visual
+	* call_ctrl_process_frec
+	* ctrl_config
+	* ctrl_process_frec_DLGID
+	* error_process_DLGID
+- descargar el automatismo que esta en el servidor .7 y hacer un merge con el automatismo actual
+	* drv_config
+	* drv_db_GDA
+	* drv_dlg
+	* drv_logs
+	* drv_redis
+	* mypython
+	* serv_APP_config
+	* serv_APP_selection
+	* serv_error_APP_selection
+	* spy_log
+	* ctrl_error
+	* ctrl_library
+	* ctrl_process
+	* drv_visual
+	* call_ctrl_process_frec
+	* ctrl_config
+	* ctrl_process_frec_DLGID
+	* error_process_DLGID
+- hacer que el automatismo actual funcione con recursos locales.
+- poner en archivo de configuracion todo script que use la siguiente fraccion de ruta '/datos/cgi-bin/'
 - comparar el serv_APP_selection de los automatismos con el de test DLG.
 - buscar mejor solucion para el uso de los logs
 - meter toda la capaa de drivers dentro de la carpeta __CORE__

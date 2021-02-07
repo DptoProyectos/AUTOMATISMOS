@@ -246,7 +246,7 @@ def run_perforation_process(dlgid):
     param = '--dlgid'
     param_value = dlgid
     
-    if dlgid == 'PTEST05':
+    if dlgid == 'PTEST0521':
         try:
             os.system('/datos/cgi-bin/spx/PERFORACIONES/TEST_EQUIPOS/error_perf_test_PTEST05.pl')
         except:
