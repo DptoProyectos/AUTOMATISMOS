@@ -1,4 +1,4 @@
-#!/drbd/www/cgi-bin/spx/aut_env/bin/python3.6
+#!/datos/cgi-bin/spx/aut_env/bin/python3.8
 '''
 APLICACION DE CONTROL DE ERRORES EN CTRL_FREC
 
@@ -49,7 +49,7 @@ def error_process(LIST_CONFIG):
     # INSTANCIA DE error_process
     import importlib.util
     #spec = importlib.util.spec_from_file_location("archivo", f"../{TYPE}/PROCESS/ctrl_library.py")
-    spec = importlib.util.spec_from_file_location("archivo", f"/drbd/www/cgi-bin/spx/AUTOMATISMOS/{TYPE}/PROCESS/ctrl_library.py")
+    spec = importlib.util.spec_from_file_location("archivo", f"/datos/cgi-bin/spx/AUTOMATISMOS/{TYPE}/PROCESS/ctrl_library.py")
     archivo = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(archivo)
     e = archivo.error_process(LIST_CONFIG)

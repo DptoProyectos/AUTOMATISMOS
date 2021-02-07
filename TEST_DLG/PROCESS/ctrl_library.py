@@ -1,4 +1,4 @@
-#!/drbd/www/cgi-bin/spx/aut_env/bin/python3.6
+#!/datos/cgi-bin/spx/aut_env/bin/python3.8
 '''
 LIBRERIA DE APLICACION CTRL_FREC
 
@@ -69,8 +69,6 @@ class ctrl_process(object):
             self.redis.hset(self.DLGID_CTRL, dic.get_dic('GABINETE_ABIERTO', 'name'), dic.get_dic('TX_ERROR', 'False_value'))
         else:
             self.logs.print_inf(name_function, f"error in {name_function}, GA = {read_param(self.DLGID_CTRL,'GA')}")
-            # DEJAR REGISTRO DEL ERROR
-            self.logs.script_performance(f"error in {name_function}, GA = {read_param(self.DLGID_CTRL,'GA')}")
             
         # FALLA ELECTRICA
         if read_param(self.DLGID_CTRL,'FE') == '1':
@@ -82,8 +80,6 @@ class ctrl_process(object):
             self.redis.hset(self.DLGID_CTRL, dic.get_dic('FALLA_ELECTRICA', 'name'), dic.get_dic('FALLA_ELECTRICA', 'False_value'))
         else:
             self.logs.print_inf(name_function, f"error in {name_function}, FE = {read_param(self.DLGID_CTRL,'FE')}")
-            # DEJAR REGISTRO DEL ERROR
-            self.logs.script_performance(f"error in {name_function}, FE = {read_param(self.DLGID_CTRL,'FE')}")
              
         # FALLA TERMICA 1
         if read_param(self.DLGID_CTRL,'FT1') == '1':
@@ -95,9 +91,7 @@ class ctrl_process(object):
             self.redis.hset(self.DLGID_CTRL, dic.get_dic('FALLA_TERMICA_1', 'name'), dic.get_dic('FALLA_ELECTRICA', 'False_value'))
         else:
             self.logs.print_inf(name_function, f"error in {name_function}, FT1 = {read_param(self.DLGID_CTRL,'FT1')}")
-            # DEJAR REGISTRO DEL ERROR
-            self.logs.script_performance(f"error in {name_function}, FT1 = {read_param(self.DLGID_CTRL,'FT1')}")
-        
+            
     def chequeo_sensor(self):
         
         name_function = 'CHEQUEO_SENSOR'
@@ -128,9 +122,7 @@ class ctrl_process(object):
             #
         else:
             self.logs.print_inf(name_function, f"error in {name_function}, SW2 = {read_param(self.DLGID_CTRL,'SW2')}")
-            # DEJAR REGISTRO DEL ERROR
-            self.logs.script_performance(f"error in {name_function}, SW2 = {read_param(self.DLGID_CTRL,'SW2')}")
-        
+            
         # REVISO ACCION DE LAS SALIDAS    
         if self.ENABLE_OUTPUTS:
             if pump_state:
@@ -141,14 +133,12 @@ class ctrl_process(object):
                     douts(self.DLGID_CTRL,7)
                 else: 
                     self.logs.print_inf(name_function, f"error in {name_function}, TYPE_IN_FREC = {self.TYPE_IN_FREC}")    
-                    self.logs.script_performance(f"error in {name_function}, TYPE_IN_FREC = {self.TYPE_IN_FREC}")
                     
             # MANDOLA ACCION A LA BOMBA
             pump1(self.DLGID_CTRL, pump_state)    
                 
         else:
             self.logs.print_inf(name_function, f"SALIDAS DESCACTIVADAS [ENABLE_OUTPUTS = {self.ENABLE_OUTPUTS}]")    
-            self.logs.script_performance(f"{name_function} ==> SALIDAS DESCACTIVADAS [ENABLE_OUTPUTS = {self.ENABLE_OUTPUTS}]")
             
     def control_sistema(self):
         
@@ -168,8 +158,8 @@ class ctrl_process(object):
         if self.redis.hexist(self.DLGID_REF,'LINE'):
             REF = float(read_param(self.DLGID_REF,self.CHANNEL_REF))
         else:
-            self.logs.script_performance(f"error in {name_function}, {self.CHANNEL_REF} = {read_param(self.DLGID_CTRL,self.CHANNEL_REF)}")
-        
+            self.logs.print_inf(name_function, f"error in {name_function}, {self.CHANNEL_REF} = {read_param(self.DLGID_CTRL,self.CHANNEL_REF)}")
+            
         self.logs.print_in(name_function, 'ENABLE_OUTPUTS', self.ENABLE_OUTPUTS)
         self.logs.print_in(name_function, 'TYPE_IN_FREC', self.TYPE_IN_FREC)
         self.logs.print_in(name_function, 'LMIN', LMIN)
@@ -190,7 +180,6 @@ class ctrl_process(object):
                 #
             else: 
                 self.logs.print_inf(name_function, 'SE ALCANZA FRECUENCIA MAXIMA')
-                self.logs.script_performance(f'{name_function} ==> SE ALCANZA FRECUENCIA MAXIMA')
                         
         elif REF > LMAX:
             self.logs.print_inf(name_function, 'PRESION ALTA')
@@ -208,11 +197,10 @@ class ctrl_process(object):
                 douts(self.DLGID_CTRL,FREC)
             else: 
                 self.logs.print_inf(name_function, f"error in {name_function}, TYPE_IN_FREC = {self.TYPE_IN_FREC}")    
-                self.logs.script_performance(f"error in {name_function}, TYPE_IN_FREC = {self.TYPE_IN_FREC}")
+                
         else:
             self.logs.print_inf(name_function, f"SALIDAS DESCACTIVADAS [ENABLE_OUTPUTS = {self.ENABLE_OUTPUTS}]")    
-            self.logs.script_performance(f"{name_function} ==> SALIDAS DESCACTIVADAS [ENABLE_OUTPUTS = {self.ENABLE_OUTPUTS}]")
-        
+            
         self.logs.print_out(name_function, 'CURR_FREC', FREC)    
         self.redis.hset(self.DLGID_CTRL,'FREC',FREC)
 
@@ -274,7 +262,6 @@ class error_process(object):
         if not(self.redis.hexist(self.DLGID, 'LINE')):
             self.logs.print_inf(name_function, f'NO EXISTE VARIABLE LINE EN {self.DLGID}')
             self.logs.print_inf(name_function, f'NO SE EJECUTA {name_function}')
-            self.logs.script_performance(f'NO EXISTE VARIABLE LINE EN {self.DLGID}')
             return ''
         
         # DEVUELVO last_line CON EL LINE ANTERIOR Y current_line CON EL LINE ACTUAL
@@ -657,7 +644,6 @@ class error_process(object):
                         return True
                 else:
                     self.logs.print_inf(name_function,f'VALOR NO RECONOCIDO EN TM [ TM = {TM} ]')
-                    self.logs.script_performance(f'VALOR NO RECONOCIDO EN TM [ TM = {TM} ]')
                     return None
             
             elif DO_0 == 1:
@@ -679,12 +665,10 @@ class error_process(object):
                         self.logs.print_inf(name_function, 'OUTPUTS OK')            
                 else:
                     self.logs.print_inf(name_function,f'VALOR NO RECONOCIDO EN DO_1 [ DO_1 = {DO_1} ]')
-                    self.logs.script_performance(f'VALOR NO RECONOCIDO EN DO_1 [ DO_1 = {DO_1} ]')
                     return None
             # MODO DE CONTROL
             else:
                 self.logs.print_inf(name_function,f'VALOR NO RECONOCIDO EN D0_0 [ DO_0 = {DO_0} ]')
-                self.logs.script_performance(f'VALOR NO RECONOCIDO EN D0_0 [ DO_0 = {DO_0} ]')
                 return None       
                 
                 

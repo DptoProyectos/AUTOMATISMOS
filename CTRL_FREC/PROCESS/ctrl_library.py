@@ -1,4 +1,4 @@
-#!/drbd/www/cgi-bin/spx/aut_env/bin/python3.6
+#!/datos/cgi-bin/spx/aut_env/bin/python3.8
 '''
 LIBRERIA DE APLICACION CTRL_FREC
 

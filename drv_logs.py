@@ -1,4 +1,4 @@
-#!/drbd/www/cgi-bin/spx/aut_env/bin/python3.6
+#!/datos/cgi-bin/spx/aut_env/bin/python3.8
 '''
 DRIVER PARA EL TRABAJO CON LOGS
 
@@ -50,7 +50,8 @@ class saved_logs(object):
         try:
             os.chmod(f"{path_log}{name_log}.log", 0o777)
         except Exception as err_var:
-            log.write(f"{system_date} {system_hour} [{self.dlgid}] {err_var}\n") 
+            #log.write(f"{system_date} {system_hour} [{self.dlgid}] {err_var}\n") 
+            pass
         
     def write(self, message): 
         # ABRO EL ARCHIVO LOG

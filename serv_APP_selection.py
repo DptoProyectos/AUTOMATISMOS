@@ -1,4 +1,4 @@
-#!/drbd/www/cgi-bin/spx/aut_env/bin/python3.6
+#!/datos/cgi-bin/spx/aut_env/bin/python3.8
 '''
 SERVICIO DE DETECCION DE AUTOMATISMOS
 
@@ -25,6 +25,7 @@ sel_start_time = time()
 # CONFIGURO LAS ENTRADAS DE CONFIGURACION 
 if __name__ == '__main__':
     # LEO EL STR DE CONFIGURACION   
+    
     try:    
         STR_CONFIG = sys.argv[1]
         LIST_CONFIG = STR_CONFIG.split(',')
@@ -56,7 +57,7 @@ if __name__ == '__main__':
         else:  TYPE = 'CHARGE'
     ## SE SE LE PASA UN SOLO ARGUMENTO SE LO ASIGNO A DLGID
     else:
-        print_log = True
+        print_log = False
         DLGID_CTRL = sys.argv[1]
         TYPE = 'CHARGE'
         
@@ -218,7 +219,7 @@ def run_ctrl_process(LIST_CONFIG):
         #
         try:
             #spec = importlib.util.spec_from_file_location("archivo", f"../{TYPE}/PROCESS/ctrl_process.py")
-            spec = importlib.util.spec_from_file_location("archivo", f"/drbd/www/cgi-bin/spx/AUTOMATISMOS/{TYPE}/PROCESS/ctrl_process.py")
+            spec = importlib.util.spec_from_file_location("archivo", f"/datos/cgi-bin/spx/AUTOMATISMOS/{TYPE}/PROCESS/ctrl_process.py")
             archivo = importlib.util.module_from_spec(spec)
             spec.loader.exec_module(archivo)
             call_ctrl_process = True
@@ -240,11 +241,17 @@ def run_perforation_process(dlgid):
     
     import os;
 
-    path = '/drbd/www/cgi-bin/spx/PERFORACIONES/'
+    path = '/datos/cgi-bin/spx/PERFORACIONES/'
     file = 'ext_call.pl'
     param = '--dlgid'
     param_value = dlgid
     
+    if dlgid == 'PTEST05':
+        try:
+            os.system('/datos/cgi-bin/spx/PERFORACIONES/TEST_EQUIPOS/error_perf_test_PTEST05.pl')
+        except:
+            logs.print_inf(name_function, 'ERROR AL CORRER CALLBACK PARA {0}'.format(dlgid))
+
     try:
         os.system('{0}{1} {2} {3}'.format(path,file,param,param_value));
     except:

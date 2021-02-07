@@ -1,4 +1,4 @@
-#!/drbd/www/cgi-bin/spx/aut_env/bin/python3.6
+#!/datos/cgi-bin/spx/aut_env/bin/python3.8
 '''
 DRIVER PARA EL TRABAJO CON REDIS
 
@@ -23,7 +23,7 @@ class Redis(object):
         self.connected = 'NULL'
         self.rh = 'NULL'
         try:
-            self.rh = redis.Redis()
+            self.rh = redis.Redis('192.168.0.8')
             self.connected = True
         except Exception as err_var:
             #print(module=__name__, function='__init__', dlgid=self.dlgid, msg='Redis init ERROR !!')

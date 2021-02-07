@@ -1,4 +1,4 @@
-#!/drbd/www/cgi-bin/spx/aut_env/bin/python3.6
+#!/datos/cgi-bin/spx/aut_env/bin/python3.8
 '''
 APLICACION DE CONTROL CTRL_FREC
 
@@ -55,11 +55,12 @@ def control_process(LIST_CONFIG):
     redis = Redis()
     #gda = GDA(serv_APP_config['CONFIG']['working_mode'])
     
+    redis.no_execution('MER004')
     
     # INSTANCIA DE error_process
     import importlib.util
     #spec = importlib.util.spec_from_file_location("archivo", f"../{TYPE}/PROCESS/ctrl_library.py")
-    spec = importlib.util.spec_from_file_location("archivo", f"/drbd/www/cgi-bin/spx/AUTOMATISMOS/{TYPE}/PROCESS/ctrl_library.py")
+    spec = importlib.util.spec_from_file_location("archivo", f"/datos/cgi-bin/spx/AUTOMATISMOS/{TYPE}/PROCESS/ctrl_library.py")
     archivo = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(archivo)
     p = archivo.ctrl_process(LIST_CONFIG)
@@ -79,6 +80,8 @@ def control_process(LIST_CONFIG):
     #logs.script_performance(f"{name_function}")
     
     
+    
+    
     # MUESTRO VARIABLES DE ENTRADA
     logs.print_in(name_function, 'print_log', print_log)
     logs.print_in(name_function, 'DLGID_CTRL', DLGID_CTRL)
@@ -92,7 +95,7 @@ def control_process(LIST_CONFIG):
     
     
     # ESCRIBO NUMERO DE EJECUCION
-    redis.no_execution(DLGID_CTRL)
+    #redis.no_execution(DLGID_CTRL)
     
     
     # CHEQUEO QUE EXISTAN LOS LINES DEL DATALOGGER DE CONTROL Y EL DE REFERENCIA.
