@@ -15,3 +15,4 @@ param = '--dlgid';
 dlgid = 'UYPC03';
 
 os.system('{0} {1} {2} '.format(CBK,param,dlgid));
+
