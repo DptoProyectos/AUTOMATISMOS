@@ -10,8 +10,8 @@ Version 2.1.3 16-04-2020 12:58
 ''' 
 
 #CONEXIONES
-from drv_redis import Redis
-from mypython import bin2dec
+from __CORE__.drv_redis import Redis
+from __CORE__.mypython import bin2dec
 
 # INSTANCIAS
 redis = Redis()

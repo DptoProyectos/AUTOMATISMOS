@@ -17,13 +17,13 @@ import configparser
 
 ## CONEXIONES
 from CTRL_FREC.PROCESS.drv_visual import dic
-from drv_redis import Redis
-from drv_logs import ctrl_logs
-from mypython import str2bool, config_var
-from drv_dlg import emerg_system, read_param
+from __CORE__.drv_redis import Redis
+from __CORE__.drv_logs import ctrl_logs
+from __CORE__.mypython import str2bool, config_var
+from __CORE__.drv_dlg import emerg_system, read_param
 from time import time  
 #from drv_db_GDA import GDA
-from drv_config import serv_APP_config
+from __CORE__.drv_config import serv_APP_config
 
 ctrl_start_time = time() 
 

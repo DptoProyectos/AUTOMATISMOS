@@ -10,6 +10,7 @@ Version 2.1.2 06-07-2020
 ''' 
 
 import redis
+from drv_config import rddbhost
 
 class Redis(object):
     '''
@@ -23,7 +24,7 @@ class Redis(object):
         self.connected = 'NULL'
         self.rh = 'NULL'
         try:
-            self.rh = redis.Redis('192.168.0.8')
+            self.rh = redis.Redis(rddbhost)
             self.connected = True
         except Exception as err_var:
             #print(module=__name__, function='__init__', dlgid=self.dlgid, msg='Redis init ERROR !!')

@@ -108,7 +108,7 @@ class config_var():
      
      
 # OTHERS             
-project_path = os.path.dirname(os.path.abspath(__file__))   
+project_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # path en el que esta ubicado el proyecto                  
                 
 system_hour = str(datetime.now()).split(' ')[1].split('.')[0]               # HORA DEL SERVER FORMATEADA A 'HH:MM:SS'
                                                                               

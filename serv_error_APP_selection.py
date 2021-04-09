@@ -15,9 +15,9 @@ import sys
 
 
 # CONEXIONES
-from drv_redis import Redis
-from mypython import str2lst, config_var, lst2str
-from drv_logs import ctrl_logs
+from __CORE__.drv_redis import Redis
+from __CORE__.mypython import str2lst, config_var, lst2str
+from __CORE__.drv_logs import ctrl_logs
 
 
 
@@ -182,17 +182,28 @@ def run_error_process(LIST_CONFIG):
         
         import importlib.util
         #
+        
+        
+
+        '''
+        spec = importlib.util.spec_from_file_location("archivo", f"/datos/cgi-bin/spx/AUTOMATISMOS/{TYPE}/PROCESS/ctrl_error.py")
+        archivo = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(archivo)
+        call_error_process = True'''
+            
         try:
             #spec = importlib.util.spec_from_file_location("archivo", f"../{TYPE}/PROCESS/ctrl_error.py")
             spec = importlib.util.spec_from_file_location("archivo", f"/datos/cgi-bin/spx/AUTOMATISMOS/{TYPE}/PROCESS/ctrl_error.py")
             archivo = importlib.util.module_from_spec(spec)
             spec.loader.exec_module(archivo)
             call_error_process = True
-            
+                
         except:
-            logs.print_inf(name_function, f'NO SE ENCUENTRA ../{TYPE}/PROCESS/ctrl_error.py')
+            logs.print_inf(name_function, f'NO SE ENCUENTRA ../{TYPE}/PROCESS/ctrl_error.py O EL MISMO TIENE ERRORES')
             call_error_process = False
             #
+    
+        
         
         if call_error_process:  
         #    try:

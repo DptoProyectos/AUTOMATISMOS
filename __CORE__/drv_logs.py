@@ -14,10 +14,10 @@ import os
 import json
 
 #CONEXIONES
-from drv_dlg import read_param
-from drv_config import path_log,project_path,easy_log
+from __CORE__.drv_dlg import read_param
+from __CORE__.drv_config import path_log,project_path,easy_log
 from io import open
-from mypython import system_date,system_date_raw,system_hour
+from __CORE__.mypython import system_date,system_date_raw,system_hour
 
 
 class saved_logs(object):

@@ -47,6 +47,7 @@ STR_CONFIG = lst2str(LIST_CONFIG)
 #    
 # LLAMADO DEL PROGRAMA 
 os.system('{0}/serv_APP_selection.py {1}'.format(project_path,STR_CONFIG)) 
+
 #
 # CALCULO TIEMPO DE DEMORA
 #print(f'control_process_frec_{LIST_CONFIG[3]} TERMINADO A {time()-gen_start_time} s')

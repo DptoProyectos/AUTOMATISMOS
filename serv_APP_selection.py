@@ -15,9 +15,10 @@ import configparser
 import os
 
 # CONEXIONES
-from mypython import config_var, lst2str, str2lst
-from drv_redis import Redis
-from drv_logs import ctrl_logs
+from __CORE__.mypython import config_var, lst2str, str2lst
+from __CORE__.drv_redis import Redis
+from __CORE__.drv_logs import ctrl_logs
+from __CORE__.drv_config import allowedTypes
 from time import time   
 sel_start_time = time() 
 
@@ -37,16 +38,11 @@ if __name__ == '__main__':
         quit()
         
     #
-    # INSTANCIA DE config_var
+    # INSTANCIAS
     conf = config_var(STR_CONFIG) 
-    config = configparser.ConfigParser()
     redis = Redis()
     #
-    ### ABRO ARCHIVO DE CONFIGURACION
-    # OBTENFO LA CARPETA EN DONDE SE ENCUENTRA EL ARCHIVO ACTUAL
-    current_path = os.path.dirname(os.path.abspath(__file__))
-    # LEO EL ARCHIVO DE CONFIGURACION
-    config.read(f"{current_path}/serv_APP_config.ini")
+    
     #
     # CHEQUEO QUE TIPO DE LLAMADA SE ESTA HACIENDO
     ## SI SE LE PASA UN str ASIGNO VALORES ENTRADOS
@@ -57,7 +53,7 @@ if __name__ == '__main__':
         else:  TYPE = 'CHARGE'
     ## SE SE LE PASA UN SOLO ARGUMENTO SE LO ASIGNO A DLGID
     else:
-        print_log = False
+        print_log = True
         DLGID_CTRL = sys.argv[1]
         TYPE = 'CHARGE'
         
@@ -217,14 +213,22 @@ def run_ctrl_process(LIST_CONFIG):
         #
         import importlib.util
         #
+        '''
+        spec = importlib.util.spec_from_file_location("archivo","/datos/cgi-bin/spx/AUTOMATISMOS/CTRL_FREC/PROCESS/ctrl_process.py")
+        archivo = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(archivo)
+        call_ctrl_process = True
+        '''
+        
         try:
             #spec = importlib.util.spec_from_file_location("archivo", f"../{TYPE}/PROCESS/ctrl_process.py")
-            spec = importlib.util.spec_from_file_location("archivo", f"/datos/cgi-bin/spx/AUTOMATISMOS/{TYPE}/PROCESS/ctrl_process.py")
+            #spec = importlib.util.spec_from_file_location("archivo", f"/datos/cgi-bin/spx/AUTOMATISMOS/{TYPE}/PROCESS/ctrl_process.py")
+            spec = importlib.util.spec_from_file_location("archivo","/datos/cgi-bin/spx/AUTOMATISMOS/CTRL_FREC/PROCESS/ctrl_process.py")
             archivo = importlib.util.module_from_spec(spec)
             spec.loader.exec_module(archivo)
             call_ctrl_process = True
         except:
-            logs.print_inf(name_function, f'NO SE ENCUENTRA ../{TYPE}/PROCESS/ctrl_process.py')
+            logs.print_inf(name_function, f'NO SE ENCUENTRA ../{TYPE}/PROCESS/ctrl_process.py O EL MISMO TIENE ERRORES')
             call_ctrl_process = False
         #
         if call_ctrl_process:
@@ -289,7 +293,8 @@ logs.print_in(name_function,'DLGID_CTRL',DLGID_CTRL)
 ## VARIABLES PARTICULARES QUE LE ENTRAN A APP_SELECTION
 #
 
-if TYPE in str2lst(config['CTRL_CONFIG']['CTRL_ID']):
+if TYPE in allowedTypes:
+#if TYPE in str2lst(config['CTRL_CONFIG']['CTRL_ID']):
     # IMPRIMIR VARIABLES DE CONFIGURACION
     n = 4
     for param in LIST_CONFIG:
@@ -318,7 +323,7 @@ else:
 
 if bool(LIST_CONFIG):
     conf = config_var(LIST_CONFIG) 
-    if conf.lst_get('TYPE') in str2lst(config['CTRL_CONFIG']['CTRL_ID']):
+    if conf.lst_get('TYPE') in allowedTypes:
         #
         # ANADO DLGID_CTRL A 'DLGID_CTRL_TAG_CONFIG' PARA QUE SE EJECUTE EL ctrl_error_frec
         add_2_RUN(conf.lst_get('DLGID_CTRL'),conf.lst_get('TYPE'))

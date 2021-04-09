@@ -13,7 +13,7 @@ Version 2.1.1 07-06-2020
 from sqlalchemy import create_engine
 from sqlalchemy import text
 from collections import defaultdict
-from drv_config import dbuser,dbpasswd,dbhost,dbaseName
+from __CORE__.drv_config import dbuser,dbpasswd,dbhost,dbaseName
 
 class GDA(object):
     '''

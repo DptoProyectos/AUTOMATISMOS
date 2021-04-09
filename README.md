@@ -69,11 +69,12 @@ ENVIROMENT: #!/usr/aut_env/bin/python3.8
 	* ctrl_config
 	* ctrl_process_frec_DLGID
 	* error_process_DLGID
-- hacer que el automatismo actual funcione con recursos locales.
+* hacer que el automatismo actual funcione con recursos locales.
 - poner en archivo de configuracion todo script que use la siguiente fraccion de ruta '/datos/cgi-bin/'
 - comparar el serv_APP_selection de los automatismos con el de test DLG.
 - buscar mejor solucion para el uso de los logs
-- meter toda la capaa de drivers dentro de la carpeta __CORE__
+* meter toda la capaa de drivers dentro de la carpeta __CORE__
+- en cada uno de los serv_ corregir que la ruta del archivo a llama haya que ponerla a mano.
 
 
 

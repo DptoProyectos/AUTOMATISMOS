@@ -16,10 +16,10 @@ import json
 
 #CONEXIONES
 from CTRL_FREC.PROCESS.drv_visual import dic
-from drv_logs import *
-from drv_redis import Redis
-from drv_dlg import douts,pump1,emerg_system,read_param,dlg_detection,set_outs,get_outs
-from mypython import lst2str,str2lst,str2bool,not_dec,config_var
+from __CORE__.drv_logs import *
+from __CORE__.drv_redis import Redis
+from __CORE__.drv_dlg import douts,pump1,emerg_system,read_param,dlg_detection,set_outs,get_outs
+from __CORE__.mypython import lst2str,str2lst,str2bool,not_dec,config_var
 from posix import read
 
 

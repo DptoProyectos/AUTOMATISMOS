@@ -15,10 +15,10 @@ import os
 
 
 ## CONEXIONES
-from mypython import config_var, str2bool
-from drv_logs import ctrl_logs
-from drv_redis import Redis
-from drv_dlg import dlg_detection
+from __CORE__.mypython import config_var, str2bool
+from __CORE__.drv_logs import ctrl_logs
+from __CORE__.drv_redis import Redis
+from __CORE__.drv_dlg import dlg_detection
 
 
 
