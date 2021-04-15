@@ -6,7 +6,7 @@ Created on 16 mar. 2020
 
 @author: Yosniel Cabrera
 
-Version 2.1.2 16-04-2020 12:58
+Version 2.1.3 15-04-2021 09:11
 ''' 
 
 # LIBRERIAS
@@ -66,8 +66,7 @@ def upgrade_config(DLGID,LIST_CONFIG):
     
     #
     ## INSTANCIAS
-    #logs = ctrl_logs('CTRL_FREC',DLGID,print_log)
-    logs = ctrl_logs(False,'ctrl_error',DLGID,print_log)
+    logs = ctrl_logs(False,'servErrorAppSelection',DLGID,print_log)
     #
     # IMPRIMIR VARIABLES DE CONFIGURACION
     n = 4
@@ -122,8 +121,7 @@ def read_config_var(DLGID):
     FUNCTION_NAME = 'READ_CONFIG_VAR'
     
     ## INSTANCIAS
-    #logs = ctrl_logs('CTRL_FREC',DLGID,print_log)
-    logs = ctrl_logs(False,'ctrl_error',DLGID,print_log)
+    logs = ctrl_logs(False,'servErrorAppSelection',DLGID,print_log)
     redis = Redis()
     # 
     # LEO LOS TAGS DE CONFIGURACION
@@ -273,8 +271,7 @@ def del_2_Run(dlgid):
 name_function = 'APP_ERROR_SELECTION'
 
 ## INSTANCIAS
-#logs = ctrl_logs('CTRL_FREC',DLGID,print_log)
-logs = ctrl_logs(False,'ctrl_error',DLGID,print_log)
+logs = ctrl_logs(False,'servErrorAppSelection',DLGID,print_log)
 redis = Redis()
 
 n = -1
@@ -371,8 +368,7 @@ while True:
         if bool(lst_RUN):
             
             # INTANCIA DE ctrl_logs SOLO PARA LLAMADA SIN ARGUMENTOS
-            #logs = ctrl_logs('CTRL_FREC',DLGID,print_log)
-            logs = ctrl_logs(False,'ctrl_error',DLGID,print_log)
+            logs = ctrl_logs(False,'servErrorAppSelection',DLGID,print_log)
             #    
             ## VARIABLES GLOBALES QUE LE ENTRAN A CORE
             logs.print_log(' ')

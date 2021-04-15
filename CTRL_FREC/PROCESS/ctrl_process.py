@@ -50,7 +50,7 @@ def control_process(LIST_CONFIG):
     CHANNEL_REF_1 = conf.lst_get('CHANNEL_REF_1') 
     
     ## INSTANCIAS
-    logs = ctrl_logs(TYPE,'ctrl_process',DLGID_CTRL,print_log)
+    logs = ctrl_logs(TYPE,'CTRL_FREC_process',DLGID_CTRL,print_log)
     config = configparser.ConfigParser()
     redis = Redis()
     #gda = GDA(serv_APP_config['CONFIG']['working_mode'])

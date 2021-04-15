@@ -6,6 +6,7 @@
 __pycache__/
 CTRL_FREC/PROCESS/__pycache__/
 TEST_DLG/PROCESS/__pycache__/
+REVISAR/
 
 #ARCHIVOS IGNORADOS
 CTRL_FREC/call_ctrl_process_frec.py

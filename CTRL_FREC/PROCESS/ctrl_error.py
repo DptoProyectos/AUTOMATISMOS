@@ -43,7 +43,7 @@ def error_process(LIST_CONFIG):
     
     ## INSTANCIAS
     #logs = ctrl_logs(TYPE,DLGID,print_log)
-    logs = ctrl_logs(TYPE,'ctrl_error',DLGID,print_log)
+    logs = ctrl_logs(TYPE,'CTRL_FREC_error',DLGID,print_log)
     redis = Redis()
     #
     # INSTANCIA DE error_process

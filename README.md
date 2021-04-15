@@ -1,12 +1,34 @@
 ROYECTO DE SISTEMAS CON AUTOMATISMOS
 
-FLOWCHART: project => https://drive.google.com/file/d/1YFjm_3HncAyEX1VBOtet1D0vdXyxPA-W/view?usp=sharing
-		   serv_APP_selection => https://drive.google.com/file/d/1ImChibsiLTjf7Fgl6tJeAeD8pxPpUmb0/view?usp=sharing
+FLOWCHART: project 				-> 	https://drive.google.com/file/d/1YFjm_3HncAyEX1VBOtet1D0vdXyxPA-W/view?usp=sharing
+		   serv_APP_selection 	-> 	https://drive.google.com/file/d/1ImChibsiLTjf7Fgl6tJeAeD8pxPpUmb0/view?usp=sharing
+		   CTRL_FREC			->
+		   CTRL_PpotPaysandu	->  
+
+
 
 ENVIROMENT: #!/usr/aut_env/bin/python3.8
 
+# LOGS: 
+## SYSLOG
+	Los log utilizan el syslog de ubuntu. Para ello agregar al archivo /etc/rsyslog.conf la siguiente configuracion
+	<<<<<<<<<<<
+		:syslogtag, contains, "AUTO_CTRL" /var/log/autoCtrl.log
+		:syslogtag, contains, "AUTO_CTRL" ~
+	>>>>>>>>>>>
 
-# FORMA DE LLAMADA:
+## Logrotate: 
+	Para controlar el tamamano de los logs agregar al archivo XXXXXXXXXXXXXXXX la siguiete configuracion
+	<<<<<<<<<<<
+	
+	>>>>>>>>>>>
+
+
+
+	 
+
+
+# FORMA DE EJECUCION:
 ## DETECCION DE ERRORES DESDE EL CRONTAB
 /var/etc/crontab => 
 	*/1 * * * * root /datos/cgi-bin/spx/AUTOMATISMOS/serv_error_APP_selection.py > /dev/null 2>&1
@@ -75,6 +97,7 @@ ENVIROMENT: #!/usr/aut_env/bin/python3.8
 - buscar mejor solucion para el uso de los logs
 * meter toda la capaa de drivers dentro de la carpeta __CORE__
 - en cada uno de los serv_ corregir que la ruta del archivo a llama haya que ponerla a mano.
+- documentar los visio de la carperta de control de frecuencia de mercedes para drawio.
 
 
 

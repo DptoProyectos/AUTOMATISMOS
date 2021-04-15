@@ -12,6 +12,9 @@ Version 2.1.1 07-06-2020
 ## LIBRERIAS
 import os
 import json
+import logging
+import logging.handlers
+
 
 #CONEXIONES
 from __CORE__.drv_dlg import read_param
@@ -63,6 +66,41 @@ class saved_logs(object):
         # CERRAMOS EL LOG
         log.close()
         
+class sysLogs(object):
+    '''
+        Clase que envia los logs al syslog
+    '''
+    
+    def __init__(self, processName = 'processNameEmpty', dlgid = 'dlgidEmpty'):
+        '''
+            
+        '''
+        self.processName = processName
+        self.dlgid = dlgid
+
+        logging.basicConfig(level=logging.DEBUG)
+
+        formatter = logging.Formatter('AUTO_CTRL: [%(levelname)s] %(message)s')
+        handler = logging.handlers.SysLogHandler('/dev/log')
+        handler.setFormatter(formatter)
+            
+        logger1 = logging.getLogger()       # Creo un logger derivado del root para usarlo en los modulos
+        lhStdout = logger1.handlers[0]      # Le leo el handler de consola para deshabilitarlo
+        logger1.removeHandler(lhStdout)
+        logger1.addHandler(handler)         # y le agrego el handler del syslog.
+            
+        # Creo ahora un logger child local.
+        LOG = logging.getLogger('auto')
+        LOG.addHandler(handler)
+    
+    def write(self, message): 
+        logging.info('[{0}][{1}][{2}]'.format(self.processName, self.dlgid, message))
+
+    def warning(self, message):
+        logging.warning('[{0}][{1}][{2}]'.format(self.processName, self.dlgid, message))
+
+
+
 class ctrl_logs(object):
     '''
         Clase que maneja el tema de los logs tanto de pantalla como de archivo
@@ -75,7 +113,8 @@ class ctrl_logs(object):
         self.project_folder_name = project_folder_name
         self.process_name = process_name
         self.DLGID_CTRL = DLGID_CTRL
-        self.script_performance = saved_logs(f'auto_{self.process_name}', self.DLGID_CTRL)
+        #self.script_performance = saved_logs(f'auto_{self.process_name}', self.DLGID_CTRL)
+        self.script_performance = sysLogs(self.process_name, self.DLGID_CTRL)
         
         # GARANTIZO QUE SIEMPRE ME ENTRE UN BOOL
         try: self.show_log = json.loads(show_log.lower()) 
@@ -108,7 +147,7 @@ class ctrl_logs(object):
     def dlg_performance(self,message):
         
         # CREO EL OBJETO dlg_performance 
-        dlg_performance = saved_logs('auto_dlg_performance', self.DLGID_CTRL)
+        #dlg_performance = saved_logs('auto_dlg_performance', self.DLGID_CTRL)
         
         
         # OBTENGO LA FECHA DEL DLGID
@@ -118,7 +157,8 @@ class ctrl_logs(object):
         dlgid_time = read_param(self.DLGID_CTRL, 'TIME')
        
         # ESCRIBO EL LOGS
-        dlg_performance.write(f'[{dlgid_date}-{dlgid_time}] {message}')
+        self.script_performance.warning(f'[{dlgid_date}-{dlgid_time}] {message}')
+        
         
         # ESCRIBO EL LOG FACIL EN CASO DE QUE ESTE HABILITADO
         if easy_log:
@@ -127,6 +167,7 @@ class ctrl_logs(object):
             #
             # ESCRIBO EL LOGS
             easy_dlg_performance_check.write(f'[{dlgid_date}-{dlgid_time}] {message}')
+
 
 
 

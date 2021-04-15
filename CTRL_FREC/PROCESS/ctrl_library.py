@@ -53,8 +53,7 @@ class ctrl_process(object):
         self.CHANNEL_REF_1 = self.config.lst_get('CHANNEL_REF_1')
         
         ## INSTANCIAS
-        #self.logs = ctrl_logs(self.TYPE,self.DLGID_CTRL,self.print_log)
-        self.logs = ctrl_logs(self.TYPE,'ctrl_process',self.DLGID_CTRL,self.print_log)
+        self.logs = ctrl_logs(self.TYPE,'CTRL_FREC_error',self.DLGID_CTRL,self.print_log)
         self.redis = Redis()
         
     def chequeo_alarmas(self):
@@ -392,8 +391,7 @@ class error_process(object):
         #
         
         # INSTANCIAS
-        #self.logs = ctrl_logs(self.TYPE,self.DLGID,self.print_log)
-        self.logs = ctrl_logs(self.TYPE,'ctrl_error',self.DLGID,self.print_log)
+        self.logs = ctrl_logs(self.TYPE,'CTRL_FREC_error',self.DLGID,self.print_log)
         
         self.redis = Redis()   
         

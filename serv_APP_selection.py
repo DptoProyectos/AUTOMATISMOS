@@ -6,7 +6,7 @@ Created on 16 mar. 2020
 
 @author: Yosniel Cabrera
 
-Version 2.1.4 28-04-2020
+Version 2.1.5 15-04-2021
 ''' 
 
 # LIBRERIAS
@@ -269,7 +269,7 @@ name_function = 'APP_SELECTION'
 
 ## INSTANCIAS
 #logs = ctrl_logs('CTRL_FREC',DLGID_CTRL,print_log)
-logs = ctrl_logs(False,'ctrl_process',DLGID_CTRL,print_log)
+logs = ctrl_logs(False,'servAppSelection',DLGID_CTRL,print_log)
 redis = Redis()
 
 # SE CORRE EL PROCESO DE LAS PERFORACIONES EN PERL
