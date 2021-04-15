@@ -6,7 +6,7 @@ Created on 16 mar. 2020
 
 @author: Yosniel Cabrera
 
-Version 3.3.2 07-06-2020
+Version 1.0.0 15-04-2021 11:19
 
 ''' 
 
@@ -18,7 +18,7 @@ import json
 from CTRL_FREC.PROCESS.drv_visual import dic
 from __CORE__.drv_logs import *
 from __CORE__.drv_redis import Redis
-from __CORE__.drv_dlg import douts,pump1,emerg_system,read_param,dlg_detection,set_outs,get_outs
+from __CORE__.drv_dlg import mbusWrite
 from __CORE__.mypython import lst2str,str2lst,str2bool,not_dec,config_var
 from posix import read
 
@@ -29,7 +29,7 @@ from posix import read
 # CLASES DE LA LIBRERIA
 class ctrl_process(object):
     '''
-    FUNCIONES USADAS POR ctrl_process_frec.py
+    FUNCIONES USADAS POR ctrl_process.py
     '''
     
     def __init__(self,LIST_CONFIG):
@@ -45,17 +45,31 @@ class ctrl_process(object):
         self.ENABLE_OUTPUTS = self.config.lst_get('ENABLE_OUTPUTS')
         self.ENABLE_OUTPUTS = str2bool(self.config.lst_get('ENABLE_OUTPUTS'))
         
-        self.TYPE_IN_FREC = self.config.lst_get('TYPE_IN_FREC')
-        self.DLGID_REF = self.config.lst_get('DLGID_REF')
-        self.CHANNEL_REF = self.config.lst_get('CHANNEL_REF')
-        self.TYPE_IN_FREC = self.config.lst_get('TYPE_IN_FREC')
-        self.DLGID_REF_1 = self.config.lst_get('DLGID_REF_1')
-        self.CHANNEL_REF_1 = self.config.lst_get('CHANNEL_REF_1')
         
         ## INSTANCIAS
-        self.logs = ctrl_logs(self.TYPE,'CTRL_FREC_process',self.DLGID_CTRL,self.print_log)
+        self.logs = ctrl_logs(self.TYPE,'CTRL_PpotPaysandu',self.DLGID_CTRL,self.print_log)
         self.redis = Redis()
+
+
+    def pump(self,actionOnthePump):
+        '''
+            funcion que manda a prender o apagar la bomba
+        '''
+        name_function = 'MAIN'
+
+        if actionOnthePump == 'ON':
+            self.logs.print_inf(name_function, 'PRENDO BOMBA')
+            mbusWrite(self.DLGID_CTRL,'2096','interger',2)              # escribo el valor 2 en el registro 2097 para mandar a prender la bomba
+
+        elif actionOnthePump == 'OFF':
+            self.logs.print_inf(name_function, 'APAGO BOMBA')
+            mbusWrite(self.DLGID_CTRL,'2096','interger',0)              # escribo el valor 0 en el registro 2097 para mandar a apagar la bomba
         
+
+
+
+#---------------------------------------
+
     def chequeo_alarmas(self):
         
         name_function = 'CHEQUEO_ALARMAS'

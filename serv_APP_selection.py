@@ -18,7 +18,7 @@ import os
 from __CORE__.mypython import config_var, lst2str, str2lst
 from __CORE__.drv_redis import Redis
 from __CORE__.drv_logs import ctrl_logs
-from __CORE__.drv_config import allowedTypes
+from __CORE__.drv_config import allowedTypes, project_path
 from time import time   
 sel_start_time = time() 
 
@@ -65,7 +65,7 @@ def read_config_var(DLGID_CTRL):
     FUNCTION_NAME = 'READ_CONFIG_VAR'
     
     ## INSTANCIAS
-    logs = ctrl_logs(False,'ctrl_process',DLGID_CTRL,print_log)
+    logs = ctrl_logs(False,'servAppSelection',DLGID_CTRL,print_log)
     redis = Redis()
     # 
     # LEO LOS TAGS DE CONFIGURACION
@@ -112,7 +112,7 @@ def upgrade_config(DLGID_CTRL,LIST_CONFIG):
     
     #
     ## INSTANCIAS
-    logs = ctrl_logs(False,'ctrl_process',DLGID_CTRL,print_log)
+    logs = ctrl_logs(False,'servAppSelection',DLGID_CTRL,print_log)
     #
     # IMPRIMIR VARIABLES DE CONFIGURACION
     n = 4
@@ -221,9 +221,7 @@ def run_ctrl_process(LIST_CONFIG):
         '''
         
         try:
-            #spec = importlib.util.spec_from_file_location("archivo", f"../{TYPE}/PROCESS/ctrl_process.py")
-            #spec = importlib.util.spec_from_file_location("archivo", f"/datos/cgi-bin/spx/AUTOMATISMOS/{TYPE}/PROCESS/ctrl_process.py")
-            spec = importlib.util.spec_from_file_location("archivo","/datos/cgi-bin/spx/AUTOMATISMOS/CTRL_FREC/PROCESS/ctrl_process.py")
+            spec = importlib.util.spec_from_file_location("archivo",'{0}/{1}/PROCESS/ctrl_process.py'.format(project_path,TYPE))
             archivo = importlib.util.module_from_spec(spec)
             spec.loader.exec_module(archivo)
             call_ctrl_process = True
@@ -268,7 +266,6 @@ def run_perforation_process(dlgid):
 name_function = 'APP_SELECTION'
 
 ## INSTANCIAS
-#logs = ctrl_logs('CTRL_FREC',DLGID_CTRL,print_log)
 logs = ctrl_logs(False,'servAppSelection',DLGID_CTRL,print_log)
 redis = Redis()
 
@@ -329,7 +326,8 @@ if bool(LIST_CONFIG):
         add_2_RUN(conf.lst_get('DLGID_CTRL'),conf.lst_get('TYPE'))
         #
         # ANADO DLGID_REF A 'DLGID_CTRL_TAG_CONFIG' PARA QUE SE EJECUTE EL ctrl_error_frec
-        add_2_RUN(conf.lst_get('DLGID_REF'),conf.lst_get('TYPE'))
+        if conf.lst_get('DLGID_REF'):
+            add_2_RUN(conf.lst_get('DLGID_REF'),conf.lst_get('TYPE'))
         #
         # MUESTRO LAS VARIABLES QUE SE LE VAN A PASAR AL PROCESS Y LO LLAMO
         show_var_list(LIST_CONFIG)

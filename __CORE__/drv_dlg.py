@@ -6,12 +6,12 @@ Created on 16 mar. 2020
 
 @author: Yosniel Cabrera
 
-Version 2.1.3 16-04-2020 12:58
+Version 2.1.4 15-04-2021 16:43
 ''' 
 
 #CONEXIONES
 from __CORE__.drv_redis import Redis
-from __CORE__.mypython import bin2dec
+from __CORE__.mypython import lst2str
 
 # INSTANCIAS
 redis = Redis()
@@ -230,9 +230,68 @@ def get_outs(dlgid,dec_value_outs,no_out):
     else:
         return int(str_value_outs[abs(no_out - (len(str_value_outs) - 1))])
          
-    
-    
-    
+def mbusWrite(dlgid,register,dataType,value):
+    '''
+        dlgid       => datalogger por el cual se quiere mandar el valor del registro modbus
+        register    => valor del registro modbus que se quiere escribir
+        dataType    => tipo de dato que se quiere escribir [ interger | float ]
+        value       => valor que se quiere poner en este registro
+    '''
+
+    if   dataType == 'interger':    dataType ='I'
+    elif dataType == 'float':       dataType ='F'
+        
+    if not redis.hexist(dlgid,'MODBUS'):
+        redis.hset(dlgid,'MODBUS','[{0},{1},{2}]'.format(register,dataType,value))
+        redis.hset(dlgid,'lastMODBUS','[{0},{1},{2}]'.format(register,dataType,value))
+    else:
+        if not redis.hexist(dlgid,'lastMODBUS'):
+            redis.hset(dlgid,'MODBUS','[{0},{1},{2}]'.format(register,dataType,value))
+            redis.hset(dlgid,'lastMODBUS','[{0},{1},{2}]'.format(register,dataType,value))
+        else:
+            lastMODBUS = redis.hget(dlgid,'lastMODBUS')
+            lastMODBUS = lst2str(lastMODBUS.split("["))
+            lastMODBUS = lst2str(lastMODBUS.split("]"))
+            lstlastMODBUS = lastMODBUS.split(",")
+            
+            # limpio la lista lstlastMODBUS de elementos vacios
+            for element in lstlastMODBUS:
+                if element == '': lstlastMODBUS.remove('')             
+
+            # extraigo la informacion de los registros, el dataType y los valores
+            n = 0
+            lstRegisters = []
+            lstDataTypes = []
+            lstValues = []
+            for element in lstlastMODBUS:
+                lstRegisters.append(lstlastMODBUS[n])
+                lstDataTypes.append(lstlastMODBUS[n+1])
+                lstValues.append(lstlastMODBUS[n+2])
+                n += 3
+                if n >= len(lstlastMODBUS): break
+
+            if register in lstlastMODBUS:
+                # actualizo los nuevos valores que se quieren poner
+                lstDataTypes[lstRegisters.index(register)] = dataType
+                lstValues[lstRegisters.index(register)] = value
+            else:
+                # anado los valores nuevos que se quieren poner
+                lstRegisters.append(register)
+                lstDataTypes.append(dataType)
+                lstValues.append(value)
+
+            n = 0
+            currentModbus = ''
+            for element in lstRegisters:
+                if n == 0: currentModbus = f"[{lstRegisters[n]},{lstDataTypes[n]},{lstValues[n]}]"
+                else: currentModbus = f"{currentModbus}[{lstRegisters[n]},{lstDataTypes[n]},{lstValues[n]}]"
+                n += 1
+
+            # mando la orden de escribir al datalogger
+            redis.hset(dlgid,'MODBUS',currentModbus)
+            redis.hset(dlgid,'lastMODBUS',currentModbus)
+            
+            
     
     
     
