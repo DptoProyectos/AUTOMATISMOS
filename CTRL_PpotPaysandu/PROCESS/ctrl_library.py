@@ -18,8 +18,9 @@ import json
 from CTRL_FREC.PROCESS.drv_visual import dic
 from __CORE__.drv_logs import *
 from __CORE__.drv_redis import Redis
-from __CORE__.drv_dlg import mbusWrite
-from __CORE__.mypython import lst2str,str2lst,str2bool,not_dec,config_var
+from __CORE__.drv_dlg import mbusWrite, read_param
+from __CORE__.mypython import config_var, str2bool
+
 from posix import read
 
 
@@ -50,6 +51,134 @@ class ctrl_process(object):
         self.logs = ctrl_logs(self.TYPE,'CTRL_PpotPaysandu',self.DLGID_CTRL,self.print_log)
         self.redis = Redis()
 
+    def getAndUpdateMode(self,WEB_Mode):
+        '''
+            funcion para obtener el modo de trabajo y actualizarlo en caso necesario
+        '''
+        name_function = 'GET_AND_UPDATE_MODE'
+
+        # entradas
+        self.logs.print_in(name_function, 'WEB_Mode', WEB_Mode)
+
+        def readPlcMode():
+            """
+                lee el modo de trabajo en que actualmente se encuentra el tablero de control
+                0 -> EMERGENCIA
+                1 -> LOCAL
+                2 -> REMOTO
+            """
+
+            # leo el modo en que actualmente esta trabajando el PLC
+            MOD = read_param(self.DLGID_CTRL,'MOD')
+            
+            if MOD == "0": return "EMERGENCIA"
+            elif MOD == "1": return "LOCAL"
+            elif MOD == "2": return "REMOTO"
+            else: 
+                self.logs.print_error(name_function, 'MODO DE TRABAJO NO ADMITIDO')
+                self.logs.print_error(name_function, 'NO SE EJECUTA EL SCRIPT')
+                quit()
+
+        def IsWebModeChanged():
+            """
+                detecta si hubo un cambio en el modo de trabajo web
+                0 -> EMERGENCIA
+                1 -> LOCAL
+                2 -> REMOTO
+            """
+            if not self.redis.hexist(self.DLGID_CTRL,'Last_WEB_Mode'):
+                self.redis.hset(self.DLGID_CTRL,'Last_WEB_Mode',WEB_Mode)
+            else:
+                Last_WEB_Mode = self.redis.hget(self.DLGID_CTRL,'Last_WEB_Mode')
+            if Last_WEB_Mode != WEB_Mode:
+                self.redis.hset(self.DLGID_CTRL,'Last_WEB_Mode',WEB_Mode)
+                return True
+            else:
+                return False
+
+        def setToPlcMode(WEB_Mode):
+            """
+                se escribe el registro UMOD del PLC para que el mismo actualice el modo
+            """
+            if WEB_Mode == "EMERGENCIA":
+                mbusWrite(self.DLGID_CTRL,'2097','interger',5)
+            elif WEB_Mode == "REMOTO":
+                mbusWrite(self.DLGID_CTRL,'2097','interger',7)
+            else:
+                pass
+
+        def IsPlcModeUpdated():
+            """
+                se compara el modo de trabajo de la web con el modo actual de trabajo del PLC.
+                Si son iguales se retorna true, en caso contrario false
+            """
+            plcMode = readPlcMode()
+
+            if plcMode != "LOCAL":
+                if WEB_Mode == plcMode:
+                    return True 
+                else:
+                    return False 
+            else:
+                # el plc esta trabajando en modo local por lo que no se puede decir que este desactualizado con la web 
+                # ya que la misma no trabaja en este modo
+                # se asume que estan actualizados
+                return True
+            
+        def updateWebMode():
+            """
+                si UMODE es distinto de cero y su valor es de 1 o 3 se actualiza en la web el modo de la siguiente forma
+                1-> EMERGENCIA
+                3-> REMOTO
+                En caso de valor 2 return True para indicar que se esta trabajando en modo local
+            """
+            UMOD = read_param(self.DLGID_CTRL,'UMOD')
+
+            if UMOD != "0":
+                if UMOD == "1":
+                    self.logs.print_inf(name_function,"SE ACTUALIZA EL MODO EN LA WEB")
+                    self.redis.hset(self.DLGID_CTRL,'WEB_Mode','EMERGENCIA')
+                    self.redis.hset(self.DLGID_CTRL,'Last_WEB_Mode','EMERGENCIA')
+                    mbusWrite(self.DLGID_CTRL,'2097','interger',0)
+                elif UMOD == "3":
+                    self.logs.print_inf(name_function,"SE ACTUALIZA EL MODO EN LA WEB")
+                    self.redis.hset(self.DLGID_CTRL,'WEB_Mode','REMOTO')
+                    self.redis.hset(self.DLGID_CTRL,'Last_WEB_Mode','REMOTO')
+                    mbusWrite(self.DLGID_CTRL,'2097','interger',0)
+                    
+
+        # actualizo el modo para el software a partir del modo en que se encuentra el plc
+        SOFT_Mode = readPlcMode()
+        self.logs.print_in(name_function, 'MOD', SOFT_Mode)
+
+        if IsWebModeChanged():
+            self.logs.print_inf(name_function,"HUBO CAMBIO DE MODO EN LA WEB")
+            
+            # mando a escribir el modo al plc
+            self.logs.print_inf(name_function,"SE MANDA A ACTUALIZAR EL MODO EN EL PLC")
+            setToPlcMode(WEB_Mode)
+        else:
+            # chequeo si se escribio se actualizo el modo del PLC. Si no lo hizo lo vuelvo a escribir.
+            if not IsPlcModeUpdated():
+                self.logs.print_inf(name_function,"SE MANDA NUEVAMENTE!!! A ACTUALIZAR EL MODO EN EL PLC")
+                setToPlcMode(WEB_Mode)
+            else:
+                # Actualizo el modo web en caso necesario
+                updateWebMode()
+
+        return SOFT_Mode
+
+                
+        
+        
+
+        
+
+
+
+        self.logs.print_out(name_function, 'SOFT_Mode', SOFT_Mode)
+
+        return SOFT_Mode
 
     def pump(self,actionOnthePump):
         '''
@@ -65,6 +194,20 @@ class ctrl_process(object):
             self.logs.print_inf(name_function, 'APAGO BOMBA')
             mbusWrite(self.DLGID_CTRL,'2096','interger',0)              # escribo el valor 0 en el registro 2097 para mandar a apagar la bomba
         
+    def setFrequency(self,WEB_Frequency):
+        '''
+            funcion que manda a setear la frecuencia de trabajo del variador
+        '''
+        name_function = 'MAIN'
+
+        UFREQ = int(read_param(self.DLGID_CTRL,'UFREQ'))
+
+        if UFREQ == 0:
+            self.logs.print_inf(name_function, 'ACTUALIZO FRECUENCIA')
+            mbusWrite(self.DLGID_CTRL,'2098','interger',WEB_Frequency)
+        else:
+            self.logs.print_inf(name_function, 'SE ESPERA QUE SE TERMINE DE ACTUALIZAR LA FRECUENCIA')
+
 
 
 
