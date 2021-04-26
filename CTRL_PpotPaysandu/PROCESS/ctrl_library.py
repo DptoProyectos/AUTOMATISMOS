@@ -239,6 +239,7 @@ class ctrl_process(object):
             mbusWrite(self.DLGID_CTRL,'2098','interger',WEB_Frequency)
         else:
             self.logs.print_inf(name_function, 'SE ESPERA QUE SE TERMINE DE ACTUALIZAR LA FRECUENCIA')
+            self.redis.hset(self.DLGID_CTRL,'WEB_Frequency','0')
 
 
 
