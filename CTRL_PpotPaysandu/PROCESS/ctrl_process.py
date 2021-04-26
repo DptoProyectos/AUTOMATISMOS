@@ -21,11 +21,16 @@ from time import time
 from __CORE__.mypython import str2bool, config_var
 from __CORE__.drv_logs import ctrl_logs
 from __CORE__.drv_redis import Redis
+from __CORE__.drv_config import dbuser,dbpasswd,dbhost,dbaseName
 from CTRL_PpotPaysandu.PROCESS.ctrl_library import ctrl_process
+from drv_db_GDA import GDA
+
 #from CTRL_FREC.PROCESS.drv_visual import dic
 #from __CORE__.drv_dlg import emerg_system, read_param
-#from drv_db_GDA import GDA
+
 #from __CORE__.drv_config import serv_APP_config
+
+
 
 
 ctrl_start_time = time() 
@@ -51,6 +56,8 @@ def control_process(LIST_CONFIG):
     logs = ctrl_logs(TYPE,'CTRL_PpotPaysandu',DLGID_CTRL,print_log)
     redis = Redis()
     ctrl = ctrl_process(LIST_CONFIG)
+    gda = GDA(dbuser,dbpasswd,dbhost,dbaseName)
+    
     #config = configparser.ConfigParser()
     
     
@@ -80,24 +87,23 @@ def control_process(LIST_CONFIG):
     
     
     
-    WEB_Mode = 'REMOTO'
-    WEB_ActionPump = 'OFF'
-    WEB_Frequency = 12
+    WEB_Mode = gda.readAutConf('AutConfTable','WEB_Mode')
+    WEB_ActionPump = gda.readAutConf('AutConfTable','WEB_ActionPump')
+    WEB_Frequency = gda.readAutConf('AutConfTable','WEB_Frequency')
     
 
-
-    SOFT_Mode = ctrl.getAndUpdateMode(WEB_Mode)
-
-
-    # FUNCION MAIN
-    name_function = 'MAIN'
-
-    
-    # muestro logs con variables de entrada
-    logs.print_in(name_function, 'SOFT_Mode', SOFT_Mode)
+    # muestro logs con variables de configuracio
+    logs.print_in(name_function, 'WEB_Mode', WEB_Mode)
     logs.print_in(name_function, 'WEB_ActionPump', WEB_ActionPump)
     logs.print_in(name_function, 'WEB_Frequency', WEB_Frequency)
 
+    SOFT_Mode = ctrl.getAndUpdateMode(WEB_Mode)
+
+    # FUNCION MAIN
+    name_function = 'MAIN'
+   
+    # muestro logs de las variables de entrada del software
+    logs.print_in(name_function, 'SOFT_Mode', SOFT_Mode)
 
     
     # desativo la alarma para que se muestre en la web que se esta trabajando en modo local
@@ -155,7 +161,7 @@ if __name__ == '__main__':
     LIST_CONFIG = [
                 #VARIABLES DE EJECUCION
                 'print_log',        True,                             # VER LOS LOGS EN CONSOLA [ True | False ]
-                'DLGID_CTRL',       'PAYCTRL01',                      # ID DATALOGGER QUE EJECUTA LAS ACCIONES DE CONTROL
+                'DLGID_CTRL',       'CTRLPAY01',                      # ID DATALOGGER QUE EJECUTA LAS ACCIONES DE CONTROL
                 'TYPE',             'CTRL_PpotPaysandu',              # CUANDO TIENE LE VALOR CHARGE SE CARGA LA CONFIGURACION DE LA db
                 
                 #VARIABLES DE CONFIGURACION

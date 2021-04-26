@@ -114,5 +114,23 @@ class GDA(object):
         key = (canal, param)
         return dlg_config.get(key)
         
+    def readAutConf(self,autoId,param):
+        """
+            lee el valor de parametro para el automatismo autoId de la tabla automatismo_parametro de GDA
+            en caso de no encontrar los parametros de configuracion retorna false 
+        """
+        from drv_redis import Redis
+        redis = Redis()
+        return redis.hget(autoId,param)
+        #return false
+
+    def WriteAutConf(self,autoId,param,value):
+        """
+            escribe el valor de parametro para el automatismo autoId de la tabla automatismo_parametro de GDA
+        """
+        from drv_redis import Redis
+        redis = Redis()
+        return redis.hset(autoId,param,value)
+
 
 

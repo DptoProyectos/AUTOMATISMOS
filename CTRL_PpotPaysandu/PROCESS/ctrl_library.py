@@ -20,6 +20,9 @@ from __CORE__.drv_logs import *
 from __CORE__.drv_redis import Redis
 from __CORE__.drv_dlg import mbusWrite, read_param
 from __CORE__.mypython import config_var, str2bool
+from __CORE__.drv_config import dbuser,dbpasswd,dbhost,dbaseName
+from drv_db_GDA import GDA
+
 
 from posix import read
 
@@ -50,6 +53,7 @@ class ctrl_process(object):
         ## INSTANCIAS
         self.logs = ctrl_logs(self.TYPE,'CTRL_PpotPaysandu',self.DLGID_CTRL,self.print_log)
         self.redis = Redis()
+        self.gda = GDA(dbuser,dbpasswd,dbhost,dbaseName)
 
     def getAndUpdateMode(self,WEB_Mode):
         '''
@@ -88,8 +92,9 @@ class ctrl_process(object):
             """
             if not self.redis.hexist(self.DLGID_CTRL,'Last_WEB_Mode'):
                 self.redis.hset(self.DLGID_CTRL,'Last_WEB_Mode',WEB_Mode)
-            else:
-                Last_WEB_Mode = self.redis.hget(self.DLGID_CTRL,'Last_WEB_Mode')
+            
+            Last_WEB_Mode = self.redis.hget(self.DLGID_CTRL,'Last_WEB_Mode')
+
             if Last_WEB_Mode != WEB_Mode:
                 self.redis.hset(self.DLGID_CTRL,'Last_WEB_Mode',WEB_Mode)
                 return True
@@ -125,27 +130,39 @@ class ctrl_process(object):
                 # se asume que estan actualizados
                 return True
             
-        def updateWebMode():
+        def updateWebMode(UMOD):
             """
-                si UMODE es distinto de cero y su valor es de 1 o 3 se actualiza en la web el modo de la siguiente forma
+                Se actualiza en la web el modo de la siguiente forma
                 1-> EMERGENCIA
                 3-> REMOTO
                 En caso de valor 2 return True para indicar que se esta trabajando en modo local
             """
-            UMOD = read_param(self.DLGID_CTRL,'UMOD')
+            if UMOD == "1":
+                self.logs.print_inf(name_function,"SE ACTUALIZA EL MODO EN LA WEB")
+                self.gda.WriteAutConf('AutConfTable','WEB_Mode','EMERGENCIA')
+                self.redis.hset(self.DLGID_CTRL,'Last_WEB_Mode','EMERGENCIA')
+                mbusWrite(self.DLGID_CTRL,'2097','interger',0)
+            elif UMOD == "3":
+                self.logs.print_inf(name_function,"SE ACTUALIZA EL MODO EN LA WEB")
+                self.gda.WriteAutConf('AutConfTable','WEB_Mode','REMOTO')
+                self.redis.hset(self.DLGID_CTRL,'Last_WEB_Mode','REMOTO')
+                mbusWrite(self.DLGID_CTRL,'2097','interger',0)
 
-            if UMOD != "0":
-                if UMOD == "1":
-                    self.logs.print_inf(name_function,"SE ACTUALIZA EL MODO EN LA WEB")
-                    self.redis.hset(self.DLGID_CTRL,'WEB_Mode','EMERGENCIA')
-                    self.redis.hset(self.DLGID_CTRL,'Last_WEB_Mode','EMERGENCIA')
-                    mbusWrite(self.DLGID_CTRL,'2097','interger',0)
-                elif UMOD == "3":
-                    self.logs.print_inf(name_function,"SE ACTUALIZA EL MODO EN LA WEB")
-                    self.redis.hset(self.DLGID_CTRL,'WEB_Mode','REMOTO')
-                    self.redis.hset(self.DLGID_CTRL,'Last_WEB_Mode','REMOTO')
-                    mbusWrite(self.DLGID_CTRL,'2097','interger',0)
-                    
+        def IsUpdatePlcModePending():
+            '''
+               retorna true en caso de haber pendiente una actualizacion de modo hacia el PLC
+            '''        
+            if self.redis.hexist(self.DLGID_CTRL,'UpdatePlcModePending'):
+                UpdatePlcModePending  = self.redis.hget(self.DLGID_CTRL,'UpdatePlcModePending')
+            else:
+                self.redis.hset(self.DLGID_CTRL,'UpdatePlcModePending','NO')
+                UpdatePlcModePending = 'NO'
+
+            if UpdatePlcModePending == 'SI': return True
+            else: return False
+
+
+            
 
         # actualizo el modo para el software a partir del modo en que se encuentra el plc
         SOFT_Mode = readPlcMode()
@@ -157,15 +174,30 @@ class ctrl_process(object):
             # mando a escribir el modo al plc
             self.logs.print_inf(name_function,"SE MANDA A ACTUALIZAR EL MODO EN EL PLC")
             setToPlcMode(WEB_Mode)
-        else:
-            # chequeo si se escribio se actualizo el modo del PLC. Si no lo hizo lo vuelvo a escribir.
-            if not IsPlcModeUpdated():
-                self.logs.print_inf(name_function,"SE MANDA NUEVAMENTE!!! A ACTUALIZAR EL MODO EN EL PLC")
-                setToPlcMode(WEB_Mode)
-            else:
-                # Actualizo el modo web en caso necesario
-                updateWebMode()
 
+            # activo una bandera para idicar que se esta en un proceso de cambio de modo hacia el PLC
+            self.redis.hset(self.DLGID_CTRL,'UpdatePlcModePending','SI')
+
+        else:
+            # verifico que este en proceso una actualizacion de modo en el plc
+            if IsUpdatePlcModePending():
+                # chequeo si se escribio se actualizo el modo del PLC. Si no lo hizo lo vuelvo a escribir.
+                self.logs.print_inf(name_function,"PROCESO DE ACTUALIZACION DE MODO HACIA EL PLC PENDIENTE")
+                if not IsPlcModeUpdated():
+                    self.logs.print_inf(name_function,"SE MANDA NUEVAMENTE!!! A ACTUALIZAR EL MODO EN EL PLC")
+                    setToPlcMode(WEB_Mode)
+                else:
+                    self.logs.print_inf(name_function,"MODO EN EL PLC ACTUALIZADO DE FORMA CORRECTA")
+                    self.redis.hset(self.DLGID_CTRL,'UpdatePlcModePending','NO')
+            else:
+                # chequep si hay pedido para actualizar en la web
+                UMOD = read_param(self.DLGID_CTRL,'UMOD')
+                if UMOD == '0':
+                    self.logs.print_inf(name_function,"NO HAY SOLICITUD DE ACTUALIZACION MODO")
+                elif UMOD in ['1','3']:
+                    # Actualizo el modo web
+                    self.logs.print_inf(name_function,"HAY PEDIDO DE ACTUALIZACION WEB")
+                    updateWebMode(UMOD)
         return SOFT_Mode
 
                 

@@ -23,7 +23,7 @@ gen_start_time = time()
 LIST_CONFIG = [
                 #VARIABLES DE EJECUCION
                 'print_log',        True,                           # VER LOS LOGS EN CONSOLA [ True | False ]
-                'DLGID_CTRL',       'PAYCTRL01',                    # ID DATALOGGER QUE EJECUTA LAS ACCIONES DE CONTROL
+                'DLGID_CTRL',       'CTRLPAY01',                    # ID DATALOGGER QUE EJECUTA LAS ACCIONES DE CONTROL
                 'TYPE',             'CTRL_PpotPaysandu',            # [ CTRL_FREC | CTRL_PpotPaysandu ]
                 
                 

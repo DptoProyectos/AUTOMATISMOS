@@ -24,10 +24,6 @@ ENVIROMENT: #!/usr/aut_env/bin/python3.8
 	>>>>>>>>>>>
 
 
-
-	 
-
-
 # FORMA DE EJECUCION:
 ## DETECCION DE ERRORES DESDE EL CRONTAB
 /var/etc/crontab => 
@@ -98,7 +94,7 @@ ENVIROMENT: #!/usr/aut_env/bin/python3.8
 * meter toda la capaa de drivers dentro de la carpeta __CORE__
 - en cada uno de los serv_ corregir que la ruta del archivo a llama haya que ponerla a mano.
 - documentar los visio de la carperta de control de frecuencia de mercedes para drawio.
-
+- implemetar las funciones readAutConf y WriteAutConf contra la tabla en postgres
 
 
 
