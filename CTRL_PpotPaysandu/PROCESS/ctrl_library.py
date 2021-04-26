@@ -79,6 +79,7 @@ class ctrl_process(object):
             elif MOD == "1": return "LOCAL"
             elif MOD == "2": return "REMOTO"
             else: 
+                self.logs.print_in(name_function, 'MOD', MOD)
                 self.logs.print_error(name_function, 'MODO DE TRABAJO NO ADMITIDO')
                 self.logs.print_error(name_function, 'NO SE EJECUTA EL SCRIPT')
                 quit()

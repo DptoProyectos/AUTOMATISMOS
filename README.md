@@ -11,7 +11,7 @@ ENVIROMENT: #!/usr/aut_env/bin/python3.8
 
 # LOGS: 
 ## SYSLOG
-	Los log utilizan el syslog de ubuntu. Para ello agregar al archivo /etc/rsyslog.conf la siguiente configuracion
+	Los log utilizan el syslog de ubuntu. Para ello agregar al archivo /etc/rsyslog.d/50-default.conf la siguiente configuracion
 	<<<<<<<<<<<
 		:syslogtag, contains, "AUTO_CTRL" /var/log/autoCtrl.log
 		:syslogtag, contains, "AUTO_CTRL" ~
