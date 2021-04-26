@@ -53,7 +53,7 @@ if __name__ == '__main__':
         else:  TYPE = 'CHARGE'
     ## SE SE LE PASA UN SOLO ARGUMENTO SE LO ASIGNO A DLGID
     else:
-        print_log = True
+        print_log = False
         DLGID_CTRL = sys.argv[1]
         TYPE = 'CHARGE'
         

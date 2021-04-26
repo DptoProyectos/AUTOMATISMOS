@@ -236,7 +236,6 @@ class ctrl_process(object):
         UFREQ = int(read_param(self.DLGID_CTRL,'UFREQ'))
 
         if UFREQ == 0:
-            self.logs.print_inf(name_function, 'ACTUALIZO FRECUENCIA')
             mbusWrite(self.DLGID_CTRL,'2098','interger',WEB_Frequency)
         else:
             self.logs.print_inf(name_function, 'SE ESPERA QUE SE TERMINE DE ACTUALIZAR LA FRECUENCIA')

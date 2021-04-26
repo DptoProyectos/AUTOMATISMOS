@@ -128,7 +128,9 @@ def control_process(LIST_CONFIG):
             #
         # seteo de frecuencia
         if WEB_ActionPump == 'ON':
-            ctrl.setFrequency(WEB_Frequency)
+            if WEB_Frequency != '0':
+                logs.print_inf(name_function, 'ACTUALIZO FRECUENCIA')
+                ctrl.setFrequency(WEB_Frequency)
 
 
 
