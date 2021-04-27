@@ -235,11 +235,49 @@ class ctrl_process(object):
 
         UFREQ = int(read_param(self.DLGID_CTRL,'UFREQ'))
 
-        if UFREQ == 0:
-            mbusWrite(self.DLGID_CTRL,'2098','interger',WEB_Frequency)
+        # leo la variable IsfrequecyUpdating
+        if not self.redis.hexist(self.DLGID_CTRL,'IsfrequecyUpdating'):
+            self.redis.hset(self.DLGID_CTRL,'IsfrequecyUpdating','NO')
+            IsfrequecyUpdating = self.redis.hget(self.DLGID_CTRL,'IsfrequecyUpdating')
         else:
+            IsfrequecyUpdating = self.redis.hget(self.DLGID_CTRL,'IsfrequecyUpdating')
+
+        # leo la variable lastUpdatedFrequecy
+        if not self.redis.hexist(self.DLGID_CTRL,'lastUpdatedFrequecy'):
+            self.redis.hset(self.DLGID_CTRL,'lastUpdatedFrequecy',0)
+            lastUpdatedFrequecy = int(self.redis.hget(self.DLGID_CTRL,'lastUpdatedFrequecy'))
+        else:
+            lastUpdatedFrequecy = int(self.redis.hget(self.DLGID_CTRL,'lastUpdatedFrequecy'))
+
+    
+        if UFREQ == 0:
+            if IsfrequecyUpdating == 'NO':
+                if WEB_Frequency != 0:
+                    self.logs.print_inf(name_function, 'SE MANDA A ACTUALIZAR LA FRECUENCIA {0}'.format(WEB_Frequency))
+                    mbusWrite(self.DLGID_CTRL,'2098','interger',WEB_Frequency)
+                    self.redis.hset(self.DLGID_CTRL,'IsfrequecyUpdating','SI')
+                    self.redis.hset(self.DLGID_CTRL,'lastUpdatedFrequecy',WEB_Frequency)
+                else:
+                    self.logs.print_inf(name_function, 'NO HAY PEDIDO DE FRECUENCIA PARA ACTUALIZAR')
+            else:
+                if lastUpdatedFrequecy == WEB_Frequency:
+                    self.redis.hset('AutConfTable','WEB_Frequency',0)
+                    self.logs.print_inf(name_function, 'FRECUENCIA ACTUALIZADA CORRECTAMENTE')
+                    self.redis.hset(self.DLGID_CTRL,'IsfrequecyUpdating','NO')
+                    # 
+                    # pongo en cero el registro modbus para evitar que se mande por error un valor y se comience un proceso de actualizacio de frecuencia
+                    mbusWrite(self.DLGID_CTRL,'2098','interger',0)
+                else:
+                    deltaFrequency = WEB_Frequency - lastUpdatedFrequecy
+                    self.logs.print_inf(name_function, 'NUEVO VALOR DE ACTUALIZACION DE FRECUENCIA')
+                    self.logs.print_inf(name_function, 'SE CONTINUA EL PROCESO DE VARIAR LA FRECUENCIA')
+                    self.logs.print_inf(name_function, 'SE MANDA A ACTUALIZAR LA FRECUENCIA {0}'.format(deltaFrequency))
+                    mbusWrite(self.DLGID_CTRL,'2098','interger',deltaFrequency)
+                    self.redis.hset(self.DLGID_CTRL,'lastUpdatedFrequecy',WEB_Frequency)
+        else:
+            self.logs.print_inf(name_function, 'ACTUALIZACION DE FRECUENCIA EN CURSO')
             self.logs.print_inf(name_function, 'SE ESPERA QUE SE TERMINE DE ACTUALIZAR LA FRECUENCIA')
-            self.redis.hset(self.DLGID_CTRL,'WEB_Frequency','0')
+            
 
 
 

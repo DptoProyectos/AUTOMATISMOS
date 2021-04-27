@@ -21,12 +21,13 @@ from time import time
 from __CORE__.mypython import str2bool, config_var
 from __CORE__.drv_logs import ctrl_logs
 from __CORE__.drv_redis import Redis
+from __CORE__.drv_dlg import mbusWrite
 from __CORE__.drv_config import dbuser,dbpasswd,dbhost,dbaseName
 from CTRL_PpotPaysandu.PROCESS.ctrl_library import ctrl_process
 from drv_db_GDA import GDA
 
 #from CTRL_FREC.PROCESS.drv_visual import dic
-#from __CORE__.drv_dlg import emerg_system, read_param
+
 
 #from __CORE__.drv_config import serv_APP_config
 
@@ -89,7 +90,7 @@ def control_process(LIST_CONFIG):
     
     WEB_Mode = gda.readAutConf('AutConfTable','WEB_Mode')
     WEB_ActionPump = gda.readAutConf('AutConfTable','WEB_ActionPump')
-    WEB_Frequency = gda.readAutConf('AutConfTable','WEB_Frequency')
+    WEB_Frequency = int(gda.readAutConf('AutConfTable','WEB_Frequency'))
     
 
     # muestro logs con variables de configuracio
@@ -128,10 +129,9 @@ def control_process(LIST_CONFIG):
             #
         # seteo de frecuencia
         if WEB_ActionPump == 'ON':
-            if WEB_Frequency != '0':
-                logs.print_inf(name_function, 'ACTUALIZO FRECUENCIA')
-                ctrl.setFrequency(WEB_Frequency)
-
+            ctrl.setFrequency(WEB_Frequency)
+            
+                
 
 
     elif SOFT_Mode == 'LOCAL':
