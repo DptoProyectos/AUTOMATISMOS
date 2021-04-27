@@ -277,6 +277,9 @@ class ctrl_process(object):
         else:
             self.logs.print_inf(name_function, 'ACTUALIZACION DE FRECUENCIA EN CURSO')
             self.logs.print_inf(name_function, 'SE ESPERA QUE SE TERMINE DE ACTUALIZAR LA FRECUENCIA')
+            #
+            # pongo en cero el registro modbus para evitar que se mande por error un valor y se comience un proceso de actualizacio de frecuencia
+            mbusWrite(self.DLGID_CTRL,'2098','interger',0)
             
 
 
