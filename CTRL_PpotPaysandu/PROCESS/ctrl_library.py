@@ -249,6 +249,12 @@ class ctrl_process(object):
         else:
             lastUpdatedFrequecy = int(self.redis.hget(self.DLGID_CTRL,'lastUpdatedFrequecy'))
 
+        # leo la variable countFrames
+        if not self.redis.hexist(self.DLGID_CTRL,'countFrames'):
+            self.redis.hset(self.DLGID_CTRL,'countFrames',0)
+            countFrames = int(self.redis.hget(self.DLGID_CTRL,'countFrames'))
+        else:
+            countFrames = int(self.redis.hget(self.DLGID_CTRL,'countFrames'))
     
         if UFREQ == 0:
             if IsfrequecyUpdating == 'NO':
@@ -257,23 +263,30 @@ class ctrl_process(object):
                     mbusWrite(self.DLGID_CTRL,'2098','interger',WEB_Frequency)
                     self.redis.hset(self.DLGID_CTRL,'IsfrequecyUpdating','SI')
                     self.redis.hset(self.DLGID_CTRL,'lastUpdatedFrequecy',WEB_Frequency)
+                    self.redis.hset(self.DLGID_CTRL,'countFrames',0)
                 else:
                     self.logs.print_inf(name_function, 'NO HAY PEDIDO DE FRECUENCIA PARA ACTUALIZAR')
             else:
-                if lastUpdatedFrequecy == WEB_Frequency:
-                    self.redis.hset('AutConfTable','WEB_Frequency',0)
-                    self.logs.print_inf(name_function, 'FRECUENCIA ACTUALIZADA CORRECTAMENTE')
-                    self.redis.hset(self.DLGID_CTRL,'IsfrequecyUpdating','NO')
-                    # 
-                    # pongo en cero el registro modbus para evitar que se mande por error un valor y se comience un proceso de actualizacio de frecuencia
-                    mbusWrite(self.DLGID_CTRL,'2098','interger',0)
+                # dejo un frame de por medio para esperar un dato valido de UFREQ
+                countFrames += 1
+                if countFrames == 2:
+                    if lastUpdatedFrequecy == WEB_Frequency:
+                        self.redis.hset('AutConfTable','WEB_Frequency',0)
+                        self.logs.print_inf(name_function, 'FRECUENCIA ACTUALIZADA CORRECTAMENTE')
+                        self.redis.hset(self.DLGID_CTRL,'IsfrequecyUpdating','NO')
+                        # 
+                        # pongo en cero el registro modbus para evitar que se mande por error un valor y se comience un proceso de actualizacio de frecuencia
+                        mbusWrite(self.DLGID_CTRL,'2098','interger',0)
+                    else:
+                        deltaFrequency = WEB_Frequency - lastUpdatedFrequecy
+                        self.logs.print_inf(name_function, 'NUEVO VALOR DE ACTUALIZACION DE FRECUENCIA')
+                        self.logs.print_inf(name_function, 'SE CONTINUA EL PROCESO DE VARIAR LA FRECUENCIA')
+                        self.logs.print_inf(name_function, 'SE MANDA A ACTUALIZAR LA FRECUENCIA {0}'.format(deltaFrequency))
+                        mbusWrite(self.DLGID_CTRL,'2098','interger',deltaFrequency)
+                        self.redis.hset(self.DLGID_CTRL,'lastUpdatedFrequecy',WEB_Frequency)
+                        self.redis.hset(self.DLGID_CTRL,'countFrames',0)
                 else:
-                    deltaFrequency = WEB_Frequency - lastUpdatedFrequecy
-                    self.logs.print_inf(name_function, 'NUEVO VALOR DE ACTUALIZACION DE FRECUENCIA')
-                    self.logs.print_inf(name_function, 'SE CONTINUA EL PROCESO DE VARIAR LA FRECUENCIA')
-                    self.logs.print_inf(name_function, 'SE MANDA A ACTUALIZAR LA FRECUENCIA {0}'.format(deltaFrequency))
-                    mbusWrite(self.DLGID_CTRL,'2098','interger',deltaFrequency)
-                    self.redis.hset(self.DLGID_CTRL,'lastUpdatedFrequecy',WEB_Frequency)
+                    self.logs.print_inf(name_function, 'SE ESPERA UN NUEVO FRAME CON VALOR VALIDO EN UFREQ')
         else:
             self.logs.print_inf(name_function, 'ACTUALIZACION DE FRECUENCIA EN CURSO')
             self.logs.print_inf(name_function, 'SE ESPERA QUE SE TERMINE DE ACTUALIZAR LA FRECUENCIA')
