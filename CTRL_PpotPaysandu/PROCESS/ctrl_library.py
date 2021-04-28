@@ -269,7 +269,7 @@ class ctrl_process(object):
             else:
                 # dejo un frame de por medio para esperar un dato valido de UFREQ
                 countFrames += 1
-                if countFrames == 2:
+                if countFrames >= 2:
                     if lastUpdatedFrequecy == WEB_Frequency:
                         self.redis.hset('AutConfTable','WEB_Frequency',0)
                         self.logs.print_inf(name_function, 'FRECUENCIA ACTUALIZADA CORRECTAMENTE')
@@ -294,6 +294,7 @@ class ctrl_process(object):
         else:
             self.logs.print_inf(name_function, 'ACTUALIZACION DE FRECUENCIA EN CURSO')
             self.logs.print_inf(name_function, 'SE ESPERA QUE SE TERMINE DE ACTUALIZAR LA FRECUENCIA')
+            self.redis.hset(self.DLGID_CTRL,'countFrames',2)
             #
             # pongo en cero el registro modbus para evitar que se mande por error un valor y se comience un proceso de actualizacio de frecuencia
             mbusWrite(self.DLGID_CTRL,'2098','interger',0)
