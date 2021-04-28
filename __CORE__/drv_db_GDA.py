@@ -119,6 +119,8 @@ class GDA(object):
             lee el valor de parametro para el automatismo autoId de la tabla automatismo_parametro de GDA
             en caso de no encontrar los parametros de configuracion retorna false 
         """
+
+        autoId = 'AutConfTable'
         from drv_redis import Redis
         redis = Redis()
         return redis.hget(autoId,param)

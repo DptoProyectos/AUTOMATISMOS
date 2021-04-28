@@ -88,9 +88,9 @@ def control_process(LIST_CONFIG):
     
     
     
-    WEB_Mode = gda.readAutConf('AutConfTable','WEB_Mode')
-    WEB_ActionPump = gda.readAutConf('AutConfTable','WEB_ActionPump')
-    WEB_Frequency = int(gda.readAutConf('AutConfTable','WEB_Frequency'))
+    WEB_Mode = gda.readAutConf(DLGID_CTRL,'WEB_Mode')
+    WEB_ActionPump = gda.readAutConf(DLGID_CTRL,'WEB_ActionPump')
+    WEB_Frequency = int(gda.readAutConf(DLGID_CTRL,'WEB_Frequency'))
     
 
     # muestro logs con variables de configuracio

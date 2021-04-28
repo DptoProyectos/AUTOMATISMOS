@@ -95,6 +95,8 @@ ENVIROMENT: #!/usr/aut_env/bin/python3.8
 - en cada uno de los serv_ corregir que la ruta del archivo a llama haya que ponerla a mano.
 - documentar los visio de la carperta de control de frecuencia de mercedes para drawio.
 - implemetar las funciones readAutConf y WriteAutConf contra la tabla en postgres
+- garantizar que las webVisualVars siempre esten disponibles con un valor por default
+- implementar todos los estados y alarmas
 
 
 

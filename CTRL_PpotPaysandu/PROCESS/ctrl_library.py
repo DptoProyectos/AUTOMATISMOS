@@ -140,12 +140,12 @@ class ctrl_process(object):
             """
             if UMOD == "1":
                 self.logs.print_inf(name_function,"SE ACTUALIZA EL MODO EN LA WEB")
-                self.gda.WriteAutConf('AutConfTable','WEB_Mode','EMERGENCIA')
+                self.gda.WriteAutConf(self.DLGID_CTRL,'WEB_Mode','EMERGENCIA')
                 self.redis.hset(self.DLGID_CTRL,'Last_WEB_Mode','EMERGENCIA')
                 mbusWrite(self.DLGID_CTRL,'2097','interger',0)
             elif UMOD == "3":
                 self.logs.print_inf(name_function,"SE ACTUALIZA EL MODO EN LA WEB")
-                self.gda.WriteAutConf('AutConfTable','WEB_Mode','REMOTO')
+                self.gda.WriteAutConf(self.DLGID_CTRL,'WEB_Mode','REMOTO')
                 self.redis.hset(self.DLGID_CTRL,'Last_WEB_Mode','REMOTO')
                 mbusWrite(self.DLGID_CTRL,'2097','interger',0)
 
@@ -271,7 +271,7 @@ class ctrl_process(object):
                 countFrames += 1
                 if countFrames >= 2:
                     if lastUpdatedFrequecy == WEB_Frequency:
-                        self.redis.hset('AutConfTable','WEB_Frequency',0)
+                        self.gda.WriteAutConf(self.DLGID_CTRL,'WEB_Frequency',0)
                         self.logs.print_inf(name_function, 'FRECUENCIA ACTUALIZADA CORRECTAMENTE')
                         self.redis.hset(self.DLGID_CTRL,'IsfrequecyUpdating','NO')
                         # 
