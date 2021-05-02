@@ -97,6 +97,7 @@ ENVIROMENT: #!/usr/aut_env/bin/python3.8
 - implemetar las funciones readAutConf y WriteAutConf contra la tabla en postgres
 - garantizar que las webVisualVars siempre esten disponibles con un valor por default
 - implementar todos los estados y alarmas
+- implementar el test de tx
 
 
 
