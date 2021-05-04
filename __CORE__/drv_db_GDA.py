@@ -121,6 +121,7 @@ class GDA(object):
         """
 
         autoId = 'AutConfTable'
+
         from drv_redis import Redis
         redis = Redis()
         return redis.hget(autoId,param)
@@ -130,9 +131,13 @@ class GDA(object):
         """
             escribe el valor de parametro para el automatismo autoId de la tabla automatismo_parametro de GDA
         """
+
+        autoId = 'AutConfTable'
+
         from drv_redis import Redis
         redis = Redis()
-        return redis.hset(autoId,param,value)
+        redis.hset(autoId,param,value)
+        
 
 
 
