@@ -114,7 +114,10 @@ class ctrl_logs(object):
         self.process_name = process_name
         self.DLGID_CTRL = DLGID_CTRL
         self.script_performance = sysLogs(self.process_name, self.DLGID_CTRL)
+        if easy_log: 
+            self.easy_dlg_performance_check = saved_logs(f'{self.DLGID_CTRL}_{system_date_raw}', self.DLGID_CTRL, f'{project_path}/{self.project_folder_name}/DLG_PERFORMANCE/')
         
+
         # GARANTIZO QUE SIEMPRE ME ENTRE UN BOOL
         try: self.show_log = json.loads(show_log.lower()) 
         except: self.show_log = show_log
@@ -168,10 +171,10 @@ class ctrl_logs(object):
         # ESCRIBO EL LOG FACIL EN CASO DE QUE ESTE HABILITADO
         if easy_log:
             # CREO EL OBJETO easy_dlg_performance_check   MER004_20200501.log
-            easy_dlg_performance_check = saved_logs(f'{self.DLGID_CTRL}_{system_date_raw}', self.DLGID_CTRL, f'{project_path}/{self.project_folder_name}/DLG_PERFORMANCE/')
+            #easy_dlg_performance_check = saved_logs(f'{self.DLGID_CTRL}_{system_date_raw}', self.DLGID_CTRL, f'{project_path}/{self.project_folder_name}/DLG_PERFORMANCE/')
             #
             # ESCRIBO EL LOGS
-            easy_dlg_performance_check.write(f'[{dlgid_date}-{dlgid_time}] {message}')
+            self.easy_dlg_performance_check.write(f'[{dlgid_date}-{dlgid_time}] {message}')
 
 
 
