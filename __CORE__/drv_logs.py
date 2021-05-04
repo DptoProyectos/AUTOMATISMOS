@@ -113,7 +113,6 @@ class ctrl_logs(object):
         self.project_folder_name = project_folder_name
         self.process_name = process_name
         self.DLGID_CTRL = DLGID_CTRL
-        #self.script_performance = saved_logs(f'auto_{self.process_name}', self.DLGID_CTRL)
         self.script_performance = sysLogs(self.process_name, self.DLGID_CTRL)
         
         # GARANTIZO QUE SIEMPRE ME ENTRE UN BOOL

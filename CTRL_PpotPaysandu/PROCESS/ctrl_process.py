@@ -53,7 +53,7 @@ def control_process(LIST_CONFIG):
     ENABLE_OUTPUTS = str2bool(conf.lst_get('ENABLE_OUTPUTS'))
     
     
-    ## INSTANCIAS
+ ## INSTANCIAS
     logs = ctrl_logs(TYPE,'CTRL_PpotPaysandu',DLGID_CTRL,print_log)
     redis = Redis()
     ctrl = ctrl_process(LIST_CONFIG)
@@ -100,7 +100,7 @@ def control_process(LIST_CONFIG):
 
     SOFT_Mode = ctrl.getAndUpdateMode(WEB_Mode)
 
-    # FUNCION MAIN
+ # FUNCION MAIN
     name_function = 'MAIN'
    
     # muestro logs de las variables de entrada del software
@@ -130,8 +130,8 @@ def control_process(LIST_CONFIG):
         # seteo de frecuencia
         if WEB_ActionPump == 'ON':
             ctrl.setFrequency(WEB_Frequency)
-            
-                
+
+
 
 
     elif SOFT_Mode == 'LOCAL':

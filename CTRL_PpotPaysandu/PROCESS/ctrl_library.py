@@ -24,7 +24,7 @@ from __CORE__.drv_config import dbuser,dbpasswd,dbhost,dbaseName
 from drv_db_GDA import GDA
 
 
-from posix import read
+#from posix import read
 
 
 
@@ -344,10 +344,7 @@ class errorProcess(object):
         
         # CHEQUEO SI EXISTE EL LINE EN EL DATALOGGER
         if not(self.redis.hexist(self.DLGID, 'LINE')):
-            self.logs.print_inf(name_function, f'NO EXISTE VARIABLE LINE EN {self.DLGID}')
-            self.logs.print_inf(name_function, f'NO SE EJECUTA {name_function}')
-            self.logs.script_performance(f'NO EXISTE VARIABLE LINE EN {self.DLGID}')
-            return ''
+            return 'noLine'
         
         # DEVUELVO last_line CON EL LINE ANTERIOR Y current_line CON EL LINE ACTUAL
         if self.redis.hexist(f'{self.DLGID}_ERROR', 'last_line'):
@@ -519,7 +516,7 @@ class errorProcess(object):
                 self.logs.print_inf(name_function, f'TX STOPPED FOR MORE THAN {timer_poll} MIN')
                 #
                 # ESCRIBO EN EL LOG
-                self.logs.dlg_performance(f'< MAS DE {timer_poll} MIN CAIDO > [BAT = {bat}]')
+                self.logs.dlg_performance(f'< MAS DE {timer_poll} MIN CAIDO >')
                 #
                 return False
             else:
@@ -532,7 +529,7 @@ class errorProcess(object):
                 self.logs.print_out(name_function, dic.get_dic('TX_ERROR', 'name'), dic.get_dic('TX_ERROR', 'True_value'))
                 #
                 # ESCRIBO EN EL LOG
-                self.logs.dlg_performance(f'< MAS DE 10 MIN CAIDO > [BAT = {bat}]')
+                self.logs.dlg_performance(f'< MAS DE 10 MIN CAIDO > ')
                 #
                 # ESCRIBO EN REDIS LA ALARMA TX_ERROR CON VALOR DE ALARMA PRENDIDA
                 self.redis.hset(self.DLGID, dic.get_dic('TX_ERROR', 'name'), dic.get_dic('TX_ERROR', 'True_value'))
@@ -554,7 +551,7 @@ class errorProcess(object):
                     self.redis.hset(self.DLGID, 'error_1min', 'SI')
                     #
                     # ESCRIBO EN EL LOG
-                    self.logs.dlg_performance(f'< ERROR TX > [BAT = {bat}]')
+                    self.logs.dlg_performance(f'< ERROR TX >')
                     #
                     return False
                 else:
@@ -564,293 +561,17 @@ class errorProcess(object):
                     #
                     return True
                     
-    def visual(self): pass
-             
-    def event_detection(self):
-        
-        name_function = 'EVENT_DETECTION'
-        
-        # SI EVENT_DETECTION ES False INTERRUMPO LA FUNCION
-        if not(self.EVENT_DETECTION == None):
-            if not(self.EVENT_DETECTION):
-                self.logs.print_inf(name_function, 'EVENT_DETECTION INHABILITADO')
-                return
-        
-            
-        # PIERTA DEL GABINETE
-        if read_param(self.DLGID,'GA') == '1':
-            self.logs.print_inf(name_function, 'GABINETE_ABIERTO')
-            #
-            # ESCRIBO EN EL LOG
-            self.logs.dlg_performance(f'< {name_function} > GABINETE_ABIERTO')
-            
-                
-        # FALLA ELECTRICA
-        if read_param(self.DLGID,'FE') == '1':
-            self.logs.print_inf(name_function, 'FALLA_ELECTRICA')
-            #
-            # ESCRIBO EN EL LOG
-            self.logs.dlg_performance(f'< {name_function} > FALLA_ELECTRICA')
-            
-            
-        # FALLA TERMICA 1
-        if read_param(self.DLGID,'FT1') == '1':
-            self.logs.print_inf(name_function, 'FALLA_TERMICA_1')
-            #
-            # ESCRIBO EN EL LOG
-            self.logs.dlg_performance(f'< {name_function} > FALLA_TERMICA_1')
-                
-        # TRABAJO EN MODO LOCAL
-        if read_param(self.DLGID,'LM') == '1': 
-            self.logs.print_inf(name_function, 'MODO_LOCAL')
-            #
-            # ESCRIBO EN EL LOG
-            self.logs.dlg_performance(f'< {name_function} > MODO_LOCAL')
-            
-        # TRABAJO EN MODO REMOTO
-        if self.redis.hget(self.DLGID, dic.get_dic('WEB_MODE', 'name')) == dic.get_dic('WEB_MODE', 'False_value'):
-            #
-            # CHEQUEO QUE SE ESTE MANDANDO A PRENDER LA BOMBA
-            if self.redis.hget(self.DLGID, dic.get_dic('PUMP_1_WEB_MODE', 'name')) == dic.get_dic('PUMP_1_WEB_MODE', 'True_value'):
-                #
-                # ESCRIBO EN EL LOG
-                PUMP_FREC = self.redis.hget(self.DLGID, dic.get_dic('PUMP_FREC', 'name'))
-                self.logs.print_inf(name_function, f'MODO REMOTO => PRENDER BOMBA [ PUMP_FREC = {PUMP_FREC} ]')
-                self.logs.dlg_performance(f'< {name_function} > MODO REMOTO => PRENDER BOMBA [ PUMP_FREC = {PUMP_FREC} ]')
-                #
-            elif self.redis.hget(self.DLGID, dic.get_dic('PUMP_1_WEB_MODE', 'name')) == dic.get_dic('PUMP_1_WEB_MODE', 'False_value'):
-                # ESCRIBO EN EL LOG
-                self.logs.print_inf(name_function, f'MODO REMOTO => APAGAR BOMBA')
-                self.logs.dlg_performance(f'< {name_function} > MODO REMOTO => APAGAR BOMBA') 
-                
-        # TRABAJO EN MODO EMERGENCIA
-        if self.redis.hget(self.DLGID, dic.get_dic('WEB_MODE', 'name')) == dic.get_dic('WEB_MODE', 'value_1') or self.redis.hget(self.DLGID, dic.get_dic('WEB_MODE', 'name')) == dic.get_dic('WEB_MODE', 'value_2'):
-            #
-            # ESCRIBO EN EL LOG
-            self.logs.print_inf(name_function, f'MODO BOYA O TIMER')
-            self.logs.dlg_performance(f'< {name_function} > MODO BOYA O TIMER')
-               
-        # TRABAJO CON EL SISTEMA DE REFERENCIA_1
-        if self.redis.hget(self.DLGID, 'flag_work_syst_ref_1') == 'SI':
-            #
-            FREC = self.redis.hget(self.DLGID, 'FREC')
-            #
-            # ESCRIBO EN EL LOG
-            self.logs.print_inf(name_function, f'TRABAJO CON LA REFERENCIA_1 [ FREC = {FREC} ]')
-            self.logs.dlg_performance(f'< {name_function} > TRABAJO CON LA REFERENCIA_1 [ FREC = {FREC} ]')
-            
-        # TRABAJO CON FRECUENCIA MAXIMA
-        if int(self.redis.hget(self.DLGID, 'FREC')) == 7:
-            self.logs.dlg_performance(f'< {name_function} > SE ALCANZA FRECUENCIA MAXIMA')
-                
-    def switch_outputs(self):
-        
-        name_function = 'SWITCH_OUTPUTS'
-        
-        #
-        # SI ESTA HABILITADO EL SWITCH_OUTPUTS
-        if not(self.SWITCH_OUTPUTS): 
-            self.logs.print_inf(name_function, 'SWITCH_OUTPUTS INHABILITADO')
-            #
-            # ELIMINO EL MONITOR DE ESTADOS DE REDIS EN CASO DE QUE EXISTA
-            if self.redis.hexist(f'{self.DLGID}_ERROR', 'outputs_states'):
-                self.redis.hdel(f'{self.DLGID}_ERROR', 'outputs_states')
-            return 
-        
-        # PREPARO INDICADOR DE ESTADOS
-        if not(self.redis.hexist(f'{self.DLGID}_ERROR', 'outputs_states')):
-            self.redis.hset(f'{self.DLGID}_ERROR', 'outputs_states', 0)
-            outputs_states = 0
-        else:
-            outputs_states = int(self.redis.hget(f'{self.DLGID}_ERROR', 'outputs_states'))
-            
-        # DETECTO QUE TIPO DE AUTOMATISMO TENGO PARA EJECUTAR EL SWITCH DE LAS SALIDAS
-        if self.TYPE == 'CTRL_FREC':
-            # PASO POR ESTADOS
-            if outputs_states == 0:
-                DO_0 = 0;            
-                DO_1 = 0;
-            elif outputs_states == 1:
-                DO_0 = 1;            
-                DO_1 = 0;
-            elif outputs_states == 2:
-                DO_0 = 0;            
-                DO_1 = 1;
-            elif outputs_states == 3:
-                DO_0 = 1;            
-                DO_1 = 1;
-                
-            if outputs_states == 3:
-                outputs_states = 0
-            else:
-                outputs_states +=1
-                
-            # MUESTRO LOGS EN CONSOLA    
-            self.logs.print_out(name_function, 'DO_0', DO_0)
-            self.logs.print_out(name_function, 'DO_1', DO_1)
-            
-            # MANDO A SETEAR LAS SALIDAS
-            set_outs(self.DLGID,DO_0, DO_1)
-            
-            # LATCHEO LAS SALIDAS
-            error_process.latch__outpust(self, self.DLGID)
-            
-            
-        else:
-            self.logs.print_inf(name_function, 'AUTOMATISMO NO RECONOCIDO')
-            self.logs.print_out(name_function, 'TYPE', self.TYPE)
-            return
-       
-        # ESCRIBO EL VALO DEL ESTADO    
-        self.redis.hset(f'{self.DLGID}_ERROR', 'outputs_states', outputs_states)
-        
-    def test_outputs(self): 
-        '''
-        return True =>     SI EL TESTEO FUE SATISFACTORIO
-        return False =>    SI HUBO ERRORES E/S
-        retur None =>      SI TEST_OUTPUTS INHABILITADO
-                           SI SE TRABAJA EN MODO LOCAL O HAY FALLA ELECTRICA
-                           OTROS ERRORES
-        '''   
-        
-        name_function = 'TEST_OUTPUTS'
-        
-        # SI TEST_OUTPUTS ES False INTERRUMPO LA FUNCION
-        # DEJO QUE SE TESTEEN LAS SALIDAS SI NO SE CARGA TEST_OUTPUTS
-        if not(self.TEST_OUTPUTS == None):
-            if not(self.TEST_OUTPUTS):
-                self.logs.print_inf(name_function, 'TEST_OUTPUTS INHABILITADO')
-                return None
-        
-        # LEO EL VALOR ANTERIOR DE LAS SALIDAS
-        last_OUTPUTS = self.redis.hget(self.DLGID, 'last_OUTPUTS')
-        #
-        # CHEQUEO EL VALOR ANTERIOR DE LAS SALIDAS ES VALIDO
-        if not(last_OUTPUTS):
-            self.logs.print_inf(name_function, f'NO EXISTE last_OUTPUTS en {self.DLGID}')
-            self.logs.print_inf(name_function, 'NO SE TESTEAN SALIDAS')
-            return None
-        #
-        # SELECCIONO EL TEST DE ACUERDO AL TIPO DE AUTOMATISMO
-        if self.TYPE == 'CTRL_FREC':
-            # DEFINO SALIDAS A TESTEAR
-            DO_0 = get_outs(self.DLGID,last_OUTPUTS,0)
-            DO_1 = get_outs(self.DLGID,last_OUTPUTS,1)
-            #
-            # DEFINO ENTRADAS A VERIFICAR
-            BR1 = int(read_param(self.DLGID, 'BR1'))
-            TM = int(read_param(self.DLGID, 'TM'))
-            FT1 = int(read_param(self.DLGID, 'FT1'))
-            
-            
-            # PREVEO QUE NO SE TESTEEN LAS SALIDAS BAJO MODO LOCAL O FALLA ELECTRICA
-            if read_param(self.DLGID, 'LM') == '1' or read_param(self.DLGID, 'FE') == '1':
-                self.logs.print_in(name_function, 'LM', read_param(self.DLGID, 'LM'))
-                self.logs.print_in(name_function, 'FE', read_param(self.DLGID, 'FE'))
-                self.logs.print_inf(name_function, 'NO SE TESTEAN SALIDAS POR TRABAJO EN MODO LOCAL O FALLA ELECTRICA')
-                return None
-                
-            # STATE: MODO DE EMERGENCIA
-            if DO_0 == 0:
-                if TM == 0:
-                    if not(BR1 == 0 and FT1 == 0):
-                        self.logs.dlg_performance(f'< ERROR_E/S > [ TM = {TM} ], [ DO_1 = {DO_1}, DO_0 = {DO_0} ] <=> [ BR1 = {BR1}, FT1 = {FT1} ]')
-                        self.logs.print_inf(name_function, f'< ERROR_E/S > [ TM = {TM} ] - [ DO_1 = {DO_1}, DO_0 = {DO_0} ] <=> [ BR1 = {BR1}, FT1 = {FT1} ]') 
-                        return False
-                    else:
-                        self.logs.print_inf(name_function, 'OUTPUTS OK')
-                        return True
-                elif TM == 1:
-                    if not(BR1 == 1 or FT1 == 1):
-                        self.logs.dlg_performance(f'< ERROR_E/S > [ TM = {TM} ], [ DO_1 = {DO_1}, DO_0 = {DO_0} ] <=> [ BR1 = {BR1}, FT1 = {FT1} ]')
-                        self.logs.print_inf(name_function, f'< ERROR_E/S > [ TM = {TM} ] - [ DO_1 = {DO_1}, DO_0 = {DO_0} ] <=> [ BR1 = {BR1}, FT1 = {FT1} ]') 
-                        return False
-                    else:
-                        self.logs.print_inf(name_function, 'OUTPUTS OK')
-                        return True
-                else:
-                    self.logs.print_inf(name_function,f'VALOR NO RECONOCIDO EN TM [ TM = {TM} ]')
-                    self.logs.script_performance(f'VALOR NO RECONOCIDO EN TM [ TM = {TM} ]')
-                    return None
-            
-            elif DO_0 == 1:
-                if DO_1 == 0:
-                    if not(BR1 == 0 and FT1 == 0):
-                        self.logs.dlg_performance(f'< ERROR_E/S > [ DO_1 = {DO_1}, DO_0 = {DO_0} ] <=> [ BR1 = {BR1}, FT1 = {FT1} ]')
-                        self.logs.print_inf(name_function, f'< ERROR_E/S > [ DO_1 = {DO_1}, DO_0 = {DO_0} ] <=> [ BR1 = {BR1}, FT1 = {FT1} ]') 
-                        return False
-                    else:
-                        self.logs.print_inf(name_function, 'OUTPUTS OK')
-                        return True
-                elif DO_1 == 1:
-                    if not(BR1 == 1 or FT1 == 1):
-                        self.logs.dlg_performance(f'< ERROR_E/S > [ DO_1 = {DO_1}, DO_0 = {DO_0} ] <=> [ BR1 = {BR1}, FT1 = {FT1} ]')
-                        self.logs.print_inf(name_function, f'< ERROR_E/S > [ DO_1 = {DO_1}, DO_0 = {DO_0} ] <=> [ BR1 = {BR1}, FT1 = {FT1} ]') 
-                        return False
-                    else:
-                        self.logs.print_inf(name_function, 'OUTPUTS OK')   
-                        return True         
-                else:
-                    self.logs.print_inf(name_function,f'VALOR NO RECONOCIDO EN DO_1 [ DO_1 = {DO_1} ]')
-                    self.logs.script_performance(f'VALOR NO RECONOCIDO EN DO_1 [ DO_1 = {DO_1} ]')
-                    return None
-            # MODO DE CONTROL
-            else:
-                self.logs.print_inf(name_function,f'VALOR NO RECONOCIDO EN D0_0 [ DO_0 = {DO_0} ]')
-                self.logs.script_performance(f'VALOR NO RECONOCIDO EN D0_0 [ DO_0 = {DO_0} ]')
-                return None       
-                
-    def latch__outpust(self,dlgid):
-        if self.redis.hexist(dlgid, 'current_OUTPUTS'):
-            last_OUTPUTS = self.redis.hget(dlgid, 'current_OUTPUTS')
-            self.redis.hset(dlgid, 'last_OUTPUTS', last_OUTPUTS)
     
-        if self.redis.hget(dlgid, 'OUTPUTS') != '-1':
-            current_OUTPUTS = self.redis.hget(dlgid, 'OUTPUTS')
-            self.redis.hset(dlgid, 'current_OUTPUTS', current_OUTPUTS)           
+             
+    
+                
+    
+        
+      
+                
+     
            
-    def pump_time(self,channel_pump_name,no_pump):
-        #
-        name_function = f'PUMP{no_pump}_TIME'
-        #
-        from datetime import datetime, date, time, timedelta
-        #
-        pump_state = int(read_param(self.DLGID, channel_pump_name))
-        #
-        # PREPARO VARIABLES DE TIEMPO 
-        #
-        ## TIEMPO TOTAL
-        if not(self.redis.hexist(f'{self.DLGID}_ERROR', f'pump{no_pump}_total_time')):
-            self.redis.hset(f'{self.DLGID}_ERROR', f'pump{no_pump}_total_time','2020,1,1,0,0,0,0')
-            pump_total_time = datetime(2020,1,1,0,0,0,0)
-            #
-            # ESCRIBO LA VARIABLE DE VISUALIZACION
-            self.redis.hset(self.DLGID, dic.get_dic(f'PUMP{no_pump}_TOTAL_TIME', 'name'), '0 horas')
-        else:
-            # OBTENGO pump_total_time EN FORMATO datetime
-            str_pump_total_time = self.redis.hget(f'{self.DLGID}_ERROR', f'pump{no_pump}_total_time')
-            lst_pump_total_time = str_pump_total_time.split(',')
-            pump_total_time = datetime(int(lst_pump_total_time[0]),int(lst_pump_total_time[1]),int(lst_pump_total_time[2]),int(lst_pump_total_time[3]),int(lst_pump_total_time[4]),int(lst_pump_total_time[5]),int(lst_pump_total_time[6]))
-            #
-            # INCREMENTO 1 MINUTO EN pump_total_time SI LA BOMBA ESTA PRENDIDA
-            if pump_state == 1:
-                # SUMO UN MINUTO AL CONTEO DE TIEMPO
-                pump_total_time = pump_total_time + timedelta(minutes=1)
-                #
-                # VEO LA DIFERENCIA DE TIEMPO RESPECTO A LA REFERENCIA INICIAL
-                delta_total_time = pump_total_time - datetime(2020,1,1,0,0,0,0)
-                #
-                # CONVIERTO LA DIFERENCIA A HORAS
-                delta_total_time_hours = int(delta_total_time.days * 24 + delta_total_time.seconds / 3600)
-                #
-                # ESCRIBO LA VARIABLE DE VISUALIZACION
-                self.redis.hset(self.DLGID, dic.get_dic(f'PUMP{no_pump}_TOTAL_TIME', 'name'), f'{delta_total_time_hours} horas')
-                #
-                self.logs.print_out(name_function, dic.get_dic(f'PUMP{no_pump}_TOTAL_TIME', 'name'), f'{delta_total_time_hours} horas')
-            #
-            # GUARDO pump_total_time EN REDIS
-            str_pump_total_time = f'{pump_total_time.year},{pump_total_time.month},{pump_total_time.day},{pump_total_time.hour},{pump_total_time.minute},{pump_total_time.second},{pump_total_time.microsecond}'
-            self.redis.hset(f'{self.DLGID}_ERROR', f'pump{no_pump}_total_time',str_pump_total_time)
+    
             
                   
             

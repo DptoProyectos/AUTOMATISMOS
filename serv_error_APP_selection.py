@@ -129,8 +129,8 @@ def read_config_var(DLGID):
         TAG_CONFIG = redis.hget(f'{DLGID}_ERROR', 'TAG_CONFIG')
         TAG_CONFIG = TAG_CONFIG.split(',')
     else: 
-        #logs.print_inf(FUNCTION_NAME,f'NO EXISTE {DLGID}_TAG_CONFIG IN serv_error_APP_selection')
-        #logs.print_inf(FUNCTION_NAME,'NO SE EJECUTA EL SCRIPT')
+        logs.print_inf(FUNCTION_NAME,f'NO EXISTE {DLGID}_TAG_CONFIG IN serv_error_APP_selection')
+        logs.print_inf(FUNCTION_NAME,'NO SE EJECUTA EL SCRIPT')
         return ''
     #
     
