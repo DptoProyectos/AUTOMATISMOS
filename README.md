@@ -88,16 +88,19 @@ ENVIROMENT: #!/usr/aut_env/bin/python3.8
 	* ctrl_process_frec_DLGID
 	* error_process_DLGID
 * hacer que el automatismo actual funcione con recursos locales.
+* implementar el test de tx
+* buscar mejor solucion para el uso de los logs
+* meter toda la capaa de drivers dentro de la carpeta __CORE__
+* implementar todos los estados y alarmas
 - poner en archivo de configuracion todo script que use la siguiente fraccion de ruta '/datos/cgi-bin/'
 - comparar el serv_APP_selection de los automatismos con el de test DLG.
-- buscar mejor solucion para el uso de los logs
-* meter toda la capaa de drivers dentro de la carpeta __CORE__
-- en cada uno de los serv_ corregir que la ruta del archivo a llama haya que ponerla a mano.
+- en cada uno de los serv_corregir que la ruta del archivo a llama haya que ponerla a mano.
 - documentar los visio de la carperta de control de frecuencia de mercedes para drawio.
 - implemetar las funciones readAutConf y WriteAutConf contra la tabla en postgres
 - garantizar que las webVisualVars siempre esten disponibles con un valor por default
-- implementar todos los estados y alarmas
-- implementar el test de tx
+
+- ver el tema de la frecuencia
+
 
 
 

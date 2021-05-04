@@ -19,7 +19,7 @@ from CTRL_FREC.PROCESS.drv_visual import dic
 from __CORE__.drv_logs import *
 from __CORE__.drv_redis import Redis
 from __CORE__.drv_dlg import mbusWrite, read_param
-from __CORE__.mypython import config_var, str2bool
+from __CORE__.mypython import config_var, str2bool, dec2bin
 from __CORE__.drv_config import dbuser,dbpasswd,dbhost,dbaseName
 from drv_db_GDA import GDA
 
@@ -298,7 +298,64 @@ class ctrl_process(object):
             #
             # pongo en cero el registro modbus para evitar que se mande por error un valor y se comience un proceso de actualizacio de frecuencia
             mbusWrite(self.DLGID_CTRL,'2098','interger',0)
+
+    def showStatesAndAlarms(self):
+        '''
+            funcion que lee el byte que deja el plc en el LINE y lo traduce a sus correspondientes alarmas y estados
+        '''
+        
+        name_function = 'SHOW_STATES_&_ALARMS'
+
+        self.logs.print_inf('MAIN',name_function)
+               
+        decStates = int(read_param(self.DLGID_CTRL,'ST'))
+        binStates = dec2bin(decStates)
+
+        listOfAlarmsAndStates = [
+            # desctription                trueValue              falseValue              bit
+            'AlrLowFlow',                   'SI',                   'NO',                 #0
+            'StatePump',                    'ON',                   'OFF',                #1
+            'AlrLowPressure',               'SI',                   'NO',                 #2
+            'AlrLowCau',                    'SI',                   'NO',                 #3
+            'AlrLowFlow',                   'SI',                   'NO',                 #4
+            'AlrVarFail',                   'SI',                   'NO',                 #5
+            'StateVar',                     'READY',                'FAIL',               #6
+            'StateLineVar',                 'OK',                   'FAIL',               #7
+        ]
+
+        NumberOfZerosForFill = int(len(listOfAlarmsAndStates)/3) - len(binStates)
+
+        if NumberOfZerosForFill > 0:
+            # completo con ceros binStates
+            while NumberOfZerosForFill > 0:
+                binStates = '0{0}'.format(binStates)
+                NumberOfZerosForFill -= 1
+        elif NumberOfZerosForFill < 0:
+            # esto ocurre porque dentro del registro modbus se esta mandando algun bit de alarma que no esta declarado
+            self.logs.print_inf(name_function,'HAY MAS ESTADOS QUE ALARMAS DECLARADAS')
+
+        # escribo los valores de alarmas para cada uno de los bits segun declaracion en listOfAlarmsAndStates
+        bit = len(binStates)-1  
+        for valueBit in binStates:
+            if valueBit == '1':
+                self.redis.hset(self.DLGID_CTRL,listOfAlarmsAndStates[3*bit],listOfAlarmsAndStates[3*bit+1])
+                self.logs.print_out(name_function,listOfAlarmsAndStates[3*bit],listOfAlarmsAndStates[3*bit+1])
+            else:
+                self.redis.hset(self.DLGID_CTRL,listOfAlarmsAndStates[3*bit],listOfAlarmsAndStates[3*bit+2])
+                self.logs.print_out(name_function,listOfAlarmsAndStates[3*bit],listOfAlarmsAndStates[3*bit+2])
+            bit -= 1
+
             
+
+        
+
+        
+      
+        
+
+
+
+
 class errorProcess(object):  
     '''
     FUNCIONES USADAS POR ctrl_error_frec.py

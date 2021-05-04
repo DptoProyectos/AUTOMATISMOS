@@ -87,7 +87,14 @@ def bin2dec(str_in):
     Le entra un string binario y devuelve su valor en decimal
     '''
     return int(str_in, 2)
-   
+
+def dec2bin(decimal):
+            binario = ''
+            while decimal // 2 != 0:
+                binario = str(decimal % 2) + binario
+                decimal = decimal // 2
+            return str(decimal) + binario
+
 class config_var():
     '''
     
@@ -105,7 +112,6 @@ class config_var():
         my_list = self.var
         try:return my_list[my_list.index(param)+1]
         except: return None
-     
      
 # OTHERS             
 project_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # path en el que esta ubicado el proyecto                  

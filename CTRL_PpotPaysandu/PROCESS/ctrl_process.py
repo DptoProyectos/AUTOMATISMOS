@@ -59,10 +59,7 @@ def control_process(LIST_CONFIG):
     ctrl = ctrl_process(LIST_CONFIG)
     gda = GDA(dbuser,dbpasswd,dbhost,dbaseName)
     
-    #config = configparser.ConfigParser()
-    
-    
-    
+        
     #---------------------------------------------------------
     ##PROCESS
     
@@ -111,12 +108,9 @@ def control_process(LIST_CONFIG):
     redis.hset(DLGID_CTRL,'PLC_LocalMode','SI')
     
 
-
-    # REVISO EL MODO DE TRABAJO WEB
+    # DETECTO MODO DE TRABAJO
     if SOFT_Mode == 'EMERGENCIA':
         logs.print_inf(name_function, 'TRABAJO EN MODO EMERGENCIA')
-
-
 
     elif SOFT_Mode == 'REMOTO':
         logs.print_inf(name_function, 'TRABAJO EN MODO REMOTO')
@@ -131,21 +125,18 @@ def control_process(LIST_CONFIG):
         if WEB_ActionPump == 'ON':
             ctrl.setFrequency(WEB_Frequency)
 
-
-
-
     elif SOFT_Mode == 'LOCAL':
         logs.print_inf(name_function,"TRABAJANDO EN MODO LOCAL DESDE EL TABLERO")
         #
         # disparo alarma para que se muestre en la web que se esta trabajando en modo local
         redis.hset(DLGID_CTRL,'PLC_LocalMode','SI')
 
-
-
     else:
         logs.print_error(name_function, 'MODO DE TRABAJO NO ADMITIDO')
 
 
+    # Preparo para la visualizacion web los estados y alarmas del sistema
+    ctrl.showStatesAndAlarms()
     
     #
     # CALCULO TIEMPO DE DEMORA
