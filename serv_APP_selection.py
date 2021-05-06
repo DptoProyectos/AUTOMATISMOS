@@ -19,6 +19,8 @@ from __CORE__.mypython import config_var, lst2str, str2lst
 from __CORE__.drv_redis import Redis
 from __CORE__.drv_logs import ctrl_logs
 from __CORE__.drv_config import allowedTypes, project_path
+from __CORE__.drv_db_GDA import GDA
+from __CORE__.drv_config import dbUrl
 from time import time   
 sel_start_time = time() 
 
@@ -126,7 +128,8 @@ def upgrade_config(DLGID_CTRL,LIST_CONFIG):
     n = 4
     for param in LIST_CONFIG:
         if n < (len(LIST_CONFIG)): 
-            redis.hset(DLGID_CTRL,LIST_CONFIG[n],LIST_CONFIG[n+1])
+            redis.hset(DLGID_CTRL,LIST_CONFIG[n],LIST_CONFIG[n+1])              # escritura de valores en la redis
+            gda.InsertAutConf(DLGID_CTRL,LIST_CONFIG[n],LIST_CONFIG[n+1])       # escritura de valores en dbGda
             n += 2
     
     # ELIMINO LAS VARIABLES DE CONFIGURACION ANTERIORES
@@ -268,6 +271,7 @@ name_function = 'APP_SELECTION'
 ## INSTANCIAS
 logs = ctrl_logs(False,'servAppSelection',DLGID_CTRL,print_log)
 redis = Redis()
+gda = GDA(dbUrl)
 
 # SE CORRE EL PROCESO DE LAS PERFORACIONES EN PERL
 run_perforation_process(DLGID_CTRL)

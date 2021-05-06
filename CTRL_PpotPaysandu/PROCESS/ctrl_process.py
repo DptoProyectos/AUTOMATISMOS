@@ -22,9 +22,10 @@ from __CORE__.mypython import str2bool, config_var
 from __CORE__.drv_logs import ctrl_logs
 from __CORE__.drv_redis import Redis
 from __CORE__.drv_dlg import mbusWrite
-from __CORE__.drv_config import dbuser,dbpasswd,dbhost,dbaseName
+from __CORE__.drv_config import dbUrl
+from __CORE__.drv_db_GDA import GDA
 from CTRL_PpotPaysandu.PROCESS.ctrl_library import ctrl_process
-from drv_db_GDA import GDA
+
 
 #from CTRL_FREC.PROCESS.drv_visual import dic
 
@@ -57,7 +58,7 @@ def control_process(LIST_CONFIG):
     logs = ctrl_logs(TYPE,'CTRL_PpotPaysandu',DLGID_CTRL,print_log)
     redis = Redis()
     ctrl = ctrl_process(LIST_CONFIG)
-    gda = GDA(dbuser,dbpasswd,dbhost,dbaseName)
+    gda = GDA(dbUrl)
     
         
     #---------------------------------------------------------
@@ -83,7 +84,8 @@ def control_process(LIST_CONFIG):
         logs.print_inf(name_function,'EJECUCION INTERRUMPIDA')
         quit()
     
-    
+    # Garantizo que las variables que se van a usar en la visualizacion siempre existan
+    ctrl.setVisualVars()
     
     WEB_Mode = gda.readAutConf(DLGID_CTRL,'WEB_Mode')
     WEB_ActionPump = gda.readAutConf(DLGID_CTRL,'WEB_ActionPump')

@@ -10,57 +10,52 @@ Version 2.1.1 07-06-2020
 ''' 
 
 # CANEXIONES
-from sqlalchemy import create_engine
-from sqlalchemy import text
+from sqlalchemy import Table, select, create_engine, MetaData, update
+from sqlalchemy.orm import sessionmaker
 from collections import defaultdict
-from __CORE__.drv_config import dbuser,dbpasswd,dbhost,dbaseName
+from __CORE__.drv_config import dbUrl
+
 
 class GDA(object):
     '''
-        trabajo con base de datos con la estructura GDA
-        parametros necesarios
-        dbuser
-        dbpasswd
-        dbhost
-        dbaseName
+        
     '''
 
-    def __init__(self, dbuser = dbuser, dbpasswd = dbpasswd, dbhost = dbhost, dbaseName = dbaseName ):
-        '''
-        Constructor
-        '''
-        self.datasource = ''
-        self.engine = ''
-        self.conn = ''
-        self.connected = False
-        self.url = 'mysql://{0}:{1}@{2}/{3}'.format(dbuser,dbpasswd,dbhost,dbaseName)
-        
+    def __init__(self,dbUrl):
+            '''
+                Constructor
+            '''
+            self.engine = None
+            self.conn = None
+            self.connected = False
+            self.metadata = None
+            self.session = None
+            #self.url = 'mysql+pymysql://pablo:spymovil@192.168.0.8/GDA'
+            #self.url = 'postgresql+psycopg2://admin:pexco599@192.168.0.6/GDA'
+            self.url = dbUrl
+
     def connect(self):
         """
-        Retorna True/False si es posible generar una conexion a la bd GDA
+            Retorna True/False si es posible generar una conexion a la bd GDA
         """
-        
-        if self.connected:
-            return self.connected
-        
         try:
             self.engine = create_engine(self.url)
+            Session = sessionmaker(bind=self.engine) 
+            self.session = Session()
         except Exception as err_var:
-            self.connected = False
-            print('ERROR_{0}: engine NOT created. ABORT !!'.format(dbaseName))
-            print('ERROR: EXCEPTION_{0} {1}'.format(dbaseName, err_var))
-            exit(1)
-        
+            print('ERROR: engine NOT created. ABORT !!')
+            print('ERROR: EXCEPTION {0}'.format(err_var))
+            return False
+
         try:
             self.conn = self.engine.connect()
-            self.connected = True
         except Exception as err_var:
-            self.connected = False
-            print('ERROR_{0}: NOT connected. ABORT !!'.format(dbaseName))
-            print('ERROR: EXCEPTION_{0} {1}'.format(dbaseName, err_var))
-            exit(1)
+            print('ERROR: NOT connected. ABORT !!')
+            print('ERROR: EXCEPTION {0}'.format(err_var))
+            return False
 
-        return self.connected
+        self.metadata = MetaData()
+        return True
 
     def read_all_dlg_conf(self, dlgid):
         '''
@@ -114,29 +109,137 @@ class GDA(object):
         key = (canal, param)
         return dlg_config.get(key)
         
-    def readAutConf(self,autoId,param):
+    def readAutConf(self,dlgId,param):
+        '''
+            lee el valor del parametro param para el dlgId de GDA
+        '''
+
+        # establecemos conexion a la bd en caso de que no exista
+        if not self.connected:
+            if self.connect():
+                self.connected = True
+            
+        # si la conexion fue exitosa
+        if self.connected:
+            
+            tb_automatismo = Table('automatismo', self.metadata, autoload=True, autoload_with=self.engine)
+            tb_automatismoParametro = Table('automatismo_parametro', self.metadata, autoload=True, autoload_with=self.engine)
+            
+            # obtengo el valor del id del automatismo   
+            sel = select([tb_automatismo.c.id])
+            sel = sel.where(tb_automatismo.c.dlgid == dlgId)
+            autoId = self.conn.execute(sel)
+            autoId = autoId.fetchall()
+
+            if autoId:
+                # obtengo el valor del parametro  
+                autoId = autoId[0][0]
+                sel = select([tb_automatismoParametro.c.valor])
+                sel = sel.where(tb_automatismoParametro.c.auto_id == autoId)
+                sel = sel.where(tb_automatismoParametro.c.nombre == param)
+                value = self.conn.execute(sel)
+                
+                value = value.fetchall()
+                if value: return value[0][0]
+
+    def WriteAutConf(self,dlgId,param,value):
         """
-            lee el valor de parametro para el automatismo autoId de la tabla automatismo_parametro de GDA
-            en caso de no encontrar los parametros de configuracion retorna false 
+            actualiza el valor de parametro para el automatismo autoId de la tabla automatismo_parametro de GDA
         """
+        # establecemos conexion a la bd en caso de que no exista
+        if not self.connected:
+            if self.connect():
+                self.connected = True
 
-        autoId = 'AutConfTable'
+        # si la conexion fue exitosa
+        if self.connected:
+            tb_automatismo = Table('automatismo', self.metadata, autoload=True, autoload_with=self.engine)
+            tb_automatismoParametro = Table('automatismo_parametro', self.metadata, autoload=True, autoload_with=self.engine)
 
-        from drv_redis import Redis
-        redis = Redis()
-        return redis.hget(autoId,param)
-        #return false
+            # obtengo el valor del id del automatismo   
+            sel = select([tb_automatismo.c.id])
+            sel = sel.where(tb_automatismo.c.dlgid == dlgId)
+            rps = self.conn.execute(sel)
+            rps = rps.fetchall()[0][0]
 
-    def WriteAutConf(self,autoId,param,value):
-        """
-            escribe el valor de parametro para el automatismo autoId de la tabla automatismo_parametro de GDA
-        """
+            # actualizo el valor del parametro
+            update_statement = tb_automatismoParametro.update()\
+                .where(tb_automatismoParametro.c.auto_id == rps)\
+                .where(tb_automatismoParametro.c.nombre == param)\
+                .values(valor = value)
 
-        autoId = 'AutConfTable'
+            self.engine.execute(update_statement)
 
-        from drv_redis import Redis
-        redis = Redis()
-        redis.hset(autoId,param,value)
+    def InsertAutConf(self,dlgId,param,value):
+        '''
+            Inserto o actualizo un nuevo dato
+        '''
+        # establecemos conexion a la bd en caso de que no exista
+        if not self.connected:
+            if self.connect():
+                self.connected = True
+        
+        # si la conexion fue exitosa
+        if self.connected:
+            tb_automatismo = Table('automatismo', self.metadata, autoload=True, autoload_with=self.engine)
+            tb_automatismoParametro = Table('automatismo_parametro', self.metadata, autoload=True, autoload_with=self.engine)
+            
+            # reviso si el dlg ya existe
+            dlgExist = True
+            try:
+                # obtengo el valor del id del automatismo   
+                sel = select([tb_automatismo.c.id])
+                sel = sel.where(tb_automatismo.c.dlgid == dlgId)
+                autoId = self.conn.execute(sel)
+                autoId = autoId.fetchall()[0][0]
+            except:
+                dlgExist = False
+            
+            # si el dlg no existe lo inserto en la tabla automatismos
+            if not dlgExist:
+                insert_statement = tb_automatismo.insert()\
+                .values(dlgid = dlgId)
+                self.engine.execute(insert_statement)
+
+                # obtengo el valor del nuevo id del automatismo creado
+                sel = select([tb_automatismo.c.id])
+                sel = sel.where(tb_automatismo.c.dlgid == dlgId)
+                autoId = self.conn.execute(sel)
+                autoId = autoId.fetchall()[0][0]
+            
+            # chequeo si existe el parametro para el datalogger
+            paramExist = True
+            try:
+                # obtengo el valor del id del automatismo   
+                sel = select([tb_automatismoParametro.c.id])
+                sel = sel.where(tb_automatismoParametro.c.auto_id == autoId)
+                sel = sel.where(tb_automatismoParametro.c.nombre == param)
+                rps = self.conn.execute(sel)
+                rps = rps.fetchall()[0][0]
+            except:
+                paramExist = False
+
+            # si el parametro no existe lo inserto en la tabla automatismos con su correspondiente valor
+            if not paramExist:
+                insert_statement = tb_automatismoParametro.insert()\
+                .values(auto_id = autoId)\
+                .values(nombre = param)\
+                .values(valor = value)
+                self.engine.execute(insert_statement)
+
+            # si el parametro existe le hacemos un update
+            else:
+                # actualizo el valor del parametro
+                update_statement = tb_automatismoParametro.update()\
+                    .where(tb_automatismoParametro.c.auto_id == autoId)\
+                    .where(tb_automatismoParametro.c.nombre == param)\
+                    .values(valor = value)
+
+                self.engine.execute(update_statement)
+
+            
+
+
         
 
 

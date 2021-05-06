@@ -98,8 +98,9 @@ ENVIROMENT: #!/usr/aut_env/bin/python3.8
 - documentar los visio de la carperta de control de frecuencia de mercedes para drawio.
 - implemetar las funciones readAutConf y WriteAutConf contra la tabla en postgres
 - garantizar que las webVisualVars siempre esten disponibles con un valor por default
+- implementar una fucion del tipo redis.hdel(DLGID_CTRL, param) para GDA y ponerla en ambos servicios
 
-- ver el tema de la frecuencia
+
 
 
 

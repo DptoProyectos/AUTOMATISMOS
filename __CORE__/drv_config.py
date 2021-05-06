@@ -24,13 +24,7 @@ from __CORE__.mypython import str2bool, str2lst
         allowedTypes         lista con valores que puede tener la variabl de redis DLGID:TYPE para que se corra el automatismo
         
         !DATABASE
-        dbuser               usuario con acceso a la base
-        dbpasswd             password para acceder a la base
-        dbhost               host en donde se encuentra la base
-        dbaseName            nombre de la base de datos
-        
-        
-        
+        dbUrl                url de la base de datos para realizar la conexion
 '''
 
 project_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -51,10 +45,7 @@ allowedTypes = str2lst(serv_APP_config['GENERAL_CONFIG']['allowedTypes'])
 
 
 # SQL_config2use
-dbuser = serv_APP_config[sql_config2use]['dbuser']
-dbpasswd = serv_APP_config[sql_config2use]['dbpasswd']
-dbhost = serv_APP_config[sql_config2use]['dbhost']
-dbaseName = serv_APP_config[sql_config2use]['dbaseName']
+dbUrl = serv_APP_config[sql_config2use]['dbUrl']
 
 
 # REDIS_config2use

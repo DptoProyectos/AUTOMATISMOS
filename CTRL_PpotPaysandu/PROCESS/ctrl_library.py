@@ -20,7 +20,7 @@ from __CORE__.drv_logs import *
 from __CORE__.drv_redis import Redis
 from __CORE__.drv_dlg import mbusWrite, read_param
 from __CORE__.mypython import config_var, str2bool, dec2bin
-from __CORE__.drv_config import dbuser,dbpasswd,dbhost,dbaseName
+from __CORE__.drv_config import dbUrl
 from drv_db_GDA import GDA
 
 
@@ -53,7 +53,7 @@ class ctrl_process(object):
         ## INSTANCIAS
         self.logs = ctrl_logs(self.TYPE,'CTRL_PpotPaysandu',self.DLGID_CTRL,self.print_log)
         self.redis = Redis()
-        self.gda = GDA(dbuser,dbpasswd,dbhost,dbaseName)
+        self.gda = GDA(dbUrl)
 
     def getAndUpdateMode(self,WEB_Mode):
         '''
@@ -345,7 +345,10 @@ class ctrl_process(object):
                 self.logs.print_out(name_function,listOfAlarmsAndStates[3*bit],listOfAlarmsAndStates[3*bit+2])
             bit -= 1
 
-            
+    def setVisualVars(self):
+
+        ## webControlVars ##
+        #if not gda.
 
         
 
