@@ -75,7 +75,7 @@ class GDA(object):
         self.metadata = MetaData()
         return True
 
-    def readAutTable(self,dlgId,param):
+    def readAutConf(self,dlgId,param):
         '''
             lee el valor del parametro param para el dlgId de GDA
         '''
@@ -92,27 +92,55 @@ class GDA(object):
 
     def WriteAutConf(self,dlgId,param,value):
         """
-            escribe el valor de parametro para el automatismo autoId de la tabla automatismo_parametro de GDA
+            actualiza el valor de parametro para el automatismo autoId de la tabla automatismo_parametro de GDA
         """
-        tableAuto = Table('automatismo', self.metadata, autoload=True, autoload_with=self.engine)
+        tb_automatismo = Table('automatismo', self.metadata, autoload=True, autoload_with=self.engine)
+        tb_automatismoParametro = Table('automatismo_parametro', self.metadata, autoload=True, autoload_with=self.engine)
 
-        obj = self.session.query(tableAuto).filter(tableAuto.c.id == 2)
-        #tableAuto = self.engine.query(automatismo).filter(automatismo.id == 2)
-        #tableAuto = self.metadata.query(automatismo).filter(automatismo.id == 2)
-
-        '''
-        tableAuto = Table('automatismo', self.metadata, autoload=True, autoload_with=self.engine)
-        tableAutoParam = Table('automatismo_parametro', self.metadata, autoload=True, autoload_with=self.engine)
-        
-        myJoin = tableAutoParam.join(tableAuto, tableAutoParam.c.id == tableAuto.c.id)
-        sel = update({tableAutoParam.c.valor: value})
-        sel = sel.where(tableAuto.c.dlgid == dlgId)
-        sel = sel.where(tableAutoParam.c.nombre == param)
+        # obtengo el valor del id del automatismo   
+        sel = select([tb_automatismo.c.id])
+        sel = sel.where(tb_automatismo.c.dlgid == dlgId)
         rps = self.conn.execute(sel)
-        #print(rps)
-        #rps = rps.fetchall()[0][0]
-        #print(rps)
-        '''
+        rps = rps.fetchall()[0][0]
+
+        # actualizo el valor del parametro
+        update_statement = tb_automatismoParametro.update()\
+            .where(tb_automatismoParametro.c.auto_id == rps)\
+            .where(tb_automatismoParametro.c.nombre == param)\
+            .values(valor = value)
+
+        self.engine.execute(update_statement)
+
+    def InsertAutConf(self,dlgId,param,value):
+        tb_automatismo = Table('automatismo', self.metadata, autoload=True, autoload_with=self.engine)
+        tb_automatismoParametro = Table('automatismo_parametro', self.metadata, autoload=True, autoload_with=self.engine)
+        
+        # reviso si el dlg ya existe
+        dlgExist = True
+        try:
+            # obtengo el valor del id del automatismo   
+            sel = select([tb_automatismo.c.id])
+            sel = sel.where(tb_automatismo.c.dlgid == dlgId)
+            rps = self.conn.execute(sel)
+            rps = rps.fetchall()[0][0]
+        except:
+            dlgExist = False
+           
+        # si el dlg no existe lo inserto en la tabla automatismos
+        if not dlgExist:
+            insert_statement = tb_automatismo.insert()\
+            .values(dlgid = dlgId)
+            self.engine.execute(insert_statement)
+
+        # obtengo el valor del id del automatismo   
+        sel = select([tb_automatismo.c.id])
+        sel = sel.where(tb_automatismo.c.dlgid == dlgId)
+        rps = self.conn.execute(sel)
+        rps = rps.fetchall()[0][0]
+
+        print(rps)
+        
+        
     
 
 
@@ -124,7 +152,9 @@ if gda.connect():
     #print(gda.leer_df_inits())
     #print(gda.readAutTable('CTRLPAY01','WEB_Mode'))
     #print(gda.WriteAutConf('CTRLPAY01','WEB_Mode','LOCAL'))
-    gda.WriteAutConf('CTRLPAY01','WEB_Mode','LOCAL')
+    gda.InsertAutConf('CTRLPAY09','WEB_Mode','EMERGENCIA')
+    #gda.WriteAutConf('CTRLPAY01','WEB_ActionPump','ON')
+    #gda.WriteAutConf('CTRLPAY01','WEB_Frequency',0)
     #readAutTable('CTRLPAY01','WEB_Mode')
     #gda.leer_df_inits()
 else:
