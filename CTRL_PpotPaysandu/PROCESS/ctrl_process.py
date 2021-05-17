@@ -90,8 +90,7 @@ def control_process(LIST_CONFIG):
     WEB_Mode = gda.readAutConf(DLGID_CTRL,'WEB_Mode')
     WEB_ActionPump = gda.readAutConf(DLGID_CTRL,'WEB_ActionPump')
     WEB_Frequency = int(gda.readAutConf(DLGID_CTRL,'WEB_Frequency'))
-    print()
-
+    
     # muestro logs con variables de configuracio
     logs.print_in(name_function, 'WEB_Mode', WEB_Mode)
     logs.print_in(name_function, 'WEB_ActionPump', WEB_ActionPump)
@@ -104,18 +103,16 @@ def control_process(LIST_CONFIG):
    
     # muestro logs de las variables de entrada del software
     logs.print_in(name_function, 'SOFT_Mode', SOFT_Mode)
-
     
-    # desativo la alarma para que se muestre en la web que se esta trabajando en modo local
-    redis.hset(DLGID_CTRL,'PLC_LocalMode','SI')
-    
-
+     
     # DETECTO MODO DE TRABAJO
     if SOFT_Mode == 'EMERGENCIA':
         logs.print_inf(name_function, 'TRABAJO EN MODO EMERGENCIA')
+        redis.hset(DLGID_CTRL,'PLC_SoftMode','EMERGENCIA')
 
     elif SOFT_Mode == 'REMOTO':
         logs.print_inf(name_function, 'TRABAJO EN MODO REMOTO')
+        redis.hset(DLGID_CTRL,'PLC_SoftMode','REMOTO')
         #
         # accion sobre la bomba
         if not WEB_ActionPump in ['ON','OFF']:
@@ -129,10 +126,8 @@ def control_process(LIST_CONFIG):
 
     elif SOFT_Mode == 'LOCAL':
         logs.print_inf(name_function,"TRABAJANDO EN MODO LOCAL DESDE EL TABLERO")
-        #
-        # disparo alarma para que se muestre en la web que se esta trabajando en modo local
-        redis.hset(DLGID_CTRL,'PLC_LocalMode','SI')
-
+        redis.hset(DLGID_CTRL,'PLC_SoftMode','LOCAL')
+        
     else:
         logs.print_error(name_function, 'MODO DE TRABAJO NO ADMITIDO')
 
