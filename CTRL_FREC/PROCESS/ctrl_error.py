@@ -82,43 +82,46 @@ def error_process(LIST_CONFIG):
     
     # CHEQUEO ERROR TX
     logs.print_inf(name_function, 'TEST_TX_ERRORS')
-    # LLAMO A FUNCIONES QUE SOLO CORREN SI NO HAY ERROR TX
-    if e.test_tx():
-    #if True:
-        #
-        # LLAMAO A FUNCIONES QUE SOLO CORREN CON DATALOGGER 8CH Y SIN ERRORES TX
-        if dlg_detection(DLGID) == '8CH':
-            #
-            # DETECCION DE EVENTOS
-            logs.print_inf(name_function, 'EVENT_DETECTION')
-            e.event_detection()
-            #
-            # ALTERNO LAS SALIDAS
-            logs.print_inf(name_function, 'SWITCH_OUTPUTS')
-            e.switch_outputs()
-            #
-            # TESTEO LAS SALIDAS
-            logs.print_inf(name_function, 'TEST_OUTPUTS')
-            state_test_outputs = e.test_outputs()
-            #
-            # PREPARO VARIABLES DE TIEMPO QUE SE MUESTRAN EN LA VISUALIZACION
-            logs.print_inf(name_function, 'PUMP1_TIME')
-            e.pump_time('BR1',1)
-            #
-        elif dlg_detection(DLGID) == '5CH':
-            # DATALOGGER DE 5CH DETECTADO
-            #
-            logs.print_inf(name_function, 'DLG 5CH NO SE DETECTAN EVENTOS')
-            logs.print_inf(name_function, 'DLG 5CH NO SE ALTERNAN SALIDAS')
-            
+    
+    testTxResult = e.test_tx()          # chequeo estado de transmision del equipo
+
+    if testTxResult != 'noLine':
+        if testTxResult:
+            # LLAMAO A FUNCIONES QUE SOLO CORREN CON DATALOGGER 8CH Y SIN ERRORES TX
+            if dlg_detection(DLGID) == '8CH':
+                #
+                # DETECCION DE EVENTOS
+                logs.print_inf(name_function, 'EVENT_DETECTION')
+                e.event_detection()
+                #
+                # ALTERNO LAS SALIDAS
+                logs.print_inf(name_function, 'SWITCH_OUTPUTS')
+                e.switch_outputs()
+                #
+                # TESTEO LAS SALIDAS
+                logs.print_inf(name_function, 'TEST_OUTPUTS')
+                state_test_outputs = e.test_outputs()
+                #
+                # PREPARO VARIABLES DE TIEMPO QUE SE MUESTRAN EN LA VISUALIZACION
+                logs.print_inf(name_function, 'PUMP1_TIME')
+                e.pump_time('BR1',1)
+                #
+            elif dlg_detection(DLGID) == '5CH':
+                # DATALOGGER DE 5CH DETECTADO
+                #
+                logs.print_inf(name_function, 'DLG 5CH NO SE DETECTAN EVENTOS')
+                logs.print_inf(name_function, 'DLG 5CH NO SE ALTERNAN SALIDAS')
+                
+            else:
+                # NO SE DETECTA EL TIPO DE DATALOGGER
+                #
+                logs.print_inf(name_function, 'NO SE DETECTA EL TIPO DE DATALOGGER')
+                logs.script_performance(f'{name_function} => NO SE DETECTA EL TIPO DE DATALOGGER')
         else:
-            # NO SE DETECTA EL TIPO DE DATALOGGER
-            #
-            logs.print_inf(name_function, 'NO SE DETECTA EL TIPO DE DATALOGGER')
-            logs.script_performance(f'{name_function} => NO SE DETECTA EL TIPO DE DATALOGGER')
+            logs.print_inf(name_function, 'NO SE DETECTAN EVENTOS POR ERROR TX')
     else:
-        logs.print_inf(name_function, 'NO SE DETECTAN EVENTOS POR ERROR TX')
-            
+        logs.print_inf(name_function, f'NO EXISTE VARIABLE LINE EN {DLGID}')
+        logs.print_inf(name_function, f'NO SE EJECUTA {name_function}')        
     #
     logs.print_inf(name_function, 'VISUAL')
     e.visual()

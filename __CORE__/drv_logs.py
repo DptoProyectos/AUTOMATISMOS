@@ -18,7 +18,7 @@ import logging.handlers
 
 #CONEXIONES
 from __CORE__.drv_dlg import read_param
-from __CORE__.drv_config import path_log,project_path,easy_log
+from __CORE__.drv_config import project_path,easy_log
 from io import open
 from __CORE__.mypython import system_date,system_date_raw,system_hour
 
@@ -29,7 +29,7 @@ class saved_logs(object):
         
         header => 07/06/2020 20:01:22 [MER001] TEXTO
     '''
-    def __init__(self,name_log, dlgid = 'null', path_log = path_log):
+    def __init__(self,name_log, dlgid = 'null', path_log = ''):
         '''
             name_log = nombre del archivo que va a servir de log
             dlgid    = datalogger que genera el log.

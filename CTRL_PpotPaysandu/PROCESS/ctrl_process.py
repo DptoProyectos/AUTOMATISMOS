@@ -12,9 +12,7 @@ Version 1.0.0 15-04-2021 11:19
 
 ## LIBRERIAS EXTERNAS
 from time import time  
-#import sys
-#import os
-#import configparser
+
 
 
 ## CONEXIONES DE ARCHIVOS
@@ -27,10 +25,6 @@ from __CORE__.drv_db_GDA import GDA
 from CTRL_PpotPaysandu.PROCESS.ctrl_library import ctrl_process
 
 
-#from CTRL_FREC.PROCESS.drv_visual import dic
-
-
-#from __CORE__.drv_config import serv_APP_config
 
 
 
@@ -86,11 +80,17 @@ def control_process(LIST_CONFIG):
     
     # Garantizo que las variables que se van a usar en la visualizacion siempre existan
     ctrl.setVisualVars()
+
+    # Garantizo que las variable de control esten siempre disponibles para el automatismo
+    ctrl.checkAndSetControlVars()
+    # me quede por aquiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii
+
+    #
     
     WEB_Mode = gda.readAutConf(DLGID_CTRL,'WEB_Mode')
     WEB_ActionPump = gda.readAutConf(DLGID_CTRL,'WEB_ActionPump')
     WEB_Frequency = int(gda.readAutConf(DLGID_CTRL,'WEB_Frequency'))
-    
+    print()
 
     # muestro logs con variables de configuracio
     logs.print_in(name_function, 'WEB_Mode', WEB_Mode)

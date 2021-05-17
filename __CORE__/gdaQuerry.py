@@ -17,7 +17,7 @@ where auto_id = '2'
 and nombre = 'WEB_Mode'
 '''
 
-from sqlalchemy import Table, select, create_engine, MetaData, update
+from sqlalchemy import Table, select, create_engine, MetaData, update, delete
 from sqlalchemy.orm import sessionmaker
 
 engine = None
@@ -176,10 +176,31 @@ class GDA(object):
 
             self.engine.execute(update_statement)
 
-            
+    def DeleteAutConf(self,dlgId,param):
+        tb_automatismo = Table('automatismo', self.metadata, autoload=True, autoload_with=self.engine)
+        tb_automatismoParametro = Table('automatismo_parametro', self.metadata, autoload=True, autoload_with=self.engine)
+        
+        # obtengo el valor del id del automatismo   
+        sel = select([tb_automatismo.c.id])
+        sel = sel.where(tb_automatismo.c.dlgid == dlgId)
+        autoId = self.conn.execute(sel)
+        autoId = autoId.fetchall()[0][0]
+        print(autoId)
 
-
-
+        # obtengo el valor del id del automatismo   
+        sel = select([tb_automatismoParametro.c.id])
+        sel = sel.where(tb_automatismoParametro.c.auto_id == autoId)
+        sel = sel.where(tb_automatismoParametro.c.nombre == param)
+        paramId = self.conn.execute(sel)
+        paramId = paramId.fetchall()[0][0]
+        print(paramId)
+                
+        # elimino el paramatro
+        sql = (delete(tb_automatismoParametro)
+            .where(tb_automatismoParametro.c.id == paramId))
+        self.conn.execute(sql)
+        
+       
 gda = GDA()
 
 
@@ -188,7 +209,9 @@ if gda.connect():
     #print(gda.leer_df_inits())
     #print(gda.readAutTable('CTRLPAY01','WEB_Mode'))
     #print(gda.WriteAutConf('CTRLPAY01','WEB_Mode','LOCAL'))
-    #gda.InsertAutConf('CTRLPAY06','WEB_Mode','EMERGENCIA')
+    gda.InsertAutConf('CTRLPAY01','WEB_Frequency','EMERGENCIA')
+    print(gda.readAutConf('CTRLPAY01','WEB_Frequency'))
+    gda.DeleteAutConf('CTRLPAY01','WEB_Frequency')
     print(gda.readAutConf('CTRLPAY01','WEB_Frequency'))
     #gda.WriteAutConf('CTRLPAY01','WEB_ActionPump','ON')
     #gda.WriteAutConf('CTRLPAY01','WEB_Frequency',0)

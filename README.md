@@ -92,11 +92,12 @@ ENVIROMENT: #!/usr/aut_env/bin/python3.8
 * buscar mejor solucion para el uso de los logs
 * meter toda la capaa de drivers dentro de la carpeta __CORE__
 * implementar todos los estados y alarmas
-- poner en archivo de configuracion todo script que use la siguiente fraccion de ruta '/datos/cgi-bin/'
-- comparar el serv_APP_selection de los automatismos con el de test DLG.
-- en cada uno de los serv_corregir que la ruta del archivo a llama haya que ponerla a mano.
+* poner en archivo de configuracion todo script que use la siguiente fraccion de ruta '/datos/cgi-bin/'
+* comparar el serv_APP_selection de los automatismos con el de test DLG.
+* en cada uno de los serv_corregir que la ruta del archivo a llama haya que ponerla a mano.
+* implemetar las funciones readAutConf y WriteAutConf contra la tabla en postgres
 - documentar los visio de la carperta de control de frecuencia de mercedes para drawio.
-- implemetar las funciones readAutConf y WriteAutConf contra la tabla en postgres
+
 - garantizar que las webVisualVars siempre esten disponibles con un valor por default
 - implementar una fucion del tipo redis.hdel(DLGID_CTRL, param) para GDA y ponerla en ambos servicios
 

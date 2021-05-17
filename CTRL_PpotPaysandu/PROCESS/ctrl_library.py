@@ -1,6 +1,6 @@
 #!/usr/aut_env/bin/python3.8
 '''
-LIBRERIA DE APLICACION CTRL_FREC
+LIBRERIA DE APLICACION CTRL_PpotPaysandu
 
 Created on 16 mar. 2020 
 
@@ -35,7 +35,6 @@ class ctrl_process(object):
     '''
     FUNCIONES USADAS POR ctrl_process.py
     '''
-    
     def __init__(self,LIST_CONFIG):
         '''
         Constructor
@@ -346,12 +345,27 @@ class ctrl_process(object):
             bit -= 1
 
     def setVisualVars(self):
-
-        ## webControlVars ##
-        #if not gda.
-
+        '''
+            garantizo que las variables de visualizacion siempre existan
+        '''
         
+        pass
 
+    def checkAndSetControlVars(self):
+        '''
+            garantizo que las variables de control siempre existan
+        '''
+        # WEB_Mode
+        if not self.gda.readAutConf(self.DLGID_CTRL,'WEB_Mode' ):
+            self.gda.InsertAutConf(self.DLGID_CTRL, 'WEB_Mode', 'REMOTO')
+
+        # WEB_ActionPump
+        if not self.gda.readAutConf(self.DLGID_CTRL,'WEB_ActionPump' ):
+            self.gda.InsertAutConf(self.DLGID_CTRL, 'WEB_ActionPump', 'OFF')
+
+        # WEB_Frequency
+        if not self.gda.readAutConf(self.DLGID_CTRL,'WEB_Frequency' ):
+            self.gda.InsertAutConf(self.DLGID_CTRL, 'WEB_Frequency', 0)
         
       
         

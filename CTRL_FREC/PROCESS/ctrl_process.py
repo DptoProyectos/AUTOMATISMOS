@@ -22,8 +22,8 @@ from __CORE__.drv_logs import ctrl_logs
 from __CORE__.mypython import str2bool, config_var
 from __CORE__.drv_dlg import emerg_system, read_param
 from time import time  
-#from drv_db_GDA import GDA
 from __CORE__.drv_config import serv_APP_config
+from CTRL_FREC.PROCESS.ctrl_library import ctrlProcess
 
 ctrl_start_time = time() 
 
@@ -57,13 +57,17 @@ def control_process(LIST_CONFIG):
     
     redis.no_execution('MER004')
     
+    '''
     # INSTANCIA DE error_process
     import importlib.util
     #spec = importlib.util.spec_from_file_location("archivo", f"../{TYPE}/PROCESS/ctrl_library.py")
     spec = importlib.util.spec_from_file_location("archivo", f"/datos/cgi-bin/spx/AUTOMATISMOS/{TYPE}/PROCESS/ctrl_library.py")
     archivo = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(archivo)
-    p = archivo.ctrl_process(LIST_CONFIG)
+    p = archivo.ctrl_process(LIST_CONFIG)'''
+
+    p = ctrlProcess(LIST_CONFIG)
+
     
     # OBTENFO LA CARPETA EN DONDE SE ENCUENTRA EL ARCHIVO ACTUAL
     current_path = os.path.dirname(os.path.abspath(__file__))

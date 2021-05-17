@@ -27,7 +27,7 @@ from posix import read
 
 
 # CLASES DE LA LIBRERIA
-class ctrl_process(object):
+class ctrlProcess(object):
     '''
     FUNCIONES USADAS POR ctrl_process_frec.py
     '''
@@ -51,6 +51,7 @@ class ctrl_process(object):
         self.TYPE_IN_FREC = self.config.lst_get('TYPE_IN_FREC')
         self.DLGID_REF_1 = self.config.lst_get('DLGID_REF_1')
         self.CHANNEL_REF_1 = self.config.lst_get('CHANNEL_REF_1')
+        self.PROGRAMMED_FREC =self.config.lst_get('PROGRAMMED_FREC')
         
         ## INSTANCIAS
         self.logs = ctrl_logs(self.TYPE,'CTRL_FREC_process',self.DLGID_CTRL,self.print_log)
@@ -275,8 +276,9 @@ class ctrl_process(object):
         
         name_function = 'SHOW_WORK_FREQUENCY'
         
-        str_PROGRAMMED_FREC = self.redis.hget(self.DLGID_CTRL, 'PROGRAMMED_FREC')
-        lst_PROGRAMMED_FREC = str_PROGRAMMED_FREC.split('/')
+        #str_PROGRAMMED_FREC = self.redis.hget(self.DLGID_CTRL, 'PROGRAMMED_FREC')
+        #str_PROGRAMMED_FREC = self.conf.lst_get('DLGID_CTRL') 
+        lst_PROGRAMMED_FREC = self.PROGRAMMED_FREC.split('/')
         
         if self.redis.hexist(self.DLGID_CTRL, 'FREC'):
             FREC = int(self.redis.hget(self.DLGID_CTRL, 'FREC'))
@@ -361,9 +363,7 @@ class ctrl_process(object):
         else:
             self.redis.hdel(self.DLGID_CTRL, 'delta_ref1_ref')
             self.logs.print_inf(name_function, 'NO HAY SISTEMA DE REFERENCIA 1')
-            
-    
-            
+ 
         
 class error_process(object):  
     '''
@@ -410,10 +410,7 @@ class error_process(object):
         
         # CHEQUEO SI EXISTE EL LINE EN EL DATALOGGER
         if not(self.redis.hexist(self.DLGID, 'LINE')):
-            self.logs.print_inf(name_function, f'NO EXISTE VARIABLE LINE EN {self.DLGID}')
-            self.logs.print_inf(name_function, f'NO SE EJECUTA {name_function}')
-            self.logs.script_performance(f'NO EXISTE VARIABLE LINE EN {self.DLGID}')
-            return ''
+            return 'noLine'
         
         # DEVUELVO last_line CON EL LINE ANTERIOR Y current_line CON EL LINE ACTUAL
         if self.redis.hexist(f'{self.DLGID}_ERROR', 'last_line'):

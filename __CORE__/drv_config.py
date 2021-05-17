@@ -17,11 +17,12 @@ from __CORE__.mypython import str2bool, str2lst
     
     variables de salida
         !GENERAL
-        project_path         ruta en donde se encuentra la carpeta automatismos
-        working_mode         modo en que se ejecuta el automatimso [ LOCAL | SPY | OSE ]
-        path_log             ruta en donde van a estar los logs
-        easy_log             habilita (True) o deshabilita (False) los logs de adentro de la carpeta AUTOMATISMOS/..
-        allowedTypes         lista con valores que puede tener la variabl de redis DLGID:TYPE para que se corra el automatismo
+        project_path            ruta en donde se encuentra la carpeta automatismos
+        working_mode            modo en que se ejecuta el automatimso [ LOCAL | SPY | OSE ]
+        perforationProcessPath  path en donde se encuentra el ext_call.pl que llama a las perforaciones que estan en perl
+        path_log                ruta en donde van a estar los logs
+        easy_log                habilita (True) o deshabilita (False) los logs de adentro de la carpeta AUTOMATISMOS/..
+        allowedTypes            lista con valores que puede tener la variabl de redis DLGID:TYPE para que se corra el automatismo
         
         !DATABASE
         dbUrl                url de la base de datos para realizar la conexion
@@ -37,7 +38,7 @@ serv_APP_config = configparser.ConfigParser()
 serv_APP_config.read(f"{project_path}/config.ini")
 
 # GENERAL_CONFIG
-path_log =  serv_APP_config['GENERAL_CONFIG']['path_log']
+perforationProcessPath = serv_APP_config['GENERAL_CONFIG']['perforationProcessPath']
 easy_log = str2bool(serv_APP_config['GENERAL_CONFIG']['easy_log']) 
 sql_config2use = serv_APP_config['GENERAL_CONFIG']['sql_config2use']
 redis_config2use = serv_APP_config['GENERAL_CONFIG']['redis_config2use']
