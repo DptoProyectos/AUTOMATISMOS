@@ -79,10 +79,10 @@ def upgrade_config(DLGID,LIST_CONFIG):
             n += 2
     #
     ## ELIMINO LAS VARIABLES DE CONFIGURACION ANTERIORES
-    #if redis.hexist(f'{DLGID}_ERROR','TAG_CONFIG'):
-    if gda.readAutConf(f'{DLGID}_ERROR','TAG_CONFIG'):    
-        #last_TAG_CONFIG = redis.hget(f'{DLGID}_ERROR','TAG_CONFIG')
-        last_TAG_CONFIG = gda.readAutConf(f'{DLGID}_ERROR','TAG_CONFIG')
+    if redis.hexist(f'{DLGID}_ERROR','TAG_CONFIG'):
+    #if gda.readAutConf(f'{DLGID}_ERROR','TAG_CONFIG'):    
+        last_TAG_CONFIG = redis.hget(f'{DLGID}_ERROR','TAG_CONFIG')
+        #last_TAG_CONFIG = gda.readAutConf(f'{DLGID}_ERROR','TAG_CONFIG')
         #   
         for param in last_TAG_CONFIG.split(','):
             redis.hdel(f'{DLGID}_ERROR', param)
@@ -96,14 +96,14 @@ def upgrade_config(DLGID,LIST_CONFIG):
     n = 4
     for param in LIST_CONFIG:
         if n < (len(LIST_CONFIG)): 
-            #redis.hset(f'{DLGID}_ERROR',LIST_CONFIG[n],LIST_CONFIG[n+1])
-            gda.WriteAutConf(f'{DLGID}_ERROR',LIST_CONFIG[n],LIST_CONFIG[n+1])
+            redis.hset(f'{DLGID}_ERROR',LIST_CONFIG[n],LIST_CONFIG[n+1])
+            #gda.WriteAutConf(f'{DLGID}_ERROR',LIST_CONFIG[n],LIST_CONFIG[n+1])
             TAG_CONFIG.append(LIST_CONFIG[n])
             n += 2
     #
     # ESCRIBO EN REDIS EL NOMBRE DE LAS VARIABLES DE CONFIGURACION PARA QUE PUEDAN SER LEIDAS
-    #redis.hset(f'{DLGID}_ERROR','TAG_CONFIG',lst2str(TAG_CONFIG))
-    gda.WriteAutConf(f'{DLGID}_ERROR','TAG_CONFIG',lst2str(TAG_CONFIG))
+    redis.hset(f'{DLGID}_ERROR','TAG_CONFIG',lst2str(TAG_CONFIG))
+    #gda.WriteAutConf(f'{DLGID}_ERROR','TAG_CONFIG',lst2str(TAG_CONFIG))
     
     # LEO VARIABLES ESCRITAS
     n = 4
@@ -111,8 +111,8 @@ def upgrade_config(DLGID,LIST_CONFIG):
     for param in LIST_CONFIG:
         if n < (len(LIST_CONFIG)): 
             check_config.append(LIST_CONFIG[n])
-            #check_config.append(redis.hget(f'{DLGID}_ERROR',LIST_CONFIG[n]))
-            check_config.append(gda.readAutConf(f'{DLGID}_ERROR',LIST_CONFIG[n]))
+            check_config.append(redis.hget(f'{DLGID}_ERROR',LIST_CONFIG[n]))
+            #check_config.append(gda.readAutConf(f'{DLGID}_ERROR',LIST_CONFIG[n]))
             n += 2
     #
     # MUESTRO VARIABLES LEIDAS
@@ -132,10 +132,10 @@ def read_config_var(DLGID):
     redis = Redis()
     # 
     # LEO LOS TAGS DE CONFIGURACION
-    #if redis.hexist(f'{DLGID}_ERROR','TAG_CONFIG'): 
-    if gda.readAutConf(f'{DLGID}_ERROR','TAG_CONFIG'): 
-        #TAG_CONFIG = redis.hget(f'{DLGID}_ERROR', 'TAG_CONFIG')
-        TAG_CONFIG = gda.readAutConf(f'{DLGID}_ERROR','TAG_CONFIG')
+    if redis.hexist(f'{DLGID}_ERROR','TAG_CONFIG'): 
+    #if gda.readAutConf(f'{DLGID}_ERROR','TAG_CONFIG'): 
+        TAG_CONFIG = redis.hget(f'{DLGID}_ERROR', 'TAG_CONFIG')
+        #TAG_CONFIG = gda.readAutConf(f'{DLGID}_ERROR','TAG_CONFIG')
         TAG_CONFIG = TAG_CONFIG.split(',')
     else: 
         logs.print_inf(FUNCTION_NAME,f'NO EXISTE {DLGID}_TAG_CONFIG IN serv_error_APP_selection')
@@ -148,8 +148,8 @@ def read_config_var(DLGID):
     vars_config = []
     for param in TAG_CONFIG:
         vars_config.append(param)
-        #vars_config.append(redis.hget(f'{DLGID}_ERROR',param))
-        vars_config.append(gda.readAutConf(f'{DLGID}_ERROR',param))
+        vars_config.append(redis.hget(f'{DLGID}_ERROR',param))
+        #vars_config.append(gda.readAutConf(f'{DLGID}_ERROR',param))
     #
     
     # MUESTRO VARIABLES LEIDAS
@@ -226,22 +226,22 @@ def add_2_RUN(dlgid):
     
     name_function = 'ADD_VAR_TO_RUN'
     
-    #if redis.hexist('serv_error_APP_selection','RUN'):
-    if gda.readAutConf('serv_error_APP_selection','RUN'):
-        #TAG_CONFIG = redis.hget('serv_error_APP_selection', 'RUN')
-        TAG_CONFIG = gda.readAutConf('serv_error_APP_selection', 'RUN')
+    if redis.hexist('serv_error_APP_selection','RUN'):
+    #if gda.readAutConf('serv_error_APP_selection','RUN'):
+        TAG_CONFIG = redis.hget('serv_error_APP_selection', 'RUN')
+        #TAG_CONFIG = gda.readAutConf('serv_error_APP_selection', 'RUN')
         lst_TAG_CONFIG = str2lst(TAG_CONFIG)
         try:
             lst_TAG_CONFIG.index(dlgid)
         except:
             lst_TAG_CONFIG.append(dlgid)
             str_TAG_CONFIG = lst2str(lst_TAG_CONFIG)
-            #redis.hset('serv_error_APP_selection', 'RUN', str_TAG_CONFIG)
-            gda.WriteAutConf('serv_error_APP_selection', 'RUN', str_TAG_CONFIG)
+            redis.hset('serv_error_APP_selection', 'RUN', str_TAG_CONFIG)
+            #gda.WriteAutConf('serv_error_APP_selection', 'RUN', str_TAG_CONFIG)
             
     else:
-        #redis.hset('serv_error_APP_selection', 'RUN', dlgid)
-        gda.WriteAutConf(dlgId, param, value)('serv_error_APP_selection', 'RUN', dlgid)
+        redis.hset('serv_error_APP_selection', 'RUN', dlgid)
+        #gda.WriteAutConf(dlgId, param, value)('serv_error_APP_selection', 'RUN', dlgid)
         
 def del_2_Run(dlgid):
     '''
@@ -250,10 +250,10 @@ def del_2_Run(dlgid):
     
     name_function = 'DEL_VAR_TO_RUN'
     
-    #if redis.hexist('serv_error_APP_selection','RUN'):
-    if gda.readAutConf('serv_error_APP_selection','RUN'):
-        #TAG_CONFIG = redis.hget('serv_error_APP_selection', 'RUN')
-        TAG_CONFIG = gda.readAutConf('serv_error_APP_selection', 'RUN')
+    if redis.hexist('serv_error_APP_selection','RUN'):
+    #if gda.readAutConf('serv_error_APP_selection','RUN'):
+        TAG_CONFIG = redis.hget('serv_error_APP_selection', 'RUN')
+        #TAG_CONFIG = gda.readAutConf('serv_error_APP_selection', 'RUN')
         lst_TAG_CONFIG = str2lst(TAG_CONFIG)
         try:
             # ELIMINO EL DATALOGGER DE LA LISTA
@@ -269,8 +269,8 @@ def del_2_Run(dlgid):
             str_TAG_CONFIG = lst2str(lst_TAG_CONFIG)
             #
             # ACTUALIZO EL RUN EL LA REDIS
-            #redis.hset('serv_error_APP_selection', 'RUN', str_TAG_CONFIG)
-            gda.WriteAutConf('serv_error_APP_selection', 'RUN', str_TAG_CONFIG)
+            redis.hset('serv_error_APP_selection', 'RUN', str_TAG_CONFIG)
+            #gda.WriteAutConf('serv_error_APP_selection', 'RUN', str_TAG_CONFIG)
             #
             # LIMPIO RESTOS DE CONFIGURACION DE LA REDIS
             redis.del_key(f'{dlgid}_ERROR')
@@ -359,10 +359,10 @@ while True:
                 # LLAMADA SIN PARAMETROS
             
                 # LEO IDs PARA EJECUTAR CORRER ctrl_error_frec.py
-                #if redis.hexist('serv_error_APP_selection', 'RUN'):
-                if gda.readAutConf('serv_error_APP_selection', 'RUN'):
-                    #str_RUN = redis.hget('serv_error_APP_selection', 'RUN')
-                    str_RUN = gda.readAutConf('serv_error_APP_selection', 'RUN')
+                if redis.hexist('serv_error_APP_selection', 'RUN'):
+                #if gda.readAutConf('serv_error_APP_selection', 'RUN'):
+                    str_RUN = redis.hget('serv_error_APP_selection', 'RUN')
+                    #str_RUN = gda.readAutConf('serv_error_APP_selection', 'RUN')
                     lst_RUN = str2lst(str_RUN)
                 else:
                     logs.print_inf(name_function, 'NO EXISTE VARIABLE RUN in serv_error_APP_selection')

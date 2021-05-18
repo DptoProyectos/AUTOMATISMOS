@@ -197,9 +197,10 @@ def add_2_RUN(dlgid,type):
     name_function = 'ADD_VAR_TO_RUN'
     
     # PREPARO EL RUN EN serv_error_APP_selection
-    if gda.readAutConf('serv_error_APP_selection','RUN'):
-        #TAG_CONFIG = redis.hget('serv_error_APP_selection', 'RUN')
-        TAG_CONFIG = gda.readAutConf('serv_error_APP_selection', 'RUN')
+    #if gda.readAutConf('serv_error_APP_selection','RUN'):
+    if redis.hexist('serv_error_APP_selection','RUN'):
+        TAG_CONFIG = redis.hget('serv_error_APP_selection', 'RUN')
+        #TAG_CONFIG = gda.readAutConf('serv_error_APP_selection', 'RUN')
 
         lst_TAG_CONFIG = str2lst(TAG_CONFIG)
         try:
@@ -208,20 +209,21 @@ def add_2_RUN(dlgid,type):
         except:
             lst_TAG_CONFIG.append(dlgid)
             str_TAG_CONFIG = lst2str(lst_TAG_CONFIG)
-            #redis.hset('serv_error_APP_selection', 'RUN', str_TAG_CONFIG)
-            gda.InsertAutConf('serv_error_APP_selection', 'RUN', str_TAG_CONFIG)
+            redis.hset('serv_error_APP_selection', 'RUN', str_TAG_CONFIG)
+            #gda.InsertAutConf('serv_error_APP_selection', 'RUN', str_TAG_CONFIG)
             #logs.print_out(name_function, 'RUN', str_TAG_CONFIG)
             
     else:
-        #redis.hset('serv_error_APP_selection', 'RUN', dlgid)
-        gda.InsertAutConf('serv_error_APP_selection', 'RUN', dlgid)
+        redis.hset('serv_error_APP_selection', 'RUN', dlgid)
+        #gda.InsertAutConf('serv_error_APP_selection', 'RUN', dlgid)
         
     # PREPARO LA VARIABLE TYPE CON SU VALOR
-    if not(gda.readAutConf(f'{dlgid}_ERROR', 'TAG_CONFIG')):
-        #redis.hset(f'{dlgid}_ERROR', 'TAG_CONFIG', 'TYPE')
-        gda.InsertAutConf(f'{dlgid}_ERROR', 'TAG_CONFIG', 'TYPE')
-        #redis.hset(f'{dlgid}_ERROR', 'TYPE', type)
-        gda.InsertAutConf(f'{dlgid}_ERROR', 'TYPE', type)
+    #if not(gda.readAutConf(f'{dlgid}_ERROR', 'TAG_CONFIG')):
+    if not(redis.hexist(f'{dlgid}_ERROR', 'TAG_CONFIG')):
+        redis.hset(f'{dlgid}_ERROR', 'TAG_CONFIG', 'TYPE')
+        #gda.InsertAutConf(f'{dlgid}_ERROR', 'TAG_CONFIG', 'TYPE')
+        redis.hset(f'{dlgid}_ERROR', 'TYPE', type)
+        #gda.InsertAutConf(f'{dlgid}_ERROR', 'TYPE', type)
     
 def show_var_list(lst):
     # instancio los logs con la informacion del LOG_LEVEL
