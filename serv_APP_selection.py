@@ -259,7 +259,7 @@ def run_perforation_process(dlgid):
     PERFORACIONES EN PERL
     '''
     
-    logs.print_inf(name_function,text )
+    #logs.print_inf(name_function,text )
     
     import os;
 
@@ -302,15 +302,16 @@ text = '''
     
     AUTOMATISMOS EN PYTHON
     '''
-logs.print_inf(name_function,text )
+#logs.print_inf(name_function,text )
 
 
 ## VARIABLES GLOBALES QUE LE ENTRAN A CORE
-logs.print_log(f"EXECUTE: {name_function}")      
+#logs.print_log(f"EXECUTE: {name_function}")      
 #
 # VARIABLES DE EJECUCION
-if conf.str_get('print_log'):logs.print_in(name_function,'print_log',print_log)
-logs.print_in(name_function,'DLGID_CTRL',DLGID_CTRL)
+if conf.str_get('print_log'):
+    logs.print_in(name_function,'print_log',print_log)
+    logs.print_in(name_function,'DLGID_CTRL',DLGID_CTRL)
 #
 ## VARIABLES PARTICULARES QUE LE ENTRAN A APP_SELECTION
 #
@@ -338,8 +339,8 @@ else:
             LIST_CONFIG=read_config_var(DLGID_CTRL)
             
         else: 
-            logs.print_inf(name_function,'NO EXISTE LA VARIABLE TYPE')
-            logs.print_inf(name_function,'NO SE EJECUTA EL SCRIPT')
+            #logs.print_inf(name_function,'NO EXISTE LA VARIABLE TYPE')
+            #logs.print_inf(name_function,'NO SE EJECUTA EL SCRIPT')
             LIST_CONFIG=[]
 
 
