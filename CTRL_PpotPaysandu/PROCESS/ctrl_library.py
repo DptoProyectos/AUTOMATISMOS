@@ -348,8 +348,34 @@ class ctrl_process(object):
         '''
             garantizo que las variables de visualizacion siempre existan
         '''
+
+        if not self.redis.hexist(self.DLGID_CTRL,'PLC_SoftMode'):
+            self.redis.hset(self.DLGID_CTRL,'PLC_SoftMode','REMOTO')
         
-        pass
+        if not self.redis.hexist(self.DLGID_CTRL,'TX_ERROR'):
+            self.redis.hset(self.DLGID_CTRL,'TX_ERROR','NO')
+
+        if not self.redis.hexist(self.DLGID_CTRL,'StatePump'):
+            self.redis.hset(self.DLGID_CTRL,'StatePump','OFF')
+
+        if not self.redis.hexist(self.DLGID_CTRL,'AlrLowPressure'):
+            self.redis.hset(self.DLGID_CTRL,'AlrLowPressure','NO')
+
+        if not self.redis.hexist(self.DLGID_CTRL,'AlrLowFlow'):
+            self.redis.hset(self.DLGID_CTRL,'AlrLowFlow','NO')
+
+        if not self.redis.hexist(self.DLGID_CTRL,'AlrLowCau'):
+            self.redis.hset(self.DLGID_CTRL,'AlrLowCau','NO')
+
+        if not self.redis.hexist(self.DLGID_CTRL,'AlrVarFail'):
+            self.redis.hset(self.DLGID_CTRL,'AlrVarFail','NO')
+
+        if not self.redis.hexist(self.DLGID_CTRL,'StateVar'):
+            self.redis.hset(self.DLGID_CTRL,'StateVar','READY')
+
+        if not self.redis.hexist(self.DLGID_CTRL,'StateLineVar'):
+            self.redis.hset(self.DLGID_CTRL,'StateLineVar','OK')
+
 
     def checkAndSetControlVars(self):
         '''
