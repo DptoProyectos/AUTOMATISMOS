@@ -1,8 +1,6 @@
 #!/usr/aut_env/bin/python3.8
 '''
-SERVICIO DE DETECCION DE AUTOMATISMOS
-
-Created on 16 mar. 2020 
+SELECCION DE AUTOMATISMOS
 
 @author: Yosniel Cabrera
 
@@ -51,8 +49,10 @@ if __name__ == '__main__':
     if conf.str_get('DLGID_CTRL'):
         print_log = conf.str_get('print_log')
         DLGID_CTRL = conf.str_get('DLGID_CTRL')
-        if conf.str_get('TYPE'): TYPE = conf.str_get('TYPE')
-        else:  TYPE = 'CHARGE'
+        if conf.str_get('TYPE'): 
+            TYPE = conf.str_get('TYPE')
+        else:  
+            TYPE = 'CHARGE'
     ## SE SE LE PASA UN SOLO ARGUMENTO SE LO ASIGNO A DLGID
     else:
         print_log = False
@@ -66,8 +66,6 @@ def read_config_var(DLGID_CTRL):
     
     FUNCTION_NAME = 'READ_CONFIG_VAR'
     
-    ## INSTANCIAS
-    logs = ctrl_logs(False,'servAppSelection',DLGID_CTRL,print_log)
     redis = Redis()
     # 
     # LEO LOS TAGS DE CONFIGURACION
@@ -82,19 +80,27 @@ def read_config_var(DLGID_CTRL):
         quit()
     #
     # LEO CONFIGUTACION DE LA REDIS
-    logs.print_inf(FUNCTION_NAME,'LEO CONFIG EN REDIS')
+    #logs.print_inf(FUNCTION_NAME,'LEO CONFIG EN REDIS')
     vars_config = []
     for param in TAG_CONFIG:
         vars_config.append(param)
         #vars_config.append(redis.hget(DLGID_CTRL,param))
         vars_config.append(gda.readAutConf(DLGID_CTRL,param))
     #
+
+    '''
+    logLevel = config_var(vars_config) 
+    LOG_LEVEL = logLevel.lst_get('LOG_LEVEL')
+    #print(LOG_LEVEL)
+    logs = ctrl_logs(False,'servAppSelection',DLGID_CTRL,print_log,'FULL')'''
+    
+    '''
     # MUESTRO VARIABLES LEIDAS
     n = 0
     for param in vars_config:
         if n < (len(vars_config)): 
             logs.print_out(FUNCTION_NAME,vars_config[n],vars_config[n+1])
-            n += 2
+            n += 2'''
     #
     # CONCATENO LAS VARIABLES DE EJECUCION Y DE CONFIGURACION
     list_out = []
@@ -218,6 +224,9 @@ def add_2_RUN(dlgid,type):
         gda.InsertAutConf(f'{dlgid}_ERROR', 'TYPE', type)
     
 def show_var_list(lst):
+    # instancio los logs con la informacion del LOG_LEVEL
+    logLevel = config_var(lst) 
+    logs = ctrl_logs(False,'servAppSelection',DLGID_CTRL,print_log,logLevel.lst_get('LOG_LEVEL'))
     n = 0
     for param in lst:
         if n < (len(lst)): 
@@ -334,7 +343,7 @@ else:
         #CHEQUEO SI EXISTE LA VARIABLE TYPE
         #if redis.hexist(DLGID_CTRL,'TYPE'):
         if gda.readAutConf(DLGID_CTRL,'TYPE'):
-            logs.print_inf(name_function,'READ_CONFIG_VAR')
+            #logs.print_inf(name_function,'READ_CONFIG_VAR')
             #LEO LAS VARIABLES DE CONFIGURACION
             LIST_CONFIG=read_config_var(DLGID_CTRL)
             

@@ -47,10 +47,11 @@ class ctrl_process(object):
         self.TYPE = self.config.lst_get('TYPE')
         self.ENABLE_OUTPUTS = self.config.lst_get('ENABLE_OUTPUTS')
         self.ENABLE_OUTPUTS = str2bool(self.config.lst_get('ENABLE_OUTPUTS'))
+        self.LOG_LEVEL = self.config.lst_get('LOG_LEVEL')
         
         
         ## INSTANCIAS
-        self.logs = ctrl_logs(self.TYPE,'CTRL_PpotPaysandu',self.DLGID_CTRL,self.print_log)
+        self.logs = ctrl_logs(self.TYPE,'CTRL_PpotPaysandu',self.DLGID_CTRL,self.print_log,self.LOG_LEVEL)
         self.redis = Redis()
         self.gda = GDA(dbUrl)
 
@@ -375,7 +376,6 @@ class ctrl_process(object):
 
         if not self.redis.hexist(self.DLGID_CTRL,'StateLineVar'):
             self.redis.hset(self.DLGID_CTRL,'StateLineVar','OK')
-
 
     def checkAndSetControlVars(self):
         '''

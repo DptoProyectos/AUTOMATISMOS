@@ -28,7 +28,9 @@ LIST_CONFIG = [
                 
                 
                 #VARIABLES DE CONFIGURACION
+                'LOG_LEVEL',        'FULL',                         # [ BASIC | FULL ]: BASIC-> SOLO TIRA UN LOG QUE INDICA CORRIDA DEL AUTOMATISMO; FULL-> TIRA TODOS LOS LOGS
                 'ENABLE_OUTPUTS',   True,                           # ACTIVA Y DESACTIVA LA ACCION DE LAS SALIDAS PARA ESTE DLGID_CTRL [ True | False]
+                
             ]
 
 

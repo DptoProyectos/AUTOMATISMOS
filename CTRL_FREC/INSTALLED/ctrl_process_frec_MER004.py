@@ -28,6 +28,7 @@ LIST_CONFIG = [
                 
                 
                 #VARIABLES DE CONFIGURACION
+                'LOG_LEVEL',        'FULL',                         # [ BASIC | FULL ]: BASIC-> SOLO TIRA UN LOG QUE INDICA CORRIDA DEL AUTOMATISMO; FULL-> TIRA TODOS LOS LOGS
                 'ENABLE_OUTPUTS',   True,                           # ACTIVA Y DESACTIVA LA ACCION DE LAS SALIDAS PARA ESTE DLGID_CTRL [ True | False]
                 'TYPE_IN_FREC',     'NPN',                          # FORMA EN QUE EL VARIADOR DE VELOCIDAD DETECTA LAS ENTRADAS [ NPN (not_in)| PNP] 
                 'PROGRAMMED_FREC',  '20.0/23.7/27.4/31.1/34.9/38.6/42.3/46.0',
@@ -38,7 +39,7 @@ LIST_CONFIG = [
                 # VARIABLES OPCIONALES. EN CASO DE NO USARLAS SETEAR ''
                 'DLGID_REF_1',      'MER004',                       # DATALOGGER AUXILIAR QUE SE VA A USAR DE REFERENCIA EN CASO DE FALLAS DE COMUNICACION DEL PRINCIPAL
                 'CHANNEL_REF_1',    'LTQA',                         # NOMBRE DEL CANAL AUXILIAR CON LA MEDIDA DE REFERENCIA PARA EL AUTOMATISMO
-                
+                                           
             ]
 
 

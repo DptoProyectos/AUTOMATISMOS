@@ -40,6 +40,7 @@ class ctrlProcess(object):
         ## DEFINICION DE VARIABLES DE LA CLASE
         self.config = config_var(LIST_CONFIG)
         self.print_log = self.config.lst_get('print_log')
+        self.LOG_LEVEL = self.config.lst_get('LOG_LEVEL')
         self.DLGID_CTRL = self.config.lst_get('DLGID_CTRL')
         self.TYPE = self.config.lst_get('TYPE')
         self.ENABLE_OUTPUTS = self.config.lst_get('ENABLE_OUTPUTS')
@@ -54,7 +55,7 @@ class ctrlProcess(object):
         self.PROGRAMMED_FREC =self.config.lst_get('PROGRAMMED_FREC')
         
         ## INSTANCIAS
-        self.logs = ctrl_logs(self.TYPE,'CTRL_FREC_process',self.DLGID_CTRL,self.print_log)
+        self.logs = ctrl_logs(self.TYPE,'CTRL_FREC_process',self.DLGID_CTRL,self.print_log,self.LOG_LEVEL)
         self.redis = Redis()
         
     def chequeo_alarmas(self):

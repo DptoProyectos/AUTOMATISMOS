@@ -71,12 +71,13 @@ class sysLogs(object):
         Clase que envia los logs al syslog
     '''
     
-    def __init__(self, processName = 'processNameEmpty', dlgid = 'dlgidEmpty'):
+    def __init__(self, processName = 'processNameEmpty', dlgid = 'dlgidEmpty', logLevel = 'FULL'):
         '''
             
         '''
         self.processName = processName
         self.dlgid = dlgid
+        self.LOG_LEVEL = logLevel
 
         logging.basicConfig(level=logging.DEBUG)
 
@@ -94,10 +95,14 @@ class sysLogs(object):
         LOG.addHandler(handler)
     
     def write(self, message): 
-        logging.info('[{0}][{1}][{2}]'.format(self.processName, self.dlgid, message))
+        if self.LOG_LEVEL == 'FULL':
+            logging.info('[{0}][{1}][{2}]'.format(self.processName, self.dlgid, message))
 
     def warning(self, message):
         logging.warning('[{0}][{1}][{2}]'.format(self.processName, self.dlgid, message))
+
+    def lowLevelLog (self, message):
+        logging.info('[{0}][{1}][{2}]'.format(self.processName, self.dlgid, message))
 
 
 
@@ -106,14 +111,15 @@ class ctrl_logs(object):
         Clase que maneja el tema de los logs tanto de pantalla como de archivo
         que se mandan desde los scripts
     '''
-    def __init__(self,project_folder_name,process_name,DLGID_CTRL,show_log):
+    def __init__(self,project_folder_name = '/',process_name = 'empty',DLGID_CTRL = 'empty',show_log = True,logLevel = 'FULL'):
         '''
         Constructor
         '''
         self.project_folder_name = project_folder_name
         self.process_name = process_name
         self.DLGID_CTRL = DLGID_CTRL
-        self.script_performance = sysLogs(self.process_name, self.DLGID_CTRL)
+        self.LOG_LEVEL = logLevel
+        self.script_performance = sysLogs(self.process_name, self.DLGID_CTRL, self.LOG_LEVEL)
         if easy_log: 
             self.easy_dlg_performance_check = saved_logs(f'{self.DLGID_CTRL}_{system_date_raw}', self.DLGID_CTRL, f'{project_path}/{self.project_folder_name}/DLG_PERFORMANCE/')
         
@@ -176,8 +182,11 @@ class ctrl_logs(object):
             # ESCRIBO EL LOGS
             self.easy_dlg_performance_check.write(f'[{dlgid_date}-{dlgid_time}] {message}')
 
-
-
+    def basicLog(self,processName,dlgid):
+        if self.show_log: print(f"{processName} -> DLGID: {dlgid}")
+        #
+        # DEJO REGISTRO EN EL LOGS
+        self.script_performance.lowLevelLog(f"{processName} -> DLGID: {dlgid}")
 
 
 

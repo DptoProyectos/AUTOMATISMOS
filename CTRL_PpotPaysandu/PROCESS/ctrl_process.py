@@ -1,10 +1,6 @@
 #!/usr/aut_env/bin/python3.8
 '''
-APLICACION DE CONTROL CTRL_PpotPaysandu
-
-Created on 15 apr. 2021
-
-@author: Yosniel Cabrera
+CTRL_PpotPaysandu 
 
 Version 1.0.0 15-04-2021 11:19
 ''' 
@@ -36,6 +32,7 @@ def control_process(LIST_CONFIG):
     ''''''
     
     name_function = 'CONTROL_PROCESS'
+    processName = 'CTRL_PpotPaysandu'
     
     conf = config_var(LIST_CONFIG)
     
@@ -43,13 +40,14 @@ def control_process(LIST_CONFIG):
     DLGID_CTRL = conf.lst_get('DLGID_CTRL') 
     TYPE = conf.lst_get('TYPE')                  
     print_log = str2bool(conf.lst_get('print_log'))
+    LOG_LEVEL = conf.lst_get('LOG_LEVEL') 
     
     #VARIABLES DE CONFIGURACION
     ENABLE_OUTPUTS = str2bool(conf.lst_get('ENABLE_OUTPUTS'))
     
     
  ## INSTANCIAS
-    logs = ctrl_logs(TYPE,'CTRL_PpotPaysandu',DLGID_CTRL,print_log)
+    logs = ctrl_logs(TYPE,'CTRL_PpotPaysandu',DLGID_CTRL,print_log,LOG_LEVEL)
     redis = Redis()
     ctrl = ctrl_process(LIST_CONFIG)
     gda = GDA(dbUrl)
@@ -58,7 +56,8 @@ def control_process(LIST_CONFIG):
     #---------------------------------------------------------
     ##PROCESS
     
-    logs.print_log(__doc__)
+    #logs.print_log(__doc__)
+    logs.basicLog(__doc__,DLGID_CTRL)
     
     # ESCRIBO LA EJECUCION DEL SCRIPT
     logs.print_log(f"{name_function}")
@@ -83,9 +82,9 @@ def control_process(LIST_CONFIG):
 
     # Garantizo que las variable de control esten siempre disponibles para el automatismo
     ctrl.checkAndSetControlVars()
-    # me quede por aquiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii
+    
 
-    #
+    
     
     WEB_Mode = gda.readAutConf(DLGID_CTRL,'WEB_Mode')
     WEB_ActionPump = gda.readAutConf(DLGID_CTRL,'WEB_ActionPump')

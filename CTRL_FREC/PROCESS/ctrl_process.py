@@ -1,12 +1,8 @@
 #!/usr/aut_env/bin/python3.8
 '''
-APLICACION DE CONTROL CTRL_FREC
+CTRL_FREC
 
-Created on 16 mar. 2020 
-
-@author: Yosniel Cabrera
-
-Version 3.1.4 07-06-2020
+Version 1.0.0 15-04-2021 11:19
 ''' 
 
 
@@ -40,6 +36,7 @@ def control_process(LIST_CONFIG):
     DLGID_CTRL = conf.lst_get('DLGID_CTRL') 
     TYPE = conf.lst_get('TYPE')                  
     print_log = str2bool(conf.lst_get('print_log'))
+    LOG_LEVEL = conf.lst_get('LOG_LEVEL')
     
     #VARIABLES DE CONFIGURACION
     ENABLE_OUTPUTS = str2bool(conf.lst_get('ENABLE_OUTPUTS'))
@@ -48,9 +45,10 @@ def control_process(LIST_CONFIG):
     CHANNEL_REF = conf.lst_get('CHANNEL_REF') 
     DLGID_REF_1 = conf.lst_get('DLGID_REF_1')   
     CHANNEL_REF_1 = conf.lst_get('CHANNEL_REF_1') 
+
     
     ## INSTANCIAS
-    logs = ctrl_logs(TYPE,'CTRL_FREC_process',DLGID_CTRL,print_log)
+    logs = ctrl_logs(TYPE,'CTRL_FREC_process',DLGID_CTRL,print_log,LOG_LEVEL)
     config = configparser.ConfigParser()
     redis = Redis()
     #gda = GDA(serv_APP_config['CONFIG']['working_mode'])
@@ -77,10 +75,11 @@ def control_process(LIST_CONFIG):
     #---------------------------------------------------------
     ##PROCESS
     
-    logs.print_log(__doc__)
+    logs.basicLog(__doc__,DLGID_CTRL)
     
     # ESCRIBO LA EJECUCION DEL SCRIPT
     logs.print_log(f"{name_function}")
+   
     #logs.script_performance(f"{name_function}")
     
     
