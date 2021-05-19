@@ -380,6 +380,7 @@ class error_process(object):
         #
         #VARIABLES DE EJECUCION
         self.print_log = self.config.lst_get('print_log')
+        self.LOG_LEVEL = self.config.lst_get('LOG_LEVEL')
         self.DLGID = self.config.lst_get('DLGID')
         self.TYPE = self.config.lst_get('TYPE')
         #
@@ -392,7 +393,7 @@ class error_process(object):
         #
         
         # INSTANCIAS
-        self.logs = ctrl_logs(self.TYPE,'CTRL_FREC_error',self.DLGID,self.print_log)
+        self.logs = ctrl_logs(self.TYPE,'CTRL_FREC_error',self.DLGID,self.print_log,self.LOG_LEVEL)
         
         self.redis = Redis()   
         

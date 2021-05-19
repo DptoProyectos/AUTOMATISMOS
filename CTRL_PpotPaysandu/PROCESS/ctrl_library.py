@@ -415,6 +415,8 @@ class errorProcess(object):
         self.print_log = self.config.lst_get('print_log')
         self.DLGID = self.config.lst_get('DLGID')
         self.TYPE = self.config.lst_get('TYPE')
+        self.LOG_LEVEL = self.config.lst_get('LOG_LEVEL')
+        
         #
         #VARIABLES DE CONFIGURACION
         self.SWITCH_OUTPUTS = str2bool(self.config.lst_get('SWITCH_OUTPUTS'))
@@ -425,7 +427,7 @@ class errorProcess(object):
         #
         
         # INSTANCIAS
-        self.logs = ctrl_logs(self.TYPE,'CTRL_FREC_error',self.DLGID,self.print_log)
+        self.logs = ctrl_logs(self.TYPE,'CTRL_FREC_error',self.DLGID,self.print_log,self.LOG_LEVEL)
         
         self.redis = Redis()   
         

@@ -188,7 +188,7 @@ def upgrade_config(DLGID_CTRL,LIST_CONFIG):
             logs.print_out(FUNCTION_NAME,check_config[n],check_config[n+1])
             n += 2
 
-def add_2_RUN(dlgid,type):
+def add_2_RUN(dlgid,type,logLevel):
     '''
         funcion que anade a serv_error_APP_selection / RUN 
         el DLGID_CTRL y el DLGID_REF
@@ -217,18 +217,22 @@ def add_2_RUN(dlgid,type):
         redis.hset('serv_error_APP_selection', 'RUN', dlgid)
         #gda.InsertAutConf('serv_error_APP_selection', 'RUN', dlgid)
         
-    # PREPARO LA VARIABLE TYPE CON SU VALOR
+    # SETEO VARIABLES DE CONFIGURACION
     #if not(gda.readAutConf(f'{dlgid}_ERROR', 'TAG_CONFIG')):
     if not(redis.hexist(f'{dlgid}_ERROR', 'TAG_CONFIG')):
-        redis.hset(f'{dlgid}_ERROR', 'TAG_CONFIG', 'TYPE')
+        redis.hset(f'{dlgid}_ERROR', 'TAG_CONFIG', 'TYPE,LOG_LEVEL')
         #gda.InsertAutConf(f'{dlgid}_ERROR', 'TAG_CONFIG', 'TYPE')
-        redis.hset(f'{dlgid}_ERROR', 'TYPE', type)
-        #gda.InsertAutConf(f'{dlgid}_ERROR', 'TYPE', type)
+            
+    # ACTUALIZO VARIABLES DE CONFIGURACION
+    redis.hset(f'{dlgid}_ERROR', 'TYPE', type)
+    #gda.InsertAutConf(f'{dlgid}_ERROR', 'TYPE', type)
+    redis.hset(f'{dlgid}_ERROR', 'LOG_LEVEL', logLevel)
+    #gda.InsertAutConf(f'{dlgid}_ERROR', 'LOG_LEVEL', FULL)
     
 def show_var_list(lst):
     # instancio los logs con la informacion del LOG_LEVEL
-    logLevel = config_var(lst) 
-    logs = ctrl_logs(False,'servAppSelection',DLGID_CTRL,print_log,logLevel.lst_get('LOG_LEVEL'))
+    LOG_LEVEL = config_var(lst).lst_get('LOG_LEVEL')
+    logs = ctrl_logs(False,'servAppSelection',DLGID_CTRL,print_log,LOG_LEVEL)
     n = 0
     for param in lst:
         if n < (len(lst)): 
@@ -361,11 +365,11 @@ if bool(LIST_CONFIG):
     if conf.lst_get('TYPE') in allowedTypes:
         #
         # ANADO DLGID_CTRL A 'DLGID_CTRL_TAG_CONFIG' PARA QUE SE EJECUTE EL ctrl_error_frec
-        add_2_RUN(conf.lst_get('DLGID_CTRL'),conf.lst_get('TYPE'))
+        add_2_RUN(conf.lst_get('DLGID_CTRL'),conf.lst_get('TYPE'),conf.lst_get('LOG_LEVEL'))
         #
         # ANADO DLGID_REF A 'DLGID_CTRL_TAG_CONFIG' PARA QUE SE EJECUTE EL ctrl_error_frec
         if conf.lst_get('DLGID_REF'):
-            add_2_RUN(conf.lst_get('DLGID_REF'),conf.lst_get('TYPE'))
+            add_2_RUN(conf.lst_get('DLGID_REF'),conf.lst_get('TYPE'),conf.lst_get('LOG_LEVEL'))
         #
         # MUESTRO LAS VARIABLES QUE SE LE VAN A PASAR AL PROCESS Y LO LLAMO
         show_var_list(LIST_CONFIG)

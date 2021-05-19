@@ -1,10 +1,6 @@
 #!/usr/aut_env/bin/python3.8
 '''
-APLICACION DE CONTROL DE ERRORES EN CTRL_FREC
-
-Created on 16 mar. 2020 
-
-@author: Yosniel Cabrera
+CONTROL DE ERRORES EN CTRL_FREC
 
 Version 2.1.6 07-06-2020 12:58
 
@@ -32,7 +28,8 @@ def error_process(LIST_CONFIG):
     #VARIABLES DE EJECUCION
     print_log = str2bool(conf.lst_get('print_log'))
     DLGID = conf.lst_get('DLGID') 
-    TYPE = conf.lst_get('TYPE')                  
+    TYPE = conf.lst_get('TYPE')      
+    LOG_LEVEL = conf.lst_get('LOG_LEVEL')            
     
     #VARIABLES DE CONFIGURACION
     SWITCH_OUTPUTS = str2bool(conf.lst_get('SWITCH_OUTPUTS'))
@@ -41,9 +38,10 @@ def error_process(LIST_CONFIG):
     EVENT_DETECTION = str2bool(conf.lst_get('EVENT_DETECTION'))
     TIMER_POLL = str2bool(conf.lst_get('TIMER_POLL'))
     
+    
     ## INSTANCIAS
     #logs = ctrl_logs(TYPE,DLGID,print_log)
-    logs = ctrl_logs(TYPE,'CTRL_FREC_error',DLGID,print_log)
+    logs = ctrl_logs(TYPE,'CTRL_FREC_error',DLGID,print_log,LOG_LEVEL)
     redis = Redis()
     #
     # INSTANCIA DE error_process
@@ -59,7 +57,8 @@ def error_process(LIST_CONFIG):
     #---------------------------------------------------------
     ##ERROR PROCESS
     
-    logs.print_log(__doc__)
+    #logs.print_log(__doc__)
+    logs.basicLog(__doc__)
     
     # ESCRIBO LA EJECUCION DEL SCRIPT
     logs.print_inf(name_function,'')

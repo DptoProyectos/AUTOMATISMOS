@@ -182,11 +182,11 @@ class ctrl_logs(object):
             # ESCRIBO EL LOGS
             self.easy_dlg_performance_check.write(f'[{dlgid_date}-{dlgid_time}] {message}')
 
-    def basicLog(self,processName,dlgid):
-        if self.show_log: print(f"{processName} -> DLGID: {dlgid}")
+    def basicLog(self,processName):
+        if self.show_log: print(processName)
         #
         # DEJO REGISTRO EN EL LOGS
-        self.script_performance.lowLevelLog(f"{processName} -> DLGID: {dlgid}")
+        self.script_performance.lowLevelLog(processName)
 
 
 

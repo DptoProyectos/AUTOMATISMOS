@@ -1,13 +1,8 @@
 #!/usr/aut_env/bin/python3.8
 '''
-APLICACION DE CONTROL DE ERRORES EN CTRL_PpotPaysandu
-
-Created on 16 mar. 2020 
-
-@author: Yosniel Cabrera
+CONTROL DE ERRORES EN CTRL_PpotPaysandu
 
 Version 2.1.6 07-06-2020 12:58
-
 ''' 
 
 ## LIBRERIAS
@@ -30,11 +25,14 @@ def error_process(LIST_CONFIG):
     name_function = 'ERROR_PROCESS'
     
     conf = config_var(LIST_CONFIG)
-    
+       
     #VARIABLES DE EJECUCION
     print_log = str2bool(conf.lst_get('print_log'))
     DLGID = conf.lst_get('DLGID') 
-    TYPE = conf.lst_get('TYPE')                  
+    TYPE = conf.lst_get('TYPE')         
+    LOG_LEVEL =  conf.lst_get('LOG_LEVEL')        
+
+    
     
     #VARIABLES DE CONFIGURACION
     SWITCH_OUTPUTS = str2bool(conf.lst_get('SWITCH_OUTPUTS'))
@@ -45,14 +43,14 @@ def error_process(LIST_CONFIG):
     
     ## INSTANCIAS
     #logs = ctrl_logs(TYPE,DLGID,print_log)
-    logs = ctrl_logs(TYPE,'CTRL_FREC_error',DLGID,print_log)
+    logs = ctrl_logs(TYPE,'CTRL_FREC_error',DLGID,print_log,LOG_LEVEL)
     redis = Redis()
     e = errorProcess(LIST_CONFIG)
 
     #---------------------------------------------------------
     ##ERROR PROCESS
-    
-    logs.print_log(__doc__)
+    logs.basicLog(__doc__)
+    #logs.print_log(__doc__)
     
     # ESCRIBO LA EJECUCION DEL SCRIPT
     logs.print_inf(name_function,'')

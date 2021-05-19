@@ -75,7 +75,7 @@ def control_process(LIST_CONFIG):
     #---------------------------------------------------------
     ##PROCESS
     
-    logs.basicLog(__doc__,DLGID_CTRL)
+    logs.basicLog(__doc__)
     
     # ESCRIBO LA EJECUCION DEL SCRIPT
     logs.print_log(f"{name_function}")

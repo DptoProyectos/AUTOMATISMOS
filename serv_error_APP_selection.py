@@ -138,26 +138,27 @@ def read_config_var(DLGID):
         #TAG_CONFIG = gda.readAutConf(f'{DLGID}_ERROR','TAG_CONFIG')
         TAG_CONFIG = TAG_CONFIG.split(',')
     else: 
-        logs.print_inf(FUNCTION_NAME,f'NO EXISTE {DLGID}_TAG_CONFIG IN serv_error_APP_selection')
-        logs.print_inf(FUNCTION_NAME,'NO SE EJECUTA EL SCRIPT')
+        #logs.print_inf(FUNCTION_NAME,f'NO EXISTE {DLGID}_TAG_CONFIG IN serv_error_APP_selection')
+        #logs.print_inf(FUNCTION_NAME,'NO SE EJECUTA EL SCRIPT')
         return ''
     #
     
     # LEO CONFIGURACION DE LA REDIS
-    logs.print_inf(FUNCTION_NAME,'LEO CONFIG EN REDIS')
+    #logs.print_inf(FUNCTION_NAME,'LEO CONFIG EN REDIS')
     vars_config = []
     for param in TAG_CONFIG:
         vars_config.append(param)
         vars_config.append(redis.hget(f'{DLGID}_ERROR',param))
         #vars_config.append(gda.readAutConf(f'{DLGID}_ERROR',param))
     #
-    
+    '''
     # MUESTRO VARIABLES LEIDAS
     n = 0
     for param in vars_config:
         if n < (len(vars_config)): 
             logs.print_out(FUNCTION_NAME,vars_config[n],vars_config[n+1])
-            n += 2
+            n += 2'''
+
     #
     # CONCATENO LAS VARIABLES DE EJECUCION Y DE CONFIGURACION
     list_out = []
@@ -174,6 +175,9 @@ def read_config_var(DLGID):
     return list_out    
     
 def show_var_list(lst):
+
+    LOG_LEVEL = config_var(LIST_CONFIG).lst_get('LOG_LEVEL')
+    logs = ctrl_logs(False,'servErrorAppSelection',DLGID,print_log,LOG_LEVEL)
     if bool(lst):
         n = 0
         for param in lst:
@@ -302,9 +306,9 @@ while True:
             # LLAMADA CON VARIABLES DE CONFIGURACION 
             
             ## VARIABLES GLOBALES QUE LE ENTRAN A CORE
-            logs.print_log(f"EXECUTE: {name_function}")
-            logs.print_in(name_function,'print_log',print_log)
-            logs.print_in(name_function,'DLGID',DLGID)
+            #logs.print_log(f"EXECUTE: {name_function}")
+            #logs.print_in(name_function,'print_log',print_log)
+            #logs.print_in(name_function,'DLGID',DLGID)
             
             # IMPRIMIR VARIABLES DE CONFIGURACION
             n = 4
@@ -388,13 +392,13 @@ while True:
             logs = ctrl_logs(False,'servErrorAppSelection',DLGID,print_log)
             #    
             ## VARIABLES GLOBALES QUE LE ENTRAN A CORE
-            logs.print_log(' ')
-            logs.print_log(f"EXECUTE: {name_function}")
-            logs.print_in(name_function,'print_log',print_log)
-            logs.print_in(name_function,'DLGID',DLGID)
+            #logs.print_log(' ')
+            #logs.print_log(f"EXECUTE: {name_function}")
+            #logs.print_in(name_function,'print_log',print_log)
+            #logs.print_in(name_function,'DLGID',DLGID)
             
             # LEO LAS VARIABLES DE CONFIGURACION
-            logs.print_inf(name_function,'READ_CONFIG_VAR')
+            #logs.print_inf(name_function,'READ_CONFIG_VAR')
             
             
             if read_config_var(DLGID):
