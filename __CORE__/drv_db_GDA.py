@@ -18,7 +18,7 @@ from __CORE__.drv_config import dbUrl
 
 class GDA(object):
     '''
-        
+        clase para el trabajo con la base de datos GDA
     '''
 
     def __init__(self,dbUrl):
@@ -267,8 +267,66 @@ class GDA(object):
                 .where(tb_automatismoParametro.c.id == paramId))
             self.conn.execute(sql)       
 
+    def getAllAutConf(self,dlgId):
+        '''
+            se trae toda la configuracion de los dataloggers que estan en la tabla automatismo y la devuelve en una lista
+        '''
 
+        ''' SELECT gda.automatismo_parametro.nombre, gda.automatismo_parametro.valor  FROM gda.automatismo_parametro
+                INNER JOIN gda.automatismo ON gda.automatismo.id= gda.automatismo_parametro.auto_id
+                WHERE gda.automatismo.dlgid = 'CTRLPAY01'''
+
+        outPut = []
+
+        # establecemos conexion a la bd en caso de que no exista
+        if not self.connected:
+            if self.connect():
+                self.connected = True
         
+        # si la conexion fue exitosa
+        if self.connected:
+            tb_automatismo = Table('automatismo', self.metadata, autoload=True, autoload_with=self.engine)
+            tb_automatismoParametro = Table('automatismo_parametro', self.metadata, autoload=True, autoload_with=self.engine)
+            
+            j1 = tb_automatismo.join(tb_automatismoParametro,tb_automatismo.c.id == tb_automatismoParametro.c.auto_id)
+            sel = select([tb_automatismoParametro.c.nombre, tb_automatismoParametro.c.valor])
+            sel = sel.select_from(j1)
+            sel = sel.where(tb_automatismo.c.dlgid == dlgId)
+            autoId = self.conn.execute(sel)
+            autoId = autoId.fetchall()
+            #print(autoId)
+
+            # armo lista
+            for param in autoId:
+                for subParam in param:
+                    outPut.append(subParam)
+            
+            return outPut
+
+            
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+'''
+# ONLY FOR TEST
+dbUrl = 'postgresql+psycopg2://admin:pexco599@192.168.0.6/GDA'
+gda = GDA(dbUrl)
+        
+#print(gda.getAllAutConf('CTRLPAY01'))
+print(gda.getAllAutConf('MER004'))'''
 
 
 
