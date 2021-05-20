@@ -82,13 +82,11 @@ def control_process(LIST_CONFIG):
 
     # Garantizo que las variable de control esten siempre disponibles para el automatismo
     ctrl.checkAndSetControlVars()
-    
 
     
-    
-    WEB_Mode = gda.readAutConf(DLGID_CTRL,'WEB_Mode')
-    WEB_ActionPump = gda.readAutConf(DLGID_CTRL,'WEB_ActionPump')
-    WEB_Frequency = int(gda.readAutConf(DLGID_CTRL,'WEB_Frequency'))
+    WEB_Mode = conf.lst_get('WEB_Mode')
+    WEB_ActionPump = conf.lst_get('WEB_ActionPump')
+    WEB_Frequency = int(conf.lst_get('WEB_Frequency'))
     
     # muestro logs con variables de configuracio
     logs.print_in(name_function, 'WEB_Mode', WEB_Mode)

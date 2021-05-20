@@ -71,7 +71,7 @@ class sysLogs(object):
         Clase que envia los logs al syslog
     '''
     
-    def __init__(self, processName = 'processNameEmpty', dlgid = 'dlgidEmpty', logLevel = 'FULL'):
+    def __init__(self, processName = 'processNameEmpty', dlgid = 'dlgidEmpty', logLevel = 'BASIC'):
         '''
             
         '''
@@ -111,7 +111,7 @@ class ctrl_logs(object):
         Clase que maneja el tema de los logs tanto de pantalla como de archivo
         que se mandan desde los scripts
     '''
-    def __init__(self,project_folder_name = '/',process_name = 'empty',DLGID_CTRL = 'empty',show_log = True,logLevel = 'FULL'):
+    def __init__(self,project_folder_name = '/',process_name = 'empty',DLGID_CTRL = 'empty',show_log = True,logLevel = 'BASIC'):
         '''
         Constructor
         '''

@@ -24,10 +24,9 @@ LIST_CONFIG = [
                 #VARIABLES DE EJECUCION
                 'print_log',        True,                           # VER LOS LOGS EN CONSOLA [ True | False ]
                 'DLGID_CTRL',       'CTRLPAY01',                    # ID DATALOGGER QUE EJECUTA LAS ACCIONES DE CONTROL
-                'TYPE',             'CTRL_PpotPaysandu',            # [ CTRL_FREC | CTRL_PpotPaysandu ]
-                
-                
+                              
                 #VARIABLES DE CONFIGURACION
+                'TYPE',             'CTRL_PpotPaysandu',            # [ CTRL_FREC | CTRL_PpotPaysandu ]
                 'LOG_LEVEL',        'FULL',                         # [ BASIC | FULL ]: BASIC-> SOLO TIRA UN LOG QUE INDICA CORRIDA DEL AUTOMATISMO; FULL-> TIRA TODOS LOS LOGS
                 'ENABLE_OUTPUTS',   True,                           # ACTIVA Y DESACTIVA LA ACCION DE LAS SALIDAS PARA ESTE DLGID_CTRL [ True | False]
                 
@@ -38,7 +37,7 @@ LIST_CONFIG = [
 STR_CONFIG = lst2str(LIST_CONFIG)
 #    
 # LLAMADO DEL PROGRAMA 
-os.system('{0}/serv_APP_selection.py {1}'.format(project_path,STR_CONFIG)) 
+os.system('{0}/serv_APP_selection1.py {1}'.format(project_path,STR_CONFIG)) 
 
 #
 # CALCULO TIEMPO DE DEMORA

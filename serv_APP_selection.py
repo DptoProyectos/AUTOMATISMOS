@@ -4,7 +4,7 @@ SELECCION DE AUTOMATISMOS
 
 @author: Yosniel Cabrera
 
-Version 2.1.5 15-04-2021
+Version 2.1.6 20-05-2021
 ''' 
 
 # LIBRERIAS
@@ -22,8 +22,8 @@ from __CORE__.drv_config import dbUrl, perforationProcessPath
 from time import time   
 sel_start_time = time() 
 
-#---------------------------------------------------------------------------------------- 
-# CONFIGURO LAS ENTRADAS DE CONFIGURACION 
+
+# CALL CONFIG ---------------------------------------------------------------------------------------- 
 if __name__ == '__main__':
     # LEO EL STR DE CONFIGURACION   
     
@@ -60,133 +60,42 @@ if __name__ == '__main__':
         TYPE = 'CHARGE'
         
     
-#----------------------------------------------------------------------------------------    
-def read_config_var(DLGID_CTRL):
-    ''''''
-    
-    FUNCTION_NAME = 'READ_CONFIG_VAR'
-    
-    redis = Redis()
-    # 
-    # LEO LOS TAGS DE CONFIGURACION
-    #if redis.hexist(DLGID_CTRL,'TAG_CONFIG'): 
-    if gda.readAutConf(DLGID_CTRL,'TAG_CONFIG'): 
-        #TAG_CONFIG = redis.hget(DLGID_CTRL,'TAG_CONFIG')
-        TAG_CONFIG = gda.readAutConf(DLGID_CTRL,'TAG_CONFIG')
-        TAG_CONFIG = TAG_CONFIG.split(',')
-    else: 
-        logs.print_inf(FUNCTION_NAME,'NO EXISTE LA VARIABLE TAG_CONFIG')
-        logs.print_inf(FUNCTION_NAME,'NO SE EJECUTA EL SCRIPT')
-        quit()
-    #
-    # LEO CONFIGUTACION DE LA REDIS
-    #logs.print_inf(FUNCTION_NAME,'LEO CONFIG EN REDIS')
-    vars_config = []
-    for param in TAG_CONFIG:
-        vars_config.append(param)
-        #vars_config.append(redis.hget(DLGID_CTRL,param))
-        vars_config.append(gda.readAutConf(DLGID_CTRL,param))
-    #
-
-    '''
-    logLevel = config_var(vars_config) 
-    LOG_LEVEL = logLevel.lst_get('LOG_LEVEL')
-    #print(LOG_LEVEL)
-    logs = ctrl_logs(False,'servAppSelection',DLGID_CTRL,print_log,'FULL')'''
-    
-    '''
-    # MUESTRO VARIABLES LEIDAS
-    n = 0
-    for param in vars_config:
-        if n < (len(vars_config)): 
-            logs.print_out(FUNCTION_NAME,vars_config[n],vars_config[n+1])
-            n += 2'''
-    #
-    # CONCATENO LAS VARIABLES DE EJECUCION Y DE CONFIGURACION
-    list_out = []
-    LIST_CONFIG = ['print_log', print_log, 'DLGID_CTRL', DLGID_CTRL, 'TYPE', TYPE]
-    n = 0
-    for param in LIST_CONFIG:
-        if n < 4:
-            list_out.append(LIST_CONFIG[n])
-            n +=1
-    
-    for param in vars_config:
-        list_out.append(param)
-    
-    return list_out
-        
+# FUNCTIONS ----------------------------------------------------------------------------------------    
 def upgrade_config(DLGID_CTRL,LIST_CONFIG):
-    ''''''
+    '''
+        actualiza en gda las variables de dconfiguracion
+    '''
     
     FUNCTION_NAME = 'UPGRADE_CONFIG'
     
-    #
     ## INSTANCIAS
     logs = ctrl_logs(False,'servAppSelection',DLGID_CTRL,print_log)
-    #
-    # IMPRIMIR VARIABLES DE CONFIGURACION
-    n = 4
-    for param in LIST_CONFIG:
-        if n < (len(LIST_CONFIG)): 
-            logs.print_in(FUNCTION_NAME,LIST_CONFIG[n],LIST_CONFIG[n+1])
-            n += 2
-    #
-    # ESCRIBO EN REDIS LAS VARIABLES DE CONFIGURACION
-    logs.print_inf(FUNCTION_NAME, 'ACTUALIZO CONFIG EN REDIS' )
-    n = 4
-    for param in LIST_CONFIG:
-        if n < (len(LIST_CONFIG)): 
-            #redis.hset(DLGID_CTRL,LIST_CONFIG[n],LIST_CONFIG[n+1])              # escritura de valores en la redis
-            gda.InsertAutConf(DLGID_CTRL,LIST_CONFIG[n],LIST_CONFIG[n+1])       # escritura de valores en dbGda
-            n += 2
+
+    # FUNCTIONS
+    def printConfigVars(LIST_CONFIG):
+        n = 4
+        for param in LIST_CONFIG:
+            if n < (len(LIST_CONFIG)): 
+                logs.print_in(FUNCTION_NAME,LIST_CONFIG[n],LIST_CONFIG[n+1])
+                n += 2
     
-    # ELIMINO LAS VARIABLES DE CONFIGURACION ANTERIORES
-    #if redis.hexist(DLGID_CTRL,'TAG_CONFIG'):
-    if gda.readAutConf(DLGID_CTRL,'TAG_CONFIG'):
-        #last_TAG_CONFIG = redis.hget(DLGID_CTRL,'TAG_CONFIG')
-        last_TAG_CONFIG = gda.readAutConf(DLGID_CTRL,'TAG_CONFIG')
-    
-           
-        for param in last_TAG_CONFIG.split(','):
-            #redis.hdel(DLGID_CTRL, param)
-            gda.DeleteAutConf(DLGID_CTRL, param)
-            
-            
-        #redis.hdel(DLGID_CTRL,'TAG_CONFIG')
-        gda.DeleteAutConf(DLGID_CTRL,'TAG_CONFIG')
-       
-        
-        
-    # ESCRIBO EN REDIS EL NOMBRE DE LAS VARIABLES DE CONFIGURACION PARA QUE PUEDAN SER LEIDAS
-    TAG_CONFIG = []
-    n = 4
-    for param in LIST_CONFIG:
-        if n < (len(LIST_CONFIG)): 
-            #redis.hset(DLGID_CTRL,LIST_CONFIG[n],LIST_CONFIG[n+1])
-            gda.InsertAutConf(DLGID_CTRL,LIST_CONFIG[n],LIST_CONFIG[n+1])
-            TAG_CONFIG.append(LIST_CONFIG[n])
-            n += 2
-    #redis.hset(DLGID_CTRL,'TAG_CONFIG',lst2str(TAG_CONFIG))
-    gda.InsertAutConf(DLGID_CTRL,'TAG_CONFIG',lst2str(TAG_CONFIG)) 
-    
-    
-    # LEO VARIABLES ESCRITAS
-    n = 4
-    check_config = []
-    for param in LIST_CONFIG:
-        if n < (len(LIST_CONFIG)): 
-            check_config.append(LIST_CONFIG[n])
-            #check_config.append(redis.hget(DLGID_CTRL,LIST_CONFIG[n]))
-            check_config.append(gda.readAutConf(DLGID_CTRL,LIST_CONFIG[n]))
-            n += 2
-    #
-    # MUESTRO VARIABLES LEIDAS
-    n = 0
-    for param in check_config:
-        if n < (len(check_config)): 
-            logs.print_out(FUNCTION_NAME,check_config[n],check_config[n+1])
-            n += 2
+    def saveConfigVars(LIST_CONFIG):
+        logs.print_inf(FUNCTION_NAME, 'ACTUALIZO CONFIG EN GDA' )
+        n = 4
+        for param in LIST_CONFIG:
+            if n < (len(LIST_CONFIG)): 
+                gda.InsertAutConf(DLGID_CTRL,LIST_CONFIG[n],LIST_CONFIG[n+1])       # escritura de valores en dbGda
+                n += 2
+
+    # MAIN
+    # imprimo en pantalla las variables de configuracion
+    printConfigVars(LIST_CONFIG)
+
+    # eliminto todas las variables de configuracion anteriores
+    gda.DeleteAllAutConf(DLGID_CTRL)
+
+    # escribo nuevamente toda la configuracion en GDA
+    saveConfigVars(LIST_CONFIG)
 
 def add_2_RUN(dlgid,type,logLevel):
     '''
@@ -196,38 +105,29 @@ def add_2_RUN(dlgid,type,logLevel):
     
     name_function = 'ADD_VAR_TO_RUN'
     
-    # PREPARO EL RUN EN serv_error_APP_selection
-    #if gda.readAutConf('serv_error_APP_selection','RUN'):
     if redis.hexist('serv_error_APP_selection','RUN'):
         TAG_CONFIG = redis.hget('serv_error_APP_selection', 'RUN')
-        #TAG_CONFIG = gda.readAutConf('serv_error_APP_selection', 'RUN')
-
+        
         lst_TAG_CONFIG = str2lst(TAG_CONFIG)
         try:
             lst_TAG_CONFIG.index(dlgid)
-            #logs.print_out(name_function, 'RUN', TAG_CONFIG)
+            
         except:
             lst_TAG_CONFIG.append(dlgid)
             str_TAG_CONFIG = lst2str(lst_TAG_CONFIG)
             redis.hset('serv_error_APP_selection', 'RUN', str_TAG_CONFIG)
-            #gda.InsertAutConf('serv_error_APP_selection', 'RUN', str_TAG_CONFIG)
-            #logs.print_out(name_function, 'RUN', str_TAG_CONFIG)
-            
+                        
     else:
         redis.hset('serv_error_APP_selection', 'RUN', dlgid)
-        #gda.InsertAutConf('serv_error_APP_selection', 'RUN', dlgid)
-        
+
+
     # SETEO VARIABLES DE CONFIGURACION
-    #if not(gda.readAutConf(f'{dlgid}_ERROR', 'TAG_CONFIG')):
     if not(redis.hexist(f'{dlgid}_ERROR', 'TAG_CONFIG')):
         redis.hset(f'{dlgid}_ERROR', 'TAG_CONFIG', 'TYPE,LOG_LEVEL')
-        #gda.InsertAutConf(f'{dlgid}_ERROR', 'TAG_CONFIG', 'TYPE')
-            
+    
     # ACTUALIZO VARIABLES DE CONFIGURACION
     redis.hset(f'{dlgid}_ERROR', 'TYPE', type)
-    #gda.InsertAutConf(f'{dlgid}_ERROR', 'TYPE', type)
     redis.hset(f'{dlgid}_ERROR', 'LOG_LEVEL', logLevel)
-    #gda.InsertAutConf(f'{dlgid}_ERROR', 'LOG_LEVEL', FULL)
     
 def show_var_list(lst):
     # instancio los logs con la informacion del LOG_LEVEL
@@ -247,25 +147,15 @@ def run_ctrl_process(LIST_CONFIG):
         TYPE = conf.lst_get('TYPE')
         #
         import importlib.util
-        #
-        '''
-        spec = importlib.util.spec_from_file_location("archivo",'{0}/{1}/PROCESS/ctrl_process.py'.format(project_path,TYPE))
-        archivo = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(archivo)
-        call_ctrl_process = True'''
-              
         
         try:
             spec = importlib.util.spec_from_file_location("archivo",'{0}/{1}/PROCESS/ctrl_process.py'.format(project_path,TYPE))
             archivo = importlib.util.module_from_spec(spec)
             spec.loader.exec_module(archivo)
-            call_ctrl_process = True
+            archivo.control_process(LIST_CONFIG)
         except:
             logs.print_inf(name_function, f'NO SE ENCUENTRA ../{TYPE}/PROCESS/ctrl_process.py O EL MISMO TIENE ERRORES')
-            call_ctrl_process = False
-        #
-        if call_ctrl_process:
-            archivo.control_process(LIST_CONFIG)
+            exit(0)
             
 def run_perforation_process(dlgid):
     
@@ -284,23 +174,22 @@ def run_perforation_process(dlgid):
     param = '--dlgid'
     param_value = dlgid
     
-    '''
-    # bloque para alternar las salidas mediante el error_perf_test cada vez que llega un dato del datlogger
-    if dlgid == 'PTEST05':
-        try:
-            os.system('/datos/cgi-bin/spx/PERFORACIONES/TEST_EQUIPOS/error_perf_test_PTEST05.pl')
-        except:
-            logs.print_inf(name_function, 'ERROR AL CORRER CALLBACK PARA {0}'.format(dlgid))
-    '''
+    
 
     try:
         os.system('{0}{1} {2} {3}'.format(path,file,param,param_value));
     except:
         logs.print_inf(name_function, 'ERROR AL CORRER LAS PERFORACIONES EN PERL')
-        
-       
-    
-#----------------------------------------------------------------------------------------      
+
+
+# MAIN ----------------------------------------------------------------------------------------    
+'''
+    Las variables que siempren estan disponible para el MAIN son:
+        print_log = False
+        DLGID_CTRL = ...
+        TYPE = 'CHARGE'
+        LIST_CONFIG = ...
+'''
 
 name_function = 'APP_SELECTION'
 
@@ -309,81 +198,67 @@ logs = ctrl_logs(False,'servAppSelection',DLGID_CTRL,print_log)
 redis = Redis()
 gda = GDA(dbUrl)
 
-# SE CORRE EL PROCESO DE LAS PERFORACIONES EN PERL
-run_perforation_process(DLGID_CTRL)
 
-# AQUI COMIENZA LO QUE SERIA EL AUTOATISMO EN PYTON
-text = '''
+# se ejecuta el process que atiende las automatismos en perl
+run_perforation_process(DLGID_CTRL)                                    # mine
+
+
+# condicion que se cumple cuandos se llama desde el callback
+if TYPE == 'CHARGE':                                                    
     
-    AUTOMATISMOS EN PYTHON
-    '''
-#logs.print_inf(name_function,text )
+    # armo la lista de configuracion para el process
+    LIST_CONFIG = ['print_log', print_log, 'DLGID_CTRL', DLGID_CTRL] + gda.getAllAutConf(DLGID_CTRL)
 
-
-## VARIABLES GLOBALES QUE LE ENTRAN A CORE
-#logs.print_log(f"EXECUTE: {name_function}")      
-#
-# VARIABLES DE EJECUCION
-if conf.str_get('print_log'):
-    logs.print_in(name_function,'print_log',print_log)
-    logs.print_in(name_function,'DLGID_CTRL',DLGID_CTRL)
-#
-## VARIABLES PARTICULARES QUE LE ENTRAN A APP_SELECTION
-#
-
-if TYPE in allowedTypes:
-#if TYPE in str2lst(config['CTRL_CONFIG']['CTRL_ID']):
-    # IMPRIMIR VARIABLES DE CONFIGURACION
-    n = 4
-    for param in LIST_CONFIG:
-        if n < (len(LIST_CONFIG)): 
-            logs.print_in(name_function,LIST_CONFIG[n],LIST_CONFIG[n+1])
-            n += 2
-    #
-    # ACTUALIZO LA CONFIGURACION
-    logs.print_inf(name_function,'UPGRADE CONFIG')
-    upgrade_config(DLGID_CTRL,LIST_CONFIG)
-    #
-
-else:
-        #CHEQUEO SI EXISTE LA VARIABLE TYPE
-        #if redis.hexist(DLGID_CTRL,'TYPE'):
-        if gda.readAutConf(DLGID_CTRL,'TYPE'):
-            #logs.print_inf(name_function,'READ_CONFIG_VAR')
-            #LEO LAS VARIABLES DE CONFIGURACION
-            LIST_CONFIG=read_config_var(DLGID_CTRL)
-            
-        else: 
-            #logs.print_inf(name_function,'NO EXISTE LA VARIABLE TYPE')
-            #logs.print_inf(name_function,'NO SE EJECUTA EL SCRIPT')
-            LIST_CONFIG=[]
-
-
-
-if bool(LIST_CONFIG):
-    conf = config_var(LIST_CONFIG) 
-    if conf.lst_get('TYPE') in allowedTypes:
-        #
-        # ANADO DLGID_CTRL A 'DLGID_CTRL_TAG_CONFIG' PARA QUE SE EJECUTE EL ctrl_error_frec
-        add_2_RUN(conf.lst_get('DLGID_CTRL'),conf.lst_get('TYPE'),conf.lst_get('LOG_LEVEL'))
-        #
-        # ANADO DLGID_REF A 'DLGID_CTRL_TAG_CONFIG' PARA QUE SE EJECUTE EL ctrl_error_frec
-        if conf.lst_get('DLGID_REF'):
-            add_2_RUN(conf.lst_get('DLGID_REF'),conf.lst_get('TYPE'),conf.lst_get('LOG_LEVEL'))
-        #
-        # MUESTRO LAS VARIABLES QUE SE LE VAN A PASAR AL PROCESS Y LO LLAMO
-        show_var_list(LIST_CONFIG)
-        #
-        # LLAMO AL PROCESS DEL AUTOMATISMO Y LE PASO LIST_CONFIG
-        run_ctrl_process(LIST_CONFIG)
-        #
-    else: 
-        logs.print_inf(name_function,f"[TYPE = {conf.lst_get('TYPE')}]")
+    # leo el valor de TYPE
+    TYPE = config_var(LIST_CONFIG).lst_get('TYPE')
+           
+    # chequeo que el tipo de automatismo a ejecutar este programado
+    if not TYPE in allowedTypes:
+        logs.print_inf(name_function,f"[TYPE = {TYPE}]")
         logs.print_inf(name_function,'VARIABLE TYPE CON VALOR NO RECONOCIDO ')
-        
+        exit(0)
 
+#condicion que se cumple cuando se llama desde un script con configuracion precargada y el tipo de automatismo esta programado
+elif TYPE in allowedTypes:                                              
     
-#   
+    upgrade_config(DLGID_CTRL,LIST_CONFIG)                              # actualizo la configuracion pasada en gda
+    
+else:
+    # condicion que se cumple cuando se llama desde un script con configuracion precargada y el tipo de automatismo NO esta programado
+    logs.print_inf(name_function,f"[TYPE = {TYPE}]")
+    logs.print_inf(name_function,'VARIABLE TYPE CON VALOR NO RECONOCIDO ')
+    exit(0)
+
+
+
+conf = config_var(LIST_CONFIG)
+
+TYPE = conf.lst_get('TYPE')
+DLGID_CTRL = conf.lst_get('DLGID_CTRL')
+DLGID_REF = conf.lst_get('DLGID_REF')
+LOG_LEVEL = conf.lst_get('LOG_LEVEL')
+
+
+# anado el DLGID_CTRL a 'REDIS:serv_error_APP_selection/RUN' PARA QUE SE EJECUTE EL ctrl_error_frec
+add_2_RUN(DLGID_CTRL,TYPE,LOG_LEVEL)
+
+# anado el DLGID_CTRL a 'REDIS:serv_error_APP_selection/RUN' PARA QUE SE EJECUTE EL ctrl_error_frec
+if DLGID_REF:
+    add_2_RUN(DLGID_REF,TYPE,LOG_LEVEL)
+    
+# log de las vriables que se le van a pasar al process
+show_var_list(LIST_CONFIG)
+
+# llamo al automatismo y le paso la lista con las configuraciones
+run_ctrl_process(LIST_CONFIG)
+
+
+
+
+
 # CALCULO TIEMPO DE DEMORA
 #print(f'serv_APP_selection TERMINADO A {time()-sel_start_time} s')
-#
+
+
+
+exit(0)

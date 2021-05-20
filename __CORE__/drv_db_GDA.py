@@ -303,8 +303,28 @@ class GDA(object):
             
             return outPut
 
+    def DeleteAllAutConf(self,dlgId):
+        
+        # establecemos conexion a la bd en caso de que no exista
+        if not self.connected:
+            if self.connect():
+                self.connected = True
+        
+        # si la conexion fue exitosa
+        if self.connected:
+            tb_automatismo = Table('automatismo', self.metadata, autoload=True, autoload_with=self.engine)
+            tb_automatismoParametro = Table('automatismo_parametro', self.metadata, autoload=True, autoload_with=self.engine)
             
-
+            # obtengo el valor del id del automatismo   
+            sel = select([tb_automatismo.c.id])
+            sel = sel.where(tb_automatismo.c.dlgid == dlgId)
+            autoId = self.conn.execute(sel)
+            autoId = autoId.fetchall()[0][0]
+            
+            # elimino toda la configuracion para ese automatismo
+            sql = (delete(tb_automatismoParametro)
+                .where(tb_automatismoParametro.c.auto_id == autoId))
+            self.conn.execute(sql)          
 
 
 
@@ -326,7 +346,8 @@ dbUrl = 'postgresql+psycopg2://admin:pexco599@192.168.0.6/GDA'
 gda = GDA(dbUrl)
         
 #print(gda.getAllAutConf('CTRLPAY01'))
-print(gda.getAllAutConf('MER004'))'''
+#print(gda.getAllAutConf('MER004'))
+gda.DeleteAllAutConf('CTRLPAY01')'''
 
 
 

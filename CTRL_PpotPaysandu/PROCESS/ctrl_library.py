@@ -319,7 +319,7 @@ class ctrl_process(object):
             'AlrLowCau',                    'SI',                   'NO',                 #3
             'AlrLowFlow',                   'SI',                   'NO',                 #4
             'AlrVarFail',                   'SI',                   'NO',                 #5
-            'StateVar',                     'READY',                'FAIL',               #6
+            'StateVar',                     'OK',                   'FAIL',               #6
             'StateLineVar',                 'OK',                   'FAIL',               #7
         ]
 
@@ -372,7 +372,7 @@ class ctrl_process(object):
             self.redis.hset(self.DLGID_CTRL,'AlrVarFail','NO')
 
         if not self.redis.hexist(self.DLGID_CTRL,'StateVar'):
-            self.redis.hset(self.DLGID_CTRL,'StateVar','READY')
+            self.redis.hset(self.DLGID_CTRL,'StateVar','OK')
 
         if not self.redis.hexist(self.DLGID_CTRL,'StateLineVar'):
             self.redis.hset(self.DLGID_CTRL,'StateLineVar','OK')
@@ -382,15 +382,15 @@ class ctrl_process(object):
             garantizo que las variables de control siempre existan
         '''
         # WEB_Mode
-        if not self.gda.readAutConf(self.DLGID_CTRL,'WEB_Mode' ):
+        if not self.config.lst_get('WEB_Mode'):
             self.gda.InsertAutConf(self.DLGID_CTRL, 'WEB_Mode', 'REMOTO')
-
+            
         # WEB_ActionPump
-        if not self.gda.readAutConf(self.DLGID_CTRL,'WEB_ActionPump' ):
+        if not self.config.lst_get('WEB_ActionPump'):
             self.gda.InsertAutConf(self.DLGID_CTRL, 'WEB_ActionPump', 'OFF')
 
         # WEB_Frequency
-        if not self.gda.readAutConf(self.DLGID_CTRL,'WEB_Frequency' ):
+        if not self.config.lst_get('WEB_Frequency'):
             self.gda.InsertAutConf(self.DLGID_CTRL, 'WEB_Frequency', 0)
         
       

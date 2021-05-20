@@ -96,10 +96,14 @@ ENVIROMENT: #!/usr/aut_env/bin/python3.8
 * comparar el serv_APP_selection de los automatismos con el de test DLG.
 * en cada uno de los serv_corregir que la ruta del archivo a llama haya que ponerla a mano.
 * implemetar las funciones readAutConf y WriteAutConf contra la tabla en postgres
-- documentar los visio de la carperta de control de frecuencia de mercedes para drawio.
+* implementar una fucion del tipo redis.hdel(DLGID_CTRL, param) para GDA y ponerla en ambos servicios
+* garantizar que las webVisualVars siempre esten disponibles con un valor por default
+- optimizar as consultas en la base de datos
+- ver el tema de la actualizacion de frecuencia y que la misma se ejecute cuando la tx este ok
 
-- garantizar que las webVisualVars siempre esten disponibles con un valor por default
-- implementar una fucion del tipo redis.hdel(DLGID_CTRL, param) para GDA y ponerla en ambos servicios
+
+
+
 
 
 
