@@ -228,7 +228,10 @@ class ctrl_process(object):
             mbusWrite(self.DLGID_CTRL,'2096','interger',0)              # escribo el valor 0 en el registro 2097 para mandar a apagar la bomba
 
     def getTxState(self):
-        
+        '''
+            devuelve true si la transmision es continua
+            devuelve false si la transmision es inestable
+        '''
         nameFunction = 'getTxState'
         
         #READ INPUTS VALUES
@@ -266,8 +269,6 @@ class ctrl_process(object):
         self.redis.hset(self.DLGID_CTRL,'countRecoveryTx',countRecoveryTx)
            
         return IsStableTx
-
-
 
     def setFrequency(self,WEB_Frequency):
         '''
@@ -418,6 +419,9 @@ class ctrl_process(object):
 
         if not self.redis.hexist(self.DLGID_CTRL,'StateLineVar'):
             self.redis.hset(self.DLGID_CTRL,'StateLineVar','OK')
+
+        if not self.redis.hexist(self.DLGID_CTRL,'UnstableTx'):
+            self.redis.hset(self.DLGID_CTRL,'UnstableTx','NO')
 
     def checkAndSetControlVars(self):
         '''

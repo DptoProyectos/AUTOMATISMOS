@@ -122,9 +122,10 @@ def control_process(LIST_CONFIG):
         if WEB_ActionPump == 'ON':
             if ctrl.getTxState():
                 ctrl.setFrequency(WEB_Frequency)
+                redis.hset(DLGID_CTRL,'UnstableTx','NO')           
             else:
                 logs.print_inf(name_function, 'NO SE ACTUALIZA LA FRECUENCIA POR PROBLEMAS TX')
-                
+                redis.hset(DLGID_CTRL,'UnstableTx','SI')            # activo alerta de transmision inestable
 
     elif SOFT_Mode == 'LOCAL':
         logs.print_inf(name_function,"TRABAJANDO EN MODO LOCAL DESDE EL TABLERO")
