@@ -46,7 +46,7 @@ def control_process(LIST_CONFIG):
     ENABLE_OUTPUTS = str2bool(conf.lst_get('ENABLE_OUTPUTS'))
     
     
- ## INSTANCIAS
+    ## INSTANCIAS
     logs = ctrl_logs(TYPE,'CTRL_PpotPaysandu',DLGID_CTRL,print_log,LOG_LEVEL)
     redis = Redis()
     ctrl = ctrl_process(LIST_CONFIG)
@@ -54,52 +54,53 @@ def control_process(LIST_CONFIG):
     
         
     #---------------------------------------------------------
-    ##PROCESS
+    ## PROCESS ##
     
-    #logs.print_log(__doc__)
-    logs.basicLog(__doc__)
-    
+
     # ESCRIBO LA EJECUCION DEL SCRIPT
+    logs.basicLog(__doc__)
     logs.print_log(f"{name_function}")
     
+
     # MUESTRO VARIABLES DE ENTRADA
     logs.print_in(name_function, 'print_log', print_log)
     logs.print_in(name_function, 'DLGID_CTRL', DLGID_CTRL)
     logs.print_in(name_function, 'TYPE', TYPE)
     logs.print_in(name_function, 'ENABLE_OUTPUTS', ENABLE_OUTPUTS)
-      
+    
 
-
-    # CHEQUEO QUE EXISTAN LOS LINES DEL DATALOGGER DE CONTROL Y EL DE REFERENCIA.
+    # CHEQUEO QUE EXISTA EL DATALOGGER DE CONTROL.
     if not(redis.hexist(DLGID_CTRL,'LINE')): 
-        #logs.script_performance(f'{name_function} ==> NO EXISTE LINE {DLGID_CTRL}')
         logs.print_inf(name_function,f'NO EXISTE LINE {DLGID_CTRL}')
         logs.print_inf(name_function,'EJECUCION INTERRUMPIDA')
         quit()
     
+
     # Garantizo que las variables que se van a usar en la visualizacion siempre existan
     ctrl.setVisualVars()
+
 
     # Garantizo que las variable de control esten siempre disponibles para el automatismo
     ctrl.checkAndSetControlVars()
 
-    
+
+    # Leo las variables de control
     WEB_Mode = conf.lst_get('WEB_Mode')
     WEB_ActionPump = conf.lst_get('WEB_ActionPump')
     WEB_Frequency = int(conf.lst_get('WEB_Frequency'))
+    SOFT_Mode = ctrl.getAndUpdateMode(WEB_Mode)                             # obtengo el modo actual de funcionamiento del sistema
     
-    # muestro logs con variables de configuracio
-    logs.print_in(name_function, 'WEB_Mode', WEB_Mode)
-    logs.print_in(name_function, 'WEB_ActionPump', WEB_ActionPump)
-    logs.print_in(name_function, 'WEB_Frequency', WEB_Frequency)
 
-    SOFT_Mode = ctrl.getAndUpdateMode(WEB_Mode)
-
- # FUNCION MAIN
+    #---------------------------------------------------------
+    ## MAIN DEL FUNCIONAMIETO DEL SISTEMA ##
+    
     name_function = 'MAIN'
    
     # muestro logs de las variables de entrada del software
     logs.print_in(name_function, 'SOFT_Mode', SOFT_Mode)
+    logs.print_in(name_function, 'WEB_Mode', WEB_Mode)
+    logs.print_in(name_function, 'WEB_ActionPump', WEB_ActionPump)
+    logs.print_in(name_function, 'WEB_Frequency', WEB_Frequency)
     
      
     # DETECTO MODO DE TRABAJO
@@ -117,9 +118,13 @@ def control_process(LIST_CONFIG):
         else: 
             ctrl.pump(WEB_ActionPump)
             #
-        # seteo de frecuencia
+        # seteo de frecuencia si la comunicacion es estable
         if WEB_ActionPump == 'ON':
-            ctrl.setFrequency(WEB_Frequency)
+            if ctrl.getTxState():
+                ctrl.setFrequency(WEB_Frequency)
+            else:
+                logs.print_inf(name_function, 'NO SE ACTUALIZA LA FRECUENCIA POR PROBLEMAS TX')
+                
 
     elif SOFT_Mode == 'LOCAL':
         logs.print_inf(name_function,"TRABAJANDO EN MODO LOCAL DESDE EL TABLERO")

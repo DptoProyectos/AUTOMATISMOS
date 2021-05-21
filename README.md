@@ -2,8 +2,8 @@ ROYECTO DE SISTEMAS CON AUTOMATISMOS
 
 FLOWCHART: project 				-> 	https://drive.google.com/file/d/1YFjm_3HncAyEX1VBOtet1D0vdXyxPA-W/view?usp=sharing
 		   serv_APP_selection 	-> 	https://drive.google.com/file/d/1ImChibsiLTjf7Fgl6tJeAeD8pxPpUmb0/view?usp=sharing
-		   CTRL_FREC			->
-		   CTRL_PpotPaysandu	->  
+		   CTRL_FREC			->	
+		   CTRL_PpotPaysandu	->  https://drive.google.com/file/d/1VDwYcD7yKF_tMaDpcf-pSyj6EQ-DgkTK/view?usp=sharing
 
 
 
@@ -98,8 +98,8 @@ ENVIROMENT: #!/usr/aut_env/bin/python3.8
 * implemetar las funciones readAutConf y WriteAutConf contra la tabla en postgres
 * implementar una fucion del tipo redis.hdel(DLGID_CTRL, param) para GDA y ponerla en ambos servicios
 * garantizar que las webVisualVars siempre esten disponibles con un valor por default
-- optimizar as consultas en la base de datos
-- ver el tema de la actualizacion de frecuencia y que la misma se ejecute cuando la tx este ok
+* optimizar as consultas en la base de datos
+* ver el tema de la actualizacion de frecuencia y que la misma se ejecute cuando la tx este ok
 
 
 

@@ -54,7 +54,7 @@ class ctrl_process(object):
         self.logs = ctrl_logs(self.TYPE,'CTRL_PpotPaysandu',self.DLGID_CTRL,self.print_log,self.LOG_LEVEL)
         self.redis = Redis()
         self.gda = GDA(dbUrl)
-
+        
     def getAndUpdateMode(self,WEB_Mode):
         '''
             funcion para obtener el modo de trabajo y actualizarlo en caso necesario
@@ -164,7 +164,7 @@ class ctrl_process(object):
 
 
             
-
+        # MAIN
         # actualizo el modo para el software a partir del modo en que se encuentra el plc
         SOFT_Mode = readPlcMode()
         self.logs.print_in(name_function, 'MOD', SOFT_Mode)
@@ -226,7 +226,49 @@ class ctrl_process(object):
         elif actionOnthePump == 'OFF':
             self.logs.print_inf(name_function, 'APAGO BOMBA')
             mbusWrite(self.DLGID_CTRL,'2096','interger',0)              # escribo el valor 0 en el registro 2097 para mandar a apagar la bomba
+
+    def getTxState(self):
         
+        nameFunction = 'getTxState'
+        
+        #READ INPUTS VALUES
+        # leo el valor del contador de restablecimiento de errores de la redis
+        countRecoveryTx = 0             # default value
+        if self.redis.hexist(self.DLGID_CTRL,'countRecoveryTx'):
+            countRecoveryTx = int(self.redis.hget(self.DLGID_CTRL,'countRecoveryTx'))
+        else:
+            self.redis.hset(self.DLGID_CTRL,'countRecoveryTx',countRecoveryTx)
+        #
+
+        # leo si esta alarmada la tx por errores
+        error_1min = 'NO'                 # default value
+        if self.redis.hexist(self.DLGID_CTRL,'error_1min'):
+            error_1min = self.redis.hget(self.DLGID_CTRL,'error_1min')
+        else:
+            self.redis.hset(self.DLGID_CTRL,'error_1min',error_1min)
+        
+        # MAIN  
+        IsStableTx = False
+        
+        if error_1min == 'NO':
+            if countRecoveryTx >= 3:
+                IsStableTx = True
+            else:
+                countRecoveryTx += 1
+                self.logs.print_inf(nameFunction,'ESPERANDO QUE ESTABLICEN LAS COMUNICACIONES')
+                self.logs.print_out(nameFunction,'countRecoveryTx',countRecoveryTx)
+        else:
+            print('estoy aqui')
+            countRecoveryTx = 0
+            self.logs.print_inf(nameFunction,'COMUNICACIONES INESTABLES')
+
+        # WRITE OUTPUT VARS
+        self.redis.hset(self.DLGID_CTRL,'countRecoveryTx',countRecoveryTx)
+           
+        return IsStableTx
+
+
+
     def setFrequency(self,WEB_Frequency):
         '''
             funcion que manda a setear la frecuencia de trabajo del variador
