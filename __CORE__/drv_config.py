@@ -22,7 +22,7 @@ from __CORE__.mypython import str2bool, str2lst
         perforationProcessPath  path en donde se encuentra el ext_call.pl que llama a las perforaciones que estan en perl
         path_log                ruta en donde van a estar los logs
         easy_log                habilita (True) o deshabilita (False) los logs de adentro de la carpeta AUTOMATISMOS/..
-        allowedTypes            lista con valores que puede tener la variabl de redis DLGID:TYPE para que se corra el automatismo
+        allowedTypes            lista con valores que puede tener la variable de redis DLGID:TYPE para que se corra el automatismo
         
         !DATABASE
         dbUrl                url de la base de datos para realizar la conexion

@@ -120,7 +120,7 @@ class ctrl_logs(object):
         self.DLGID_CTRL = DLGID_CTRL
         self.LOG_LEVEL = logLevel
         self.script_performance = sysLogs(self.process_name, self.DLGID_CTRL, self.LOG_LEVEL)
-        if easy_log: 
+        if easy_log and self.project_folder_name:
             self.easy_dlg_performance_check = saved_logs(f'{self.DLGID_CTRL}_{system_date_raw}', self.DLGID_CTRL, f'{project_path}/{self.project_folder_name}/DLG_PERFORMANCE/')
         
 

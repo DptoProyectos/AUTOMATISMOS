@@ -156,6 +156,7 @@ def run_ctrl_process(LIST_CONFIG):
         except:
             logs.print_inf(name_function, f'NO SE ENCUENTRA ../{TYPE}/PROCESS/ctrl_process.py O EL MISMO TIENE ERRORES')
             exit(0)
+    
             
 def run_perforation_process(dlgid):
     
