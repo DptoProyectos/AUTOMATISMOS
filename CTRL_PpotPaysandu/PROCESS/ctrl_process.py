@@ -110,7 +110,7 @@ def control_process(LIST_CONFIG):
 
     elif SOFT_Mode == 'REMOTO':
         logs.print_inf(name_function, 'TRABAJO EN MODO REMOTO')
-        redis.hset(DLGID_CTRL,'PLC_SoftMode','REMOTO')
+        redis.hset(DLGID_CTRL,'PLC_SoftMode','REMOTO')                      # guardo variable para la visualizacion web
         #
         # accion sobre la bomba
         if not WEB_ActionPump in ['ON','OFF']:
@@ -122,14 +122,14 @@ def control_process(LIST_CONFIG):
         if WEB_ActionPump == 'ON':
             if ctrl.getTxState():
                 ctrl.setFrequency(WEB_Frequency)
-                redis.hset(DLGID_CTRL,'UnstableTx','NO')           
+                redis.hset(DLGID_CTRL,'UnstableTx','NO')                    # guardo variable para la visualizacion web      
             else:
                 logs.print_inf(name_function, 'NO SE ACTUALIZA LA FRECUENCIA POR PROBLEMAS TX')
-                redis.hset(DLGID_CTRL,'UnstableTx','SI')            # activo alerta de transmision inestable
+                redis.hset(DLGID_CTRL,'UnstableTx','SI')                    # activo alerta de transmision inestable para la visualizacion web 
 
     elif SOFT_Mode == 'LOCAL':
         logs.print_inf(name_function,"TRABAJANDO EN MODO LOCAL DESDE EL TABLERO")
-        redis.hset(DLGID_CTRL,'PLC_SoftMode','LOCAL')
+        redis.hset(DLGID_CTRL,'PLC_SoftMode','LOCAL')                       # guardo variable para la visualizacion web  
         
     else:
         logs.print_error(name_function, 'MODO DE TRABAJO NO ADMITIDO')
@@ -137,6 +137,7 @@ def control_process(LIST_CONFIG):
 
     # Preparo para la visualizacion web los estados y alarmas del sistema
     ctrl.showStatesAndAlarms()
+    
     
     #
     # CALCULO TIEMPO DE DEMORA

@@ -130,16 +130,15 @@ def read_param(dlgid,param):
             i += 1
         if match == 9: return True
         else: return False
-    
-    
+   
     ## INSTANCIAS
-    
     redis = Redis()
     # LEO LINE
-    if redis.hexist(dlgid, 'LINE'): line = redis.hget(dlgid,'LINE') 
-    else: return None
-        
-        
+    if redis.hexist(dlgid, 'LINE'): 
+        line = redis.hget(dlgid,'LINE') 
+    else: 
+        return None
+ 
     
     # DETECTO SI EXISTE CABECERA LINE
     if head_detect(line,'LINE=DATE'):
@@ -165,7 +164,7 @@ def read_param(dlgid,param):
                 out = my_list[my_list.index(param)+1]
             except:
                 out = '' 
-        return out
+        #return out
         
     else:
         
@@ -192,7 +191,18 @@ def read_param(dlgid,param):
                 out = my_list[my_list.index(param)+1]
             except:
                 out = '' 
-        return out
+        #return out
+    
+    
+    # aplico validacion de datos modbus
+    if out == '9999':
+        if redis.hexist(dlgid,"lastValidData_{0}".format(param)):
+            out = redis.hget(dlgid,"lastValidData_{0}".format(param))
+    else:
+        redis.hset(dlgid,"lastValidData_{0}".format(param),out)
+    
+
+    return out
 
 def dlg_detection(dlgid):
     '''
