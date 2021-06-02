@@ -18,9 +18,21 @@ ENVIROMENT: #!/usr/aut_env/bin/python3.8
 	>>>>>>>>>>>
 
 ## Logrotate: 
-	Para controlar el tamamano de los logs agregar al archivo XXXXXXXXXXXXXXXX la siguiete configuracion
+	Para controlar el tamamano de los logs crear un archivo en la carpeta /etc/logrotate.d con la siguiete configuracion
 	<<<<<<<<<<<
-	
+		/var/log/autoCtrl.log
+		{
+				rotate 3
+				daily
+				size 1G
+				missingok
+				notifempty
+				delaycompress
+				compress
+				postrotate
+						invoke-rc.d rsyslog rotate > /dev/null
+				endscript
+		}
 	>>>>>>>>>>>
 
 

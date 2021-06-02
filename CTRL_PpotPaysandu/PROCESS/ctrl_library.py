@@ -15,7 +15,6 @@ import redis
 import json
 
 #CONEXIONES
-from CTRL_FREC.PROCESS.drv_visual import dic
 from __CORE__.drv_logs import *
 from __CORE__.drv_redis import Redis
 from __CORE__.drv_dlg import mbusWrite, read_param
@@ -261,7 +260,6 @@ class ctrl_process(object):
                 self.logs.print_inf(nameFunction,'ESPERANDO QUE ESTABLICEN LAS COMUNICACIONES')
                 self.logs.print_out(nameFunction,'countRecoveryTx',countRecoveryTx)
         else:
-            print('estoy aqui')
             countRecoveryTx = 0
             self.logs.print_inf(nameFunction,'COMUNICACIONES INESTABLES')
 
@@ -436,6 +434,7 @@ class ctrl_process(object):
             self.gda.InsertAutConf(self.DLGID_CTRL, 'WEB_ActionPump', 'OFF')
 
         # WEB_Frequency
+
         if not self.config.lst_get('WEB_Frequency'):
             self.gda.InsertAutConf(self.DLGID_CTRL, 'WEB_Frequency', 0)
         
@@ -674,22 +673,22 @@ class errorProcess(object):
                 #
                 # MUESTRO LOG EN CONSOLA
                 self.logs.print_inf(name_function, 'TX STOPPED FOR MORE THAN 10 MIN')
-                self.logs.print_out(name_function, dic.get_dic('TX_ERROR', 'name'), dic.get_dic('TX_ERROR', 'True_value'))
+                self.logs.print_out(name_function, 'TX_ERROR', 'SI')
                 #
                 # ESCRIBO EN EL LOG
                 self.logs.dlg_performance(f'< MAS DE 10 MIN CAIDO > ')
                 #
                 # ESCRIBO EN REDIS LA ALARMA TX_ERROR CON VALOR DE ALARMA PRENDIDA
-                self.redis.hset(self.DLGID, dic.get_dic('TX_ERROR', 'name'), dic.get_dic('TX_ERROR', 'True_value'))
+                self.redis.hset(self.DLGID,'TX_ERROR', 'SI')
                 #
                 return False
             else:
                 #
                 # ESCRIBO EN REDIS LA ALARMA TX_ERROR CON VALOR DE ALARMA APAGADA
-                self.redis.hset(self.DLGID, dic.get_dic('TX_ERROR', 'name'), dic.get_dic('TX_ERROR', 'False_value'))
+                self.redis.hset(self.DLGID, 'TX_ERROR', 'NO')
                 #
                 #MUESTRO LOGS EN CONSOLA DE QUE SE ESCRIBIO LA ALARMA DE ERROR TX EN REDIS
-                self.logs.print_out(name_function, dic.get_dic('TX_ERROR', 'name'), dic.get_dic('TX_ERROR', 'False_value'))
+                self.logs.print_out(name_function,'TX_ERROR', 'NO')
                 #
                 if error_1min:
                     # MUESTRO LOG EN CONSOLA

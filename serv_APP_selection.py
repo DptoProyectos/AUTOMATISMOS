@@ -92,7 +92,7 @@ def upgrade_config(DLGID_CTRL,LIST_CONFIG):
     printConfigVars(LIST_CONFIG)
 
     # eliminto todas las variables de configuracion anteriores
-    gda.DeleteAllAutConf(DLGID_CTRL)
+    #gda.DeleteAllAutConf(DLGID_CTRL)
 
     # escribo nuevamente toda la configuracion en GDA
     saveConfigVars(LIST_CONFIG)
@@ -156,6 +156,8 @@ def run_ctrl_process(LIST_CONFIG):
         except:
             logs.print_inf(name_function, f'NO SE ENCUENTRA ../{TYPE}/PROCESS/ctrl_process.py O EL MISMO TIENE ERRORES')
             exit(0)
+
+        
             
 def run_perforation_process(dlgid):
     
@@ -218,10 +220,22 @@ if TYPE == 'CHARGE':
         logs.print_inf(name_function,'VARIABLE TYPE CON VALOR NO RECONOCIDO ')
         exit(0)
 
+    # leo el valor de LOG_LEVEL y en caso de que no haya lo creo con el valor BASIC
+    # IMPORTANTE QUE ESTE DESPUES DE CHEQUEAR LA CONDICION DE SALIDA
+    LOG_LEVEL = config_var(LIST_CONFIG).lst_get('LOG_LEVEL')
+    if not LOG_LEVEL:
+        LIST_CONFIG += ['LOG_LEVEL','BASIC']
+        gda.InsertAutConf(DLGID_CTRL, 'LOG_LEVEL', 'BASIC')
+        
+
 #condicion que se cumple cuando se llama desde un script con configuracion precargada y el tipo de automatismo esta programado
 elif TYPE in allowedTypes:                                              
     
     upgrade_config(DLGID_CTRL,LIST_CONFIG)                              # actualizo la configuracion pasada en gda
+
+    # armo la lista de configuracion para el process
+    LIST_CONFIG = ['print_log', print_log, 'DLGID_CTRL', DLGID_CTRL] + gda.getAllAutConf(DLGID_CTRL)
+    
     
 else:
     # condicion que se cumple cuando se llama desde un script con configuracion precargada y el tipo de automatismo NO esta programado

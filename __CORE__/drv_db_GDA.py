@@ -337,17 +337,19 @@ class GDA(object):
 
 
 
+'''
+
+
+# ONLY FOR TEST
+dbUrl = 'postgresql+psycopg2://admin:pexco599@10.1.1.153/GDA'
+gda = GDA(dbUrl)
+        
+print(gda.getAllAutConf('CTRLPAY01'))
+#print(gda.getAllAutConf('MER004'))
+#gda.DeleteAllAutConf('CTRLPAY01')
+#gda.DeleteAutConf('CTRLPAY01','LOG_LEVEL')
+print(gda.getAllAutConf('CTRLPAY01'))
 
 
 
 '''
-# ONLY FOR TEST
-dbUrl = 'postgresql+psycopg2://admin:pexco599@192.168.0.6/GDA'
-gda = GDA(dbUrl)
-        
-#print(gda.getAllAutConf('CTRLPAY01'))
-#print(gda.getAllAutConf('MER004'))
-gda.DeleteAllAutConf('CTRLPAY01')'''
-
-
-
