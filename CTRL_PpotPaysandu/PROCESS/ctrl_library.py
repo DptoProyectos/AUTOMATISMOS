@@ -11,6 +11,7 @@ Version 1.0.0 15-04-2021 11:19
 ''' 
 
 # LIBRERIAS
+from os import PRIO_PGRP
 import redis
 import json
 
@@ -21,11 +22,6 @@ from __CORE__.drv_dlg import mbusWrite, read_param
 from __CORE__.mypython import config_var, str2bool, dec2bin
 from __CORE__.drv_config import dbUrl
 from drv_db_GDA import GDA
-
-
-#from posix import read
-
-
 
 
 
@@ -73,22 +69,19 @@ class ctrl_process(object):
 
             # leo el modo en que actualmente esta trabajando el PLC
             MOD = read_param(self.DLGID_CTRL,'MOD')
+            MOD = '102'       
             
-            if MOD == "0": return "EMERGENCIA"
-            elif MOD == "1": return "LOCAL"
-            elif MOD == "2": return "REMOTO"
+            if MOD == "100": return "EMERGENCIA"
+            elif MOD == "101": return "LOCAL"
+            elif MOD == "102": return "REMOTO"
             else: 
-                self.logs.print_in(name_function, 'MOD', MOD)
-                self.logs.print_error(name_function, 'MODO DE TRABAJO NO ADMITIDO')
+                self.logs.print_error(name_function, 'MODO DE TRABAJO NO ADMITIDO: MOD = {0}'.format(MOD))
                 self.logs.print_error(name_function, 'NO SE EJECUTA EL SCRIPT')
                 quit()
 
         def IsWebModeChanged():
             """
                 detecta si hubo un cambio en el modo de trabajo web
-                0 -> EMERGENCIA
-                1 -> LOCAL
-                2 -> REMOTO
             """
             if not self.redis.hexist(self.DLGID_CTRL,'Last_WEB_Mode'):
                 self.redis.hset(self.DLGID_CTRL,'Last_WEB_Mode',WEB_Mode)
@@ -106,9 +99,9 @@ class ctrl_process(object):
                 se escribe el registro UMOD del PLC para que el mismo actualice el modo
             """
             if WEB_Mode == "EMERGENCIA":
-                mbusWrite(self.DLGID_CTRL,'2097','interger',5)
+                mbusWrite(self.DLGID_CTRL,'2097','interger',105)
             elif WEB_Mode == "REMOTO":
-                mbusWrite(self.DLGID_CTRL,'2097','interger',7)
+                mbusWrite(self.DLGID_CTRL,'2097','interger',107)
             else:
                 pass
 
@@ -133,20 +126,24 @@ class ctrl_process(object):
         def updateWebMode(UMOD):
             """
                 Se actualiza en la web el modo de la siguiente forma
-                1-> EMERGENCIA
-                3-> REMOTO
-                En caso de valor 2 return True para indicar que se esta trabajando en modo local
+                101-> EMERGENCIA
+                103-> LOCAL
+                103-> REMOTO
+                En caso de valor 102 return True para indicar que se esta trabajando en modo local
             """
-            if UMOD == "1":
+            if UMOD == "101":
                 self.logs.print_inf(name_function,"SE ACTUALIZA EL MODO EN LA WEB")
                 self.gda.WriteAutConf(self.DLGID_CTRL,'WEB_Mode','EMERGENCIA')
                 self.redis.hset(self.DLGID_CTRL,'Last_WEB_Mode','EMERGENCIA')
-                mbusWrite(self.DLGID_CTRL,'2097','interger',0)
-            elif UMOD == "3":
+                mbusWrite(self.DLGID_CTRL,'2097','interger',100)
+            elif UMOD == "102":
+                self.logs.print_inf(name_function,"MODO LOCAL EN EL TABLERO")
+                self.logs.print_inf(name_function,"NO SE TIENE CONTROL REMOTO")
+            elif UMOD == "103":
                 self.logs.print_inf(name_function,"SE ACTUALIZA EL MODO EN LA WEB")
                 self.gda.WriteAutConf(self.DLGID_CTRL,'WEB_Mode','REMOTO')
                 self.redis.hset(self.DLGID_CTRL,'Last_WEB_Mode','REMOTO')
-                mbusWrite(self.DLGID_CTRL,'2097','interger',0)
+                mbusWrite(self.DLGID_CTRL,'2097','interger',100)
 
         def IsUpdatePlcModePending():
             '''
@@ -158,8 +155,10 @@ class ctrl_process(object):
                 self.redis.hset(self.DLGID_CTRL,'UpdatePlcModePending','NO')
                 UpdatePlcModePending = 'NO'
 
-            if UpdatePlcModePending == 'SI': return True
-            else: return False
+            if UpdatePlcModePending == 'SI': 
+                return True
+            else: 
+                return False
 
 
             
@@ -181,7 +180,7 @@ class ctrl_process(object):
         else:
             # verifico que este en proceso una actualizacion de modo en el plc
             if IsUpdatePlcModePending():
-                # chequeo si se escribio se actualizo el modo del PLC. Si no lo hizo lo vuelvo a escribir.
+                # chequeo si se actualizo el modo del PLC. Si no lo hizo lo vuelvo a escribir.
                 self.logs.print_inf(name_function,"PROCESO DE ACTUALIZACION DE MODO HACIA EL PLC PENDIENTE")
                 if not IsPlcModeUpdated():
                     self.logs.print_inf(name_function,"SE MANDA NUEVAMENTE!!! A ACTUALIZAR EL MODO EN EL PLC")
@@ -192,26 +191,20 @@ class ctrl_process(object):
             else:
                 # chequep si hay pedido para actualizar en la web
                 UMOD = read_param(self.DLGID_CTRL,'UMOD')
-                if UMOD == '0':
-                    self.logs.print_inf(name_function,"NO HAY SOLICITUD DE ACTUALIZACION MODO")
-                elif UMOD in ['1','3']:
+                #UMOD = '101'
+                if UMOD == '100':
+                    self.logs.print_inf(name_function,"MODOS DE TRABAJO ACTUALIZADOS")
+                elif UMOD in ['101','102','103']:
                     # Actualizo el modo web
-                    self.logs.print_inf(name_function,"HAY PEDIDO DE ACTUALIZACION WEB")
+                    self.logs.print_inf(name_function,"HUBO CAMBIO DE MODO EN EL PLC")
                     updateWebMode(UMOD)
-        return SOFT_Mode
-
-                
-        
-        
-
-        
-
-
+                else:
+                    self.logs.print_error(name_function,"VALOR NO ADMITIDO PARA ACTUALIZACION DE MODOS: UMOD = {0}".format(UMOD))
+                    self.logs.print_error(name_function,"SE IGNORA ESTE VALOR")
 
         self.logs.print_out(name_function, 'SOFT_Mode', SOFT_Mode)
-
         return SOFT_Mode
-
+       
     def pump(self,actionOnthePump):
         '''
             funcion que manda a prender o apagar la bomba
@@ -220,11 +213,11 @@ class ctrl_process(object):
 
         if actionOnthePump == 'ON':
             self.logs.print_inf(name_function, 'PRENDO BOMBA')
-            mbusWrite(self.DLGID_CTRL,'2096','interger',2)              # escribo el valor 2 en el registro 2097 para mandar a prender la bomba
+            mbusWrite(self.DLGID_CTRL,'2096','interger',101)              # escribo el valor 2 en el registro 2097 para mandar a prender la bomba
 
         elif actionOnthePump == 'OFF':
             self.logs.print_inf(name_function, 'APAGO BOMBA')
-            mbusWrite(self.DLGID_CTRL,'2096','interger',0)              # escribo el valor 0 en el registro 2097 para mandar a apagar la bomba
+            mbusWrite(self.DLGID_CTRL,'2096','interger',100)              # escribo el valor 0 en el registro 2097 para mandar a apagar la bomba
 
     def getTxState(self):
         '''
@@ -275,7 +268,7 @@ class ctrl_process(object):
         name_function = 'MAIN'
 
         UFREQ = int(read_param(self.DLGID_CTRL,'UFREQ'))
-
+                 
         # leo la variable IsfrequecyUpdating
         if not self.redis.hexist(self.DLGID_CTRL,'IsfrequecyUpdating'):
             self.redis.hset(self.DLGID_CTRL,'IsfrequecyUpdating','NO')
@@ -297,11 +290,11 @@ class ctrl_process(object):
         else:
             countFrames = int(self.redis.hget(self.DLGID_CTRL,'countFrames'))
     
-        if UFREQ == 0:
+        if UFREQ == 100:
             if IsfrequecyUpdating == 'NO':
                 if WEB_Frequency != 0:
                     self.logs.print_inf(name_function, 'SE MANDA A ACTUALIZAR LA FRECUENCIA {0}'.format(WEB_Frequency))
-                    mbusWrite(self.DLGID_CTRL,'2098','interger',WEB_Frequency)
+                    mbusWrite(self.DLGID_CTRL,'2098','interger',WEB_Frequency+100)
                     self.redis.hset(self.DLGID_CTRL,'IsfrequecyUpdating','SI')
                     self.redis.hset(self.DLGID_CTRL,'lastUpdatedFrequecy',WEB_Frequency)
                     self.redis.hset(self.DLGID_CTRL,'countFrames',0)
@@ -317,7 +310,7 @@ class ctrl_process(object):
                         self.redis.hset(self.DLGID_CTRL,'IsfrequecyUpdating','NO')
                         # 
                         # pongo en cero el registro modbus para evitar que se mande por error un valor y se comience un proceso de actualizacio de frecuencia
-                        mbusWrite(self.DLGID_CTRL,'2098','interger',0)
+                        mbusWrite(self.DLGID_CTRL,'2098','interger',100)
                     else:
                         deltaFrequency = WEB_Frequency - lastUpdatedFrequecy
                         self.logs.print_inf(name_function, 'NUEVO VALOR DE ACTUALIZACION DE FRECUENCIA')
@@ -331,14 +324,19 @@ class ctrl_process(object):
                     self.redis.hset(self.DLGID_CTRL,'countFrames',countFrames)
                     #
                     # pongo en cero el registro modbus para evitar que se mande por error un valor y se comience un proceso de actualizacio de frecuencia
-                    mbusWrite(self.DLGID_CTRL,'2098','interger',0)
+                    mbusWrite(self.DLGID_CTRL,'2098','interger',100)
         else:
-            self.logs.print_inf(name_function, 'ACTUALIZACION DE FRECUENCIA EN CURSO')
-            self.logs.print_inf(name_function, 'SE ESPERA QUE SE TERMINE DE ACTUALIZAR LA FRECUENCIA')
-            self.redis.hset(self.DLGID_CTRL,'countFrames',2)
-            #
-            # pongo en cero el registro modbus para evitar que se mande por error un valor y se comience un proceso de actualizacio de frecuencia
-            mbusWrite(self.DLGID_CTRL,'2098','interger',0)
+            if UFREQ >= 50 and UFREQ <= 150:
+                print(UFREQ)
+                self.logs.print_inf(name_function, 'ACTUALIZACION DE FRECUENCIA EN CURSO')
+                self.logs.print_inf(name_function, 'SE ESPERA QUE SE TERMINE DE ACTUALIZAR LA FRECUENCIA')
+                self.redis.hset(self.DLGID_CTRL,'countFrames',2)
+                #
+                # pongo en cero el registro modbus para evitar que se mande por error un valor y se comience un proceso de actualizacio de frecuencia
+                mbusWrite(self.DLGID_CTRL,'2098','interger',100)
+            else:
+                self.logs.print_error(name_function, "VALOR INCORRECTO: UFREQ = {0}".format(UFREQ))
+                self.logs.print_error(name_function,"SE IGNORA ESTE VALOR")
 
     def showStatesAndAlarms(self):
         '''
@@ -349,42 +347,78 @@ class ctrl_process(object):
 
         self.logs.print_inf('MAIN',name_function)
                
+        def IsValidStates(wordState):
+            '''
+                devuelve False se es invalida la palabra de estados recibida
+            '''
+
+            validData = True
+            
+            # Condiciones para que el dato de estado leidosea valido 
+            ## 1- que esten prensente los 16 bits
+            bitAmount = 0
+            for bit in wordState:
+                bitAmount += 1
+            if bitAmount != 16:
+                validData = False
+
+            ## 2- que la palabra comience por 101
+            bitPosition = 15
+            for bitValue in wordState:
+                if bitPosition == 15:
+                    if bitValue != '1':
+                        validData = False
+                if bitPosition == 14:
+                    if bitValue != '0':
+                        validData = False
+                if bitPosition == 13:
+                    if bitValue != '1':
+                        validData = False
+                if bitPosition == 13:
+                    break
+                bitPosition -= 1 
+
+            return validData
+
+
         decStates = int(read_param(self.DLGID_CTRL,'ST'))
         binStates = dec2bin(decStates)
+                
+        if IsValidStates(binStates):
+            listOfAlarmsAndStates = [
+                # desctription                trueValue              falseValue              bit
+                'AlrLowFlow',                   'SI',                   'NO',                 #0
+                'StatePump',                    'ON',                   'OFF',                #1
+                'AlrLowPressure',               'SI',                   'NO',                 #2
+                'AlrLowCau',                    'SI',                   'NO',                 #3
+                'AlrLowFlow',                   'SI',                   'NO',                 #4
+                'AlrVarFail',                   'SI',                   'NO',                 #5
+                'StateVar',                     'OK',                   'FAIL',               #6
+                'StateLineVar',                 'OK',                   'FAIL',               #7
+            ]
 
-        listOfAlarmsAndStates = [
-            # desctription                trueValue              falseValue              bit
-            'AlrLowFlow',                   'SI',                   'NO',                 #0
-            'StatePump',                    'ON',                   'OFF',                #1
-            'AlrLowPressure',               'SI',                   'NO',                 #2
-            'AlrLowCau',                    'SI',                   'NO',                 #3
-            'AlrLowFlow',                   'SI',                   'NO',                 #4
-            'AlrVarFail',                   'SI',                   'NO',                 #5
-            'StateVar',                     'OK',                   'FAIL',               #6
-            'StateLineVar',                 'OK',                   'FAIL',               #7
-        ]
+            NumberOfZerosForFill = int(len(listOfAlarmsAndStates)/3) - len(binStates)
 
-        NumberOfZerosForFill = int(len(listOfAlarmsAndStates)/3) - len(binStates)
-
-        if NumberOfZerosForFill > 0:
-            # completo con ceros binStates
-            while NumberOfZerosForFill > 0:
-                binStates = '0{0}'.format(binStates)
-                NumberOfZerosForFill -= 1
-        elif NumberOfZerosForFill < 0:
-            # esto ocurre porque dentro del registro modbus se esta mandando algun bit de alarma que no esta declarado
-            self.logs.print_inf(name_function,'HAY MAS ESTADOS QUE ALARMAS DECLARADAS')
-
-        # escribo los valores de alarmas para cada uno de los bits segun declaracion en listOfAlarmsAndStates
-        bit = len(binStates)-1  
-        for valueBit in binStates:
-            if valueBit == '1':
-                self.redis.hset(self.DLGID_CTRL,listOfAlarmsAndStates[3*bit],listOfAlarmsAndStates[3*bit+1])
-                self.logs.print_out(name_function,listOfAlarmsAndStates[3*bit],listOfAlarmsAndStates[3*bit+1])
-            else:
-                self.redis.hset(self.DLGID_CTRL,listOfAlarmsAndStates[3*bit],listOfAlarmsAndStates[3*bit+2])
-                self.logs.print_out(name_function,listOfAlarmsAndStates[3*bit],listOfAlarmsAndStates[3*bit+2])
-            bit -= 1
+            if NumberOfZerosForFill > 0:
+                # completo con ceros binStates
+                while NumberOfZerosForFill > 0:
+                    binStates = '0{0}'.format(binStates)
+                    NumberOfZerosForFill -= 1
+            
+            # escribo los valores de alarmas para cada uno de los bits segun declaracion en listOfAlarmsAndStates
+            bit = len(binStates)-1  
+            for valueBit in binStates:
+                if not bit in [15, 14, 13]:                                             # ignoro las posiciones de cabecera de control
+                    if bit < int(len(listOfAlarmsAndStates)/3):                         # ignoro las posiciones que no tenga estado declarados en listOfAlarmsAndStates
+                        if valueBit == '1':
+                            self.redis.hset(self.DLGID_CTRL,listOfAlarmsAndStates[3*bit],listOfAlarmsAndStates[3*bit+1])
+                            self.logs.print_out(name_function,listOfAlarmsAndStates[3*bit],listOfAlarmsAndStates[3*bit+1])
+                        else:
+                            self.redis.hset(self.DLGID_CTRL,listOfAlarmsAndStates[3*bit],listOfAlarmsAndStates[3*bit+2])
+                            self.logs.print_out(name_function,listOfAlarmsAndStates[3*bit],listOfAlarmsAndStates[3*bit+2])
+                bit -= 1
+        else:
+            self.logs.print_error(name_function,'DATOS DE ESTADOS INVALIDO: ST = {0}'.format(decStates))
 
     def setVisualVars(self):
         '''

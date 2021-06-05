@@ -153,10 +153,10 @@ class ctrl_logs(object):
         self.script_performance.write(f"{name_function} ==> {message}")
     
     def print_error(self,name_function,message):
-        if self.show_log: print(f"{name_function} ==> ERRROR: {message}")
+        if self.show_log: print(f"{name_function} ==> ERROR: {message}")
         #
         # DEJO REGISTRO EN EL LOGS
-        self.script_performance.write(f"{name_function} ==> ERRROR: {message}")
+        self.script_performance.write(f"{name_function} ==> ERROR: {message}")
         
     def dlg_performance(self,message):
         

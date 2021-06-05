@@ -147,7 +147,7 @@ def run_ctrl_process(LIST_CONFIG):
         TYPE = conf.lst_get('TYPE')
         #
         import importlib.util
-        
+        '''
         try:
             spec = importlib.util.spec_from_file_location("archivo",'{0}/{1}/PROCESS/ctrl_process.py'.format(project_path,TYPE))
             archivo = importlib.util.module_from_spec(spec)
@@ -155,8 +155,12 @@ def run_ctrl_process(LIST_CONFIG):
             archivo.control_process(LIST_CONFIG)
         except:
             logs.print_inf(name_function, f'NO SE ENCUENTRA ../{TYPE}/PROCESS/ctrl_process.py O EL MISMO TIENE ERRORES')
-            exit(0)
+            exit(0)'''
 
+        spec = importlib.util.spec_from_file_location("archivo",'{0}/{1}/PROCESS/ctrl_process.py'.format(project_path,TYPE))
+        archivo = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(archivo)
+        archivo.control_process(LIST_CONFIG)
         
             
 def run_perforation_process(dlgid):
