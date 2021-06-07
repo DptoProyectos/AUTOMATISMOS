@@ -187,6 +187,7 @@ class ctrl_process(object):
                 else:
                     self.logs.print_inf(name_function,"MODO EN EL PLC ACTUALIZADO DE FORMA CORRECTA")
                     self.redis.hset(self.DLGID_CTRL,'UpdatePlcModePending','NO')
+                    mbusWrite(self.DLGID_CTRL,'2097','interger',100)                    # pongo el registro en el valor por default para que no se este mandando continuamente a actualizar cuando se emita algun comando
             else:
                 # chequep si hay pedido para actualizar en la web
                 UMOD = read_param(self.DLGID_CTRL,'UMOD')
