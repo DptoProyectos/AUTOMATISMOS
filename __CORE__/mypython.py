@@ -89,11 +89,12 @@ def bin2dec(str_in):
     return int(str_in, 2)
 
 def dec2bin(decimal):
-            binario = ''
-            while decimal // 2 != 0:
-                binario = str(decimal % 2) + binario
-                decimal = decimal // 2
-            return str(decimal) + binario
+    binario = ''
+    decimal = abs(decimal)                  # garantizo qe el valor a convertir a binario siempre sea positivo
+    while decimal // 2 != 0:
+        binario = str(decimal % 2) + binario
+        decimal = decimal // 2
+    return str(decimal) + binario
 
 class config_var():
     '''

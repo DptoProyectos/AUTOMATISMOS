@@ -130,7 +130,9 @@ def read_param(dlgid,param):
             i += 1
         if match == 9: return True
         else: return False
-   
+    
+    
+
     ## INSTANCIAS
     redis = Redis()
     # LEO LINE
@@ -141,12 +143,16 @@ def read_param(dlgid,param):
  
     
     # DETECTO SI EXISTE CABECERA LINE
+    
     if head_detect(line,'LINE=DATE'):
+           
         parsed_line = line.split(';')
         #
         # CREO UNA LISTA A PARTIR DE SEPARAR LOS CAMPOS DEL LINE
         n = 0
         my_list = []
+        
+        
         for elements in parsed_line:
             fields = elements.split(':')
             my_list.append(fields[0])
@@ -156,7 +162,9 @@ def read_param(dlgid,param):
                 pass
       
             n = n+1
-            
+        
+
+        
         # VEO SI SE ESTA SELECCIONADO DATE O TIME 
         if param == 'DATE': out = f'20{my_list[1]}'
         else: 
@@ -201,7 +209,7 @@ def read_param(dlgid,param):
     else:
         redis.hset(dlgid,"lastValidData_{0}".format(param),out)
     
-
+    
     return out
 
 def dlg_detection(dlgid):

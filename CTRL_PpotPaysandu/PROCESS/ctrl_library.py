@@ -346,11 +346,14 @@ class ctrl_process(object):
         name_function = 'SHOW_STATES_&_ALARMS'
 
         self.logs.print_inf('MAIN',name_function)
+
+        
                
         def IsValidStates(wordState):
             '''
                 devuelve False se es invalida la palabra de estados recibida
             '''
+            
 
             validData = True
             
@@ -361,7 +364,7 @@ class ctrl_process(object):
                 bitAmount += 1
             if bitAmount != 16:
                 validData = False
-
+            
             ## 2- que la palabra comience por 101
             bitPosition = 15
             for bitValue in wordState:
@@ -380,10 +383,18 @@ class ctrl_process(object):
 
             return validData
 
+        
 
+        
+
+        
+        
         decStates = int(read_param(self.DLGID_CTRL,'ST'))
+        
         binStates = dec2bin(decStates)
-                
+        
+       
+
         if IsValidStates(binStates):
             listOfAlarmsAndStates = [
                 # desctription                trueValue              falseValue              bit
