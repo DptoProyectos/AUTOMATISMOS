@@ -319,6 +319,7 @@ class ctrl_process(object):
                         self.redis.hset(self.DLGID_CTRL,'lastUpdatedFrequecy',WEB_Frequency)
                         self.redis.hset(self.DLGID_CTRL,'countFrames',0)
                 else:
+                    self.logs.print_out(name_function,'UFREQ',UFREQ)
                     self.logs.print_inf(name_function, 'SE ESPERA UN NUEVO FRAME CON VALOR VALIDO EN UFREQ')
                     self.redis.hset(self.DLGID_CTRL,'countFrames',countFrames)
                     #
