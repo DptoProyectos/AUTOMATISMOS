@@ -355,28 +355,28 @@ class ctrl_process(object):
             
 
             validData = True
-            
             # Condiciones para que el dato de estado leidosea valido 
-            ## 1- que esten prensente los 16 bits
+            ## 1- que esten prensente los 15 bits
             bitAmount = 0
             for bit in wordState:
                 bitAmount += 1
-            if bitAmount != 16:
+            if bitAmount != 15:
                 validData = False
             
-            ## 2- que la palabra comience por 101
-            bitPosition = 15
+            ## 2- que la palabra comience por 0101
+            print(wordState)
+            bitPosition = 14
             for bitValue in wordState:
-                if bitPosition == 15:
+                if bitPosition == 14:
                     if bitValue != '1':
                         validData = False
-                if bitPosition == 14:
+                if bitPosition == 13:
                     if bitValue != '0':
                         validData = False
-                if bitPosition == 13:
+                if bitPosition == 12:
                     if bitValue != '1':
                         validData = False
-                if bitPosition == 13:
+                if bitPosition == 12:
                     break
                 bitPosition -= 1 
 
