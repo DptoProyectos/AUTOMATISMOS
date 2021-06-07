@@ -69,7 +69,6 @@ class ctrl_process(object):
 
             # leo el modo en que actualmente esta trabajando el PLC
             MOD = read_param(self.DLGID_CTRL,'MOD')
-            MOD = '102'       
             
             if MOD == "100": return "EMERGENCIA"
             elif MOD == "101": return "LOCAL"
