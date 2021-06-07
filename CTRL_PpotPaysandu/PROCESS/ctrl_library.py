@@ -212,8 +212,9 @@ class ctrl_process(object):
         name_function = 'MAIN'
 
         if actionOnthePump == 'ON':
-            self.logs.print_inf(name_function, 'PRENDO BOMBA')
-            mbusWrite(self.DLGID_CTRL,'2096','interger',101)              # escribo el valor 2 en el registro 2097 para mandar a prender la bomba
+            if self.redis.hget(self.DLGID_CTRL,'StatePump') != 'ON':
+                self.logs.print_inf(name_function, 'PRENDO BOMBA')
+                mbusWrite(self.DLGID_CTRL,'2096','interger',101)              # escribo el valor 2 en el registro 2097 para mandar a prender la bomba
 
         elif actionOnthePump == 'OFF':
             self.logs.print_inf(name_function, 'APAGO BOMBA')
@@ -328,7 +329,6 @@ class ctrl_process(object):
                     mbusWrite(self.DLGID_CTRL,'2098','interger',100)
         else:
             if UFREQ >= 50 and UFREQ <= 150:
-                print(UFREQ)
                 self.logs.print_inf(name_function, 'ACTUALIZACION DE FRECUENCIA EN CURSO')
                 self.logs.print_inf(name_function, 'SE ESPERA QUE SE TERMINE DE ACTUALIZAR LA FRECUENCIA')
                 self.redis.hset(self.DLGID_CTRL,'countFrames',2)
@@ -366,7 +366,6 @@ class ctrl_process(object):
                 validData = False
             
             ## 2- que la palabra comience por 0101
-            print(wordState)
             bitPosition = 14
             for bitValue in wordState:
                 if bitPosition == 14:
