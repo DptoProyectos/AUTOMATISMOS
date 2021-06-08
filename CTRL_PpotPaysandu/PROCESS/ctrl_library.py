@@ -399,7 +399,7 @@ class ctrl_process(object):
         if IsValidStates(binStates):
             listOfAlarmsAndStates = [
                 # desctription                trueValue              falseValue              bit
-                'AlrLowFlow',                   'SI',                   'NO',                 #0
+                'StateFlow',                    'SI',                   'NO',                 #0
                 'StatePump',                    'ON',                   'OFF',                #1
                 'AlrLowPressure',               'SI',                   'NO',                 #2
                 'AlrLowCau',                    'SI',                   'NO',                 #3
