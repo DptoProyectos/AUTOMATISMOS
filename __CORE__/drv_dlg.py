@@ -203,7 +203,7 @@ def read_param(dlgid,param):
     
     
     # aplico validacion de datos modbus
-    if out == '9999':
+    if out == 'nan':
         if redis.hexist(dlgid,"lastValidData_{0}".format(param)):
             out = redis.hget(dlgid,"lastValidData_{0}".format(param))
     else:
@@ -239,7 +239,7 @@ def get_outs(dlgid,dec_value_outs,no_out):
     '''
     #
     if no_out > 7: return None
-    #
+    #0
     bin_value_outs = bin(int(dec_value_outs))
     str_value_outs = bin_value_outs[2:]
     #
@@ -254,6 +254,8 @@ def mbusWrite(dlgid,register,dataType,value):
         register    => valor del registro modbus que se quiere escribir
         dataType    => tipo de dato que se quiere escribir [ interger | float ]
         value       => valor que se quiere poner en este registro
+
+        EX: mbusWrite(self.DLGID_CTRL,'2097','interger',105)
     '''
 
     if   dataType == 'interger':    dataType ='I'
@@ -310,10 +312,5 @@ def mbusWrite(dlgid,register,dataType,value):
             redis.hset(dlgid,'lastMODBUS',currentModbus)
             
             
-    
-    
-    
-    
-    
 
- 
+

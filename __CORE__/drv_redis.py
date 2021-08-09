@@ -24,6 +24,7 @@ class Redis(object):
         self.connected = 'NULL'
         self.rh = 'NULL'
         try:
+            #self.rh = redis.Redis('localhost')
             self.rh = redis.Redis(rddbhost)
             self.connected = True
         except Exception as err_var:
