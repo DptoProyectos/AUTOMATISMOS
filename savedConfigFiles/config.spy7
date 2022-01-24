@@ -1,0 +1,32 @@
+; config.ini
+# Version 1.1.4 07-04-2021
+
+[GENERAL_CONFIG]
+    sql_config2use = LOCAL_GDA	  
+    redis_config2use = SPY   
+    perforationProcessPath = /datos/cgi-bin/spx/PERFORACIONES/      
+    easy_log = True		
+    allowedTypes = CTRL_FREC,CTRL_PpotPaysandu,
+			
+
+
+
+# sql_config2use #
+    [LOCAL_GDA]
+        dbUrl 		= postgresql+psycopg2://admin:pexco599@192.168.0.6/GDA
+        
+    [SPY_GDA]
+        dbUrl 		= postgresql+psycopg2://admin:pexco599@192.168.0.6/GDA
+
+    [OSE_GDA]
+        dbUrl 		= postgresql+psycopg2://admin:pexco599@192.168.0.6/GDA
+        
+
+
+# redis_config2use #
+    [LOCAL]
+        host = 127.0.0.1
+    [SPY]
+        host = 192.168.0.8
+    [OSE]
+        host = 127.0.0.1
