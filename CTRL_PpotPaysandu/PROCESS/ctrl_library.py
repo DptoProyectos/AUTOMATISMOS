@@ -212,14 +212,12 @@ class ctrl_process(object):
         name_function = 'MAIN'
 
         if actionOnthePump == 'ON':
-            if self.redis.hget(self.DLGID_CTRL,'StatePump') != 'ON':
-                self.logs.print_inf(name_function, 'PRENDO BOMBA')
-                mbusWrite(self.DLGID_CTRL,'2096','interger',101)              # escribo el valor 2 en el registro 2097 para mandar a prender la bomba
+            self.logs.print_inf(name_function, 'PRENDO BOMBA')
+            mbusWrite(self.DLGID_CTRL,'2096','interger',101)              # escribo el valor 2 en el registro 2097 para mandar a prender la bomba
 
         elif actionOnthePump == 'OFF':
-            if self.redis.hget(self.DLGID_CTRL,'StatePump') != 'OFF':
-                self.logs.print_inf(name_function, 'APAGO BOMBA')
-                mbusWrite(self.DLGID_CTRL,'2096','interger',100)              # escribo el valor 0 en el registro 2097 para mandar a apagar la bomba
+            self.logs.print_inf(name_function, 'APAGO BOMBA')
+            mbusWrite(self.DLGID_CTRL,'2096','interger',100)              # escribo el valor 0 en el registro 2097 para mandar a apagar la bomba
 
     def getTxState(self):
         '''
