@@ -316,7 +316,7 @@ class ctrl_process(object):
                         self.logs.print_inf(name_function, 'NUEVO VALOR DE ACTUALIZACION DE FRECUENCIA')
                         self.logs.print_inf(name_function, 'SE CONTINUA EL PROCESO DE VARIAR LA FRECUENCIA')
                         self.logs.print_inf(name_function, 'SE MANDA A ACTUALIZAR LA FRECUENCIA {0}'.format(deltaFrequency))
-                        mbusWrite(self.DLGID_CTRL,'2098','interger',deltaFrequency)
+                        mbusWrite(self.DLGID_CTRL,'2098','interger',deltaFrequency+100)
                         self.redis.hset(self.DLGID_CTRL,'lastUpdatedFrequecy',WEB_Frequency)
                         self.redis.hset(self.DLGID_CTRL,'countFrames',0)
                 else:
